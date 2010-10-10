@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://firesheep/skin/preferences.css"?>
+
+<!--
+  websiteEditor.xul
+  Part of the Firesheep project.
+  
+  Copyright (C) 2010 Eric Butler
+  
+  Authors:
+    Eric Butler <eric@codebutler.com>
+  
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<dialog title="Edit Script" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" buttons="accept,cancel,extra1" buttonlabelextra1="Revert" onload="load()" style="width: 600px; height: 400px;" ondialogaccept="return save()" ondialogextra1="revert()">
+  <script src="websiteEditor.js" />
+  <vbox flex="1" id="scriptBox">
+    <textbox flex="1" multiline="true" id="scriptText" oninput="Websites.setDirty(true)" />
+  </vbox>
+</dialog>

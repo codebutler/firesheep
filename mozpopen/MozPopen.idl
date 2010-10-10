@@ -1,0 +1,40 @@
+/*
+ * MozPopen.idl
+ *
+ * Authors:
+ *   Eric Butler <eric@codebutler.com>
+ *
+ *  This file is part of Firesheep.
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+#include "nsISupports.idl"
+#include "nsIArray.idl"
+
+[scriptable, uuid(3b066efc-b07f-481e-9dd5-7330fa914eb1)]
+interface IMozPopenProcess : nsISupports
+{
+	void Init(in string exec,
+	          [array, size_is(argCount)] in string args,
+            in unsigned long argCount);
+
+	void Start();
+	void Stop();
+	boolean IsRunning();
+	PRUint16 Wait();
+	AUTF8String ReadOutputLine();
+	AUTF8String ReadErrorLine();
+};

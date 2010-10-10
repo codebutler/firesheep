@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  websitesPane.xul
+  Part of the Firesheep project.
+  
+  Copyright (C) 2010 Eric Butler
+  
+  Authors:
+    Eric Butler <eric@codebutler.com>
+  
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<overlay id="websitesPaneOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="websitesPane.js" />
+  <prefpane id="websitesPane" label="Websites" flex="1" onpaneload="loadScripts()">
+    <preferences>
+    </preferences>
+    <vbox width="150" height="350" flex="1">
+      <richlistbox id="scriptsList" flex="1" ondblclick="editScript()" onselect="onSelect()" />
+      <hbox>
+        <button label="Add" id="addButton" oncommand="addScript()" />
+        <button label="Edit" id="editButton" oncommand="editScript()" disabled="true" />
+        <button label="Remove" id="removeButton" oncommand="removeScript()" disabled="true" />
+        <spacer flex="1" />
+        <button label="Import" disabled="true" />
+        <button label="Export" disabled="true" />
+      </hbox>
+    </vbox>
+  </prefpane>
+</overlay>
