@@ -37,16 +37,20 @@ var FiresheepConfig = {
   load: function () {
     if (!this._isLoaded) {
       /* Load builtin scripts */
-      var doc = XML(Utils.readAllText(this.scriptsFile));
-      var scripts = doc.Script;
-      for (var i = 0; i < scripts.length(); i++) {
-        var script = scripts[i];
-        var scriptName = script.@name;
-        var scriptText = script.toString();      
-        this._scripts[scriptName] = scriptText;
-      }
-      
-      /* Load user scripts*/
+      var files = this.scriptsDir.directoryEntries;
+      while (files.hasMoreElements()) {
+        var file = files.getNext().QueryInterface(Ci.nsILocalFile);
+        if (file.leafName.match(/\.js$/)) {
+          var scriptText = Utils.readAllText(file);
+
+          var obj = ScriptParser.parseScript(scriptText);
+          var scriptName = (obj && obj.name) ? obj.name : file.leafName;
+          
+          this._scripts[scriptName] = scriptText;
+        }
+      }  
+     
+      /* Load user scripts */
       if (this.configFile.exists()) {
         doc = XML(Utils.readAllText(this.configFile));
         scripts = doc.Script;    
@@ -107,11 +111,11 @@ var FiresheepConfig = {
     return file;
   },
   
-  get scriptsFile () {
+  get scriptsDir () {
     var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
     var file = em.getInstallLocation('firesheep@codebutler.com').location;
     file.append('firesheep@codebutler.com');
-    file.append('scripts.xml');
+    file.append('handlers');
     return file;
   },
 
