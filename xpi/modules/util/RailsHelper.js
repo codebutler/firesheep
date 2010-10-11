@@ -26,8 +26,9 @@ Components.utils.import('resource://firesheep/util/RubyMarshal.js');
 var EXPORTED_SYMBOLS = [ 'RailsHelper' ];
 
 var RailsHelper = {
-  parseSessionCookie: function (cookie) {
-    var data = cookie.split('--')[0];
+  parseSessionCookie: function (cookieValue) {
+    cookieValue = unescape(cookieValue.replace('+', ' '));
+    var data = cookieValue.split('--')[0];
     data = unescape(unescape(data));
     data = data.replace(/\n/g, '');
     data = Base64.decode(data);

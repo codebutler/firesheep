@@ -179,7 +179,7 @@ function onResultDoubleClick () {
       var cookieSvc = Cc["@mozilla.org/cookieService;1"].getService(Ci.nsICookieService);
       for (var cookieName in result.firstPacket.cookies) {
         var cookieValue = result.firstPacket.cookies[cookieName];
-        var cookieString = escape(cookieName) + '=' + escape(cookieValue) + ';domain=.' + cookieUri.host;
+        var cookieString = cookieName + '=' + cookieValue + ';domain=.' + cookieUri.host;
         cookieSvc.setCookieString(cookieUri, null, cookieString, null);
       }
     

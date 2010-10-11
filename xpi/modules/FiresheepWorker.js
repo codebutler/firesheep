@@ -209,7 +209,7 @@ Result.prototype = {
     var cookies = [];
     if (this.session) {
       for (var cookieName in this.session) {
-        var cookieString = escape(cookieName) + '=' + escape(this.session[cookieName]);
+        var cookieString = cookieName + '=' + this.session[cookieName];
         cookies.push(cookieString);
       }
     }
@@ -259,7 +259,7 @@ function parseCookies(str) {
           var name  = pair.substring(0, index);
           var value = pair.substr(index+1);
           if (name.length && value.length)
-            cookies[name] = unescape(value.replace(/\+/g, " "));
+            cookies[name] = value;
       }
     });
   }
