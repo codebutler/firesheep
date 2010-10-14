@@ -2,6 +2,7 @@
 //   Ian Gallagher <crash@neg9.org>
 register({
   name: 'Google',
+  url: 'http://www.google.com/',
   domains: [ 'google.com' ],
   sessionCookieNames: [ 'SID', 'NID', 'HSID', 'PREF' ],
 
@@ -11,7 +12,6 @@ register({
   },
 
   identifyUser: function() {
-    this.siteUrl = 'http://www.google.com/';
     var resp = this.httpGet(this.siteUrl);
     this.userName = resp.body.querySelectorAll(".gb4")[0].textContent;
   }
