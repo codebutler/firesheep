@@ -61,10 +61,6 @@ var Utils = {
     return data;
   },
   
-  all: function (array, func) {
-    return array.map(func).indexOf(false) == -1;
-  },
-  
   md5: function (str) {
     var converter =
       Cc["@mozilla.org/intl/scriptableunicodeconverter"].
@@ -126,5 +122,11 @@ var Utils = {
       .parseFragment(aHTMLString, false, null, body));
 
     return body;
+  },
+  
+  generateUUID: function () {
+    var uuidGenerator = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
+    var uuid = uuidGenerator.generateUUID();
+    return uuid.toString();
   }
 };

@@ -23,9 +23,16 @@
 Components.utils.import('resource://firesheep/Firesheep.js');
 
 function load() {
-  this.name = window.arguments[0];
+  this.id     = window.arguments[0];
   this.isUser = window.arguments[1];
   revert();
+  
+  if (!this.isUser) {
+    document.getElementById('scriptText').editable = false;
+    document.getElementById('scriptText').readonly = true;
+    document.documentElement.getButton('accept').disabled = true;
+    document.documentElement.getButton('extra1').disabled = true;
+  }
 }
 
 function save () {
@@ -34,19 +41,9 @@ function save () {
   var isValid, errors;
   [ isValid, error ] = Firesheep.config.validateScript(text);
   
-  if (isValid) {
-    var name = this.name;
-    if (!this.isUser) {
-      name = prompt("Enter Name", this.name + ' (Copy)');
-      if (!name || name == '')
-        return false;
-      if (Firesheep.config.scripts[name]) {
-        alert('Name already taken');
-        return false;
-      }
-    }
-    Firesheep.config.saveScript(name, text);
-  } else
+  if (isValid)
+    Firesheep.config.saveScript(this.id, text);
+  else
     alert(error);
     
   return isValid;
@@ -55,7 +52,7 @@ function save () {
 function revert () {
   var textBox = document.getElementById("scriptText");
   if (this.isUser)
-    textBox.value = Firesheep.config.userScripts[this.name];
+    textBox.value = Firesheep.config.userScripts[this.id];
   else
-    textBox.value = Firesheep.config.scripts[this.name];
+    textBox.value = Firesheep.builtinScripts[this.id];
 }

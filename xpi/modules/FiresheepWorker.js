@@ -22,6 +22,7 @@
 
 Components.utils.import('resource://firesheep/util/Observers.js');
 Components.utils.import('resource://firesheep/util/Utils.js');
+Components.utils.import('resource://firesheep/util/underscore.js');
 Components.utils.import('resource://firesheep/util/CookieMonster.js');
 
 const Cc = Components.classes;
@@ -75,14 +76,25 @@ FiresheepWorker.prototype = {
   
   _processPacket: function (packet) {   
     var host = packet.host;
+    
+    // Strip port number, if any.
+    if (host.indexOf(':') > 0)
+      host = host.slice(0, host.indexOf(':'));
+    
+    var handlers = this._captureSession._handlers;
         
-    var handler = this._captureSession._core.domainHandlers[host];
+    var handler = handlers.domains[host];
     if (!handler) {
       // Try stripping off subdomains
-      host = (host.indexOf('.') > 0) ? host.split('.').slice(-2).join('.') : host;
-      handler = this._captureSession._core.domainHandlers[host];
-      if (!handler)
-        return;
+      host = (host.indexOf('.') > 0) ? host.split('.').slice(-2).join('.') : host;  
+      handler = handlers.domains[host];
+      if (!handler) {
+        handler = _.find(handlers.dynamic, function (h) {
+          return h.matchPacket(packet);
+        });
+        if (!handler)
+          return;
+      }
     }
 
     packet.cookieString = packet.cookies;
@@ -107,7 +119,7 @@ FiresheepWorker.prototype = {
     // Default session handling
     if (handler && handler.sessionCookieNames) {
       var theSession = {};      
-      var foundAll = Utils.all(handler.sessionCookieNames, function (cookieName) {
+      var foundAll = _.all(handler.sessionCookieNames, function (cookieName) {
         var cookieValue = packet.cookies[cookieName];
         if (cookieValue) {
           theSession[cookieName] = cookieValue;

@@ -30,74 +30,45 @@ const Ci = Components.interfaces;
 var EXPORTED_SYMBOLS = [ 'FiresheepConfig' ];
 
 var FiresheepConfig = {
-  _scripts: {},
   _userScripts: {},
   _isLoaded: false,
 
   load: function () {
     if (!this._isLoaded) {
-      /* Load builtin scripts */
-      var files = this.scriptsDir.directoryEntries;
-      while (files.hasMoreElements()) {
-        var file = files.getNext().QueryInterface(Ci.nsILocalFile);
-        if (file.leafName.match(/\.js$/)) {
-          var scriptText = Utils.readAllText(file);
-
-          var obj = ScriptParser.parseScript(scriptText);
-          var scriptName = (obj && obj.name) ? obj.name : file.leafName;
-          
-          this._scripts[scriptName] = scriptText;
-        }
-      }  
-     
       /* Load user scripts */
       if (this.configFile.exists()) {
         doc = XML(Utils.readAllText(this.configFile));
         scripts = doc.Script;    
         for (var i = 0; i < scripts.length(); i++) {
           var script = scripts[i];
-          var scriptName = script.@name;
+          var scriptId   = script.@id;
           var scriptText = script.toString();      
-          this._userScripts[scriptName] = scriptText;
+          this._userScripts[scriptId] = scriptText;
         }
       }      
       this._isLoaded = true;
     }
   },
 
-  saveScript: function (name, scriptText) {
-    var isNew = (this._userScripts[name] == null);
+  saveScript: function (id, scriptText) {
+    var isNew = (this._userScripts[id] == null);
   
-    this._userScripts[name] = scriptText;
+    this._userScripts[id] = scriptText;
     this._writeScripts();   
   
     var action = (isNew ? 'script_added' : 'script_updated');
-    Observers.notify('Firesheep', { action: action, name: name });
+    Observers.notify('Firesheep', { action: action, id: id });
   },
 
-  removeScript: function (name) {
-    delete this._userScripts[name];
+  removeScript: function (id) {
+    delete this._userScripts[id];
     this._writeScripts();
-    Observers.notify('Firesheep', { action: 'script_removed', name: name });
-  },
-
-  renameScript: function (oldName, newName) {
-    var script = this._userScripts[oldName];
-    this._userScripts[newName] = script;
-    delete this._userScripts[oldName];
-  
-    this._writeScripts();
-  
-    Observers.notify('Firesheep', { action: 'script_renamed', old_name: oldName, new_name: newName })
-  },
-  
-  get scripts() {
-    return this._scripts;
+    Observers.notify('Firesheep', { action: 'script_removed', id: id });
   },
   
   get userScripts() {
     return this._userScripts;
-  },
+  },  
 
   validateScript: function (scriptText) {    
     return ScriptParser.validateScript(scriptText);
@@ -105,26 +76,18 @@ var FiresheepConfig = {
 
   get configFile () {
     var file = Cc["@mozilla.org/file/directory_service;1"]
-                         .getService(Ci.nsIProperties)
-                         .get("ProfD", Ci.nsILocalFile);
+      .getService(Ci.nsIProperties)
+      .get("ProfD", Ci.nsILocalFile);
     file.append("firesheep-config.xml");
-    return file;
-  },
-  
-  get scriptsDir () {
-    var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
-    var file = em.getInstallLocation('firesheep@codebutler.com').location;
-    file.append('firesheep@codebutler.com');
-    file.append('handlers');
     return file;
   },
 
   _writeScripts: function () {
     var doc = <Scripts />;
   
-    for (var name in this._userScripts) {
-      var scriptText = this._userScripts[name];
-      var script = <Script name={name}>{scriptText}</Script>;
+    for (var id in this._userScripts) {
+      var scriptText = this._userScripts[id];
+      var script = <Script id={id}>{scriptText}</Script>;
       doc.appendChild(script);
     }
   

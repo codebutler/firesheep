@@ -35,6 +35,11 @@ var ScriptParser = {
     return [ isValid, errorText ];
   },
   
+  getName: function (scriptText) {
+    var obj = this.parseScript(scriptText);
+    return (obj) ? obj.name : null;
+  },
+  
   _loadScript: function (scriptText) {
     var registerCalled = false;
     var errorText      = null;
@@ -47,7 +52,7 @@ var ScriptParser = {
 
         if (obj && typeof(obj) == 'object') {
           // Validate the object
-          var fields = [ 'domains' ];
+          var fields = [ 'name', 'domains' ];
           for (var x in fields) {
             var field = fields[x];
             if (obj[field] == null) {
@@ -58,7 +63,7 @@ var ScriptParser = {
           if (missingFields.length > 0) {
             errorText = 'Missing required field(s): ' + missingFields.join(', ');
           } else {
-            objectValid = true;
+            //objectValid = true;
           }
         } else {
           errorText = "register() requires one object parameter.";

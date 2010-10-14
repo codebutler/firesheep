@@ -24,6 +24,8 @@ Components.utils.import('resource://firesheep/util/Observers.js');
 Components.utils.import('resource://firesheep/util/ScriptParser.js');
 Components.utils.import('resource://firesheep/FiresheepConfig.js');
 Components.utils.import('resource://firesheep/FiresheepSession.js');
+Components.utils.import('resource://firesheep/util/Utils.js');
+Components.utils.import('resource://firesheep/util/underscore.js');
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
@@ -35,8 +37,6 @@ var Firesheep = {
   
   _captureSession: null,
   
-  _domains: {},
-  
   _loaded: false,
   
   _results: null,
@@ -45,8 +45,7 @@ var Firesheep = {
     if (!this._loaded) {
       this.config.load();
       
-      this.reloadScripts();
-      this.clearSession();    
+      this.clearSession();
       
       this._loaded = true;
       
@@ -122,32 +121,57 @@ var Firesheep = {
     return this._results;
   },
   
-  reloadScripts: function () {
-    var domains = {};
+  get handlers () {
+    var handlers = {
+      domains: {},
+      dynamic: []
+    };
     
-    [ this.config.scripts, this.config.userScripts ].forEach(function (scripts) {
-      for (var scriptName in scripts) {
-        var scriptText = scripts[scriptName];
-        var obj = ScriptParser.parseScript(scriptText);
-        if (obj != null) {
-          obj.name = scriptName;
-
-          // Sort by domain.
-          obj.domains.forEach(function (domain) {
-            domains[domain] = obj;
-          });
-        } else {
-          dump('Failed to load script: ' + scriptName + '\n');
+    function loadScript(scriptText, scriptId) {
+      var obj = ScriptParser.parseScript(scriptText);
+      if (obj != null) {
+        // Sort by domain.
+        obj.domains.forEach(function (domain) {
+          handlers.domains[domain] = obj;
+        });
+        
+        // Dynamic handlers
+        if (typeof(obj.matchPacket) == 'function') {
+          dynamic.push(obj);
         }
+      } else {
+        dump('Failed to load script: ' + scriptName + '\n');
       }
-    });
-    this._domains = domains;
+    }
+    
+    _.each(this.builtinScripts, loadScript);
+    _.each(this.config.userScripts, loadScript);
+    
+    return handlers;
   },
   
-  get domainHandlers () {
-    return this._domains;
+  get _scriptsDir () {
+    var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
+    var file = em.getInstallLocation('firesheep@codebutler.com').location;
+    file.append('firesheep@codebutler.com');
+    file.append('handlers');
+    return file;
   },
   
+  get builtinScripts () {
+    var builtinScripts = {};
+    var files = this._scriptsDir.directoryEntries;
+    while (files.hasMoreElements()) {
+      var file = files.getNext().QueryInterface(Ci.nsILocalFile);
+      if (file.leafName.match(/\.js$/)) {
+        var scriptId = file.leafName;
+        var scriptText = Utils.readAllText(file);
+        builtinScripts[scriptId] = scriptText;
+      }
+    }
+    return builtinScripts;
+  },
+    
   _handleResult: function (result) {
     this._results.push(result);
     Observers.notify('Firesheep', { action: 'result_added', result: result });

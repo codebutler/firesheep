@@ -21,21 +21,19 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Components.utils.import('resource://firesheep/Firesheep.js');
+Components.utils.import('resource://firesheep/util/ScriptParser.js');
 Components.utils.import('resource://firesheep/util/Observers.js');
+Components.utils.import('resource://firesheep/util/underscore.js');
+Components.utils.import('resource://firesheep/util/Utils.js');
 
 function loadScripts () {
   try {
-    /* Add builtin scripts */
-    for (var name in Firesheep.config.scripts) {
-      var script = Firesheep.config.scripts[name];
-      addListItem(name, false);
-    }    
-    
-    /* Add user scripts */
-    for (var name in Firesheep.config.userScripts) {
-      var script = Firesheep.config.userScripts[name];
-      addListItem(name, true);
-    }
+    _.each(Firesheep.builtinScripts, function (scriptText, scriptId) {
+      addListItem(scriptId, false);
+    });
+    _.each(Firesheep.config.userScripts, function (scriptText, scriptId) {
+      addListItem(scriptId, true);
+    });
     
     Observers.add('Firesheep', observer);
   } catch (e) {
@@ -47,7 +45,8 @@ function addScript () {
   try {
     var name = prompt('Enter a name:');
     if (name != null && name.length > 0) {
-      Firesheep.config.saveScript(name, '');
+      var id = Utils.generateUUID();
+      Firesheep.config.saveScript(id, scriptTemplate(name));
     }
   } catch (e) {
     alert(e);
@@ -72,42 +71,28 @@ function editScript () {
   }
 }
 
-function renameScript () {
-  try {
-    var item = document.getElementById("scriptsList").selectedItem;
-    if (item && item.isUser) {
-      var newName = prompt("New name:", item.value);
-      if (newName && newName.length > 0) {
-        Firesheep.config.renameScript(item.value, newName); 
-      }
-    }
-  } catch (e) {
-    alert(e);
-  }
-}
-
 function observer (data) {
   var list = document.getElementById("scriptsList");
   switch (data.action) {
     case 'script_added':
-      var item = addListItem(data.name, true);
+      var item = addListItem(data.id, true);
       list.selectItem(item);
       break;
     case 'script_removed':
       for (var x = 0; x < list.itemCount; x++) {
         var item = list.getItemAtIndex(x);
-        if (item.value == data.name) {
+        if (item.value == data.id && item.isUser) {
           list.removeItemAt(list.getIndexOfItem(item));
           break;
         }
       }
       break;
-    case 'script_renamed':
+    case 'script_updated':
       for (var x = 0; x < list.itemCount; x++) {
         var item = list.getItemAtIndex(x);
-        if (item.value == data.old_name) {
-          item.nameLabel.value = data.new_name;
-          item.value = data.new_name;
+        if (item.value == data.id && item.isUser) {
+          var name = ScriptParser.getName(Firesheep.config.userScripts[data.id]);
+          item.nameLabel.setAttribute('value', name || data.id);
           break;
         }
       }
@@ -115,18 +100,19 @@ function observer (data) {
   }
 }
 
-function addListItem(name, isUser)
+function addListItem(id, isUser)
 {
   var item = document.createElement('richlistitem');
-  item.value = name;
+  item.value  = id;
   item.isUser = isUser;
   
+  var name = ScriptParser.getName(isUser ? Firesheep.config.userScripts[id] : Firesheep.builtinScripts[id]) || id;
   var hbox = document.createElement("hbox");
   
   var nameLabel = document.createElement('label');
   nameLabel.setAttribute('value', name);
   hbox.appendChild(nameLabel);
-  item.setAttribute('nameLabel', nameLabel);
+  item.nameLabel = nameLabel;
   
   var customLabel = document.createElement('label');
   customLabel.setAttribute('value', (isUser ? '(Custom)' : ''));
@@ -137,7 +123,6 @@ function addListItem(name, isUser)
   
   var list = document.getElementById('scriptsList');
   list.appendChild(item);
-  
   return item;
 }
 
@@ -147,9 +132,17 @@ function onSelect()
 
   var editButton   = document.getElementById('editButton');
   var removeButton = document.getElementById('removeButton');
-  //var renameButton = document.getElementById('renameButton');
 
-  editButton.setAttribute('disabled', !item);
-  removeButton.setAttribute('disabled', !(item && item.isUser));
-  //renameButton.setAttribute('disabled', !(item && item.isUser));
+  editButton.disabled = !item;
+  removeButton.disabled = !(item && item.isUser);
+}
+
+function scriptTemplate(name) {
+  return "register({\n\
+  name: \"" + name + "\",\n\
+  sessionCookieNames: [ /* FIXME */ ],\n\
+  identifyUser: function () {\n\
+    /* FIXME */\n\
+  }\n\
+});";
 }

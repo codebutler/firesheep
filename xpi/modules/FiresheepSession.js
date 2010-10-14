@@ -36,6 +36,7 @@ function FiresheepSession (fs, iface, filter) {
   this._iface       = iface;
   this._filter      = filter;
   this._resultCache = {};
+  this._handlers    = fs.handlers;
 }
 
 FiresheepSession.prototype = {
