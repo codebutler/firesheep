@@ -131,13 +131,15 @@ var Firesheep = {
       var obj = ScriptParser.parseScript(scriptText);
       if (obj != null) {
         // Sort by domain.
-        obj.domains.forEach(function (domain) {
-          handlers.domains[domain] = obj;
-        });
+        if (obj.domains) {
+          obj.domains.forEach(function (domain) {
+            handlers.domains[domain] = obj;
+          });
+        }
         
         // Dynamic handlers
         if (typeof(obj.matchPacket) == 'function') {
-          dynamic.push(obj);
+          handlers.dynamic.push(obj);
         }
       } else {
         dump('Failed to load script: ' + scriptName + '\n');

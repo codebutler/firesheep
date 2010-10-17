@@ -81,38 +81,40 @@ FiresheepWorker.prototype = {
     if (host.indexOf(':') > 0)
       host = host.slice(0, host.indexOf(':'));
     
+    packet.cookieString = packet.cookies;
+    packet.cookies = parseCookies(packet.cookieString);
+
+    packet.queryString = packet.query;
+    packet.query = parseQuery(packet.queryString);
+      
     var handlers = this._captureSession._handlers;
         
     var handler = handlers.domains[host];
     if (!handler) {
       // Try stripping off subdomains
-      host = (host.indexOf('.') > 0) ? host.split('.').slice(-2).join('.') : host;  
-      handler = handlers.domains[host];
+      var tmpHost = (host.indexOf('.') > 0) ? host.split('.').slice(-2).join('.') : host;  
+      handler = handlers.domains[tmpHost];
       if (!handler) {
         handler = _.find(handlers.dynamic, function (h) {
           return h.matchPacket(packet);
         });
         if (!handler)
           return;
+      } else {
+        host = tmpHost;
       }
     }
-
-    packet.cookieString = packet.cookies;
-    packet.cookies = parseCookies(packet.cookieString);
     
-    packet.queryString = packet.query;
-    packet.query = parseQuery(packet.queryString);
-
-    // FIXME: Call matchPacket() on any handlers that support it.
+    if (handler.domains)
+      host = handler.domains[0];
     
-    host = handler.domains[0];
     var result = new Result({
-      siteName: (handler && handler.name) ? handler.name : host, 
+      siteName: (handler && handler.name) ? handler.name : host,
       siteUrl:  (handler && handler.url)  ? handler.url  : 'http://' + host + '/',
       siteIcon: (handler && handler.icon) ? handler.icon : 'http://' + host + '/favicon.ico',
-
+      
       session:  null,
-
+      
       firstPacket: packet
     });
     
@@ -219,8 +221,8 @@ Result.prototype = {
   },
   _createRequest: function (method, url, data) {
     var cookies = [];
-    if (this.session) {
-      for (var cookieName in this.session) {
+    if (this.firstPacket.cookies) {
+      for (var cookieName in this.firstPacket.cookies) {
         var cookieString = cookieName + '=' + this.session[cookieName];
         cookies.push(cookieString);
       }
