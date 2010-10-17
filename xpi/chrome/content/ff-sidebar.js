@@ -85,7 +85,8 @@ var callback = function (data) {
     }
   } catch (e) {
     dump(e + "\n");
-    dump(e.stack + "\n");
+    if (e.stack)
+      dump(e.stack + "\n");
     var errors = document.getElementById('errors');
     errors.appendNotification(e.toString());
     updateState();
@@ -138,7 +139,7 @@ function addResult (result) {
   var vbox = document.createElement('vbox');
   
   var label = document.createElement('label');  
-  if (!result.userError) {
+  if (!result.error) {
     if (result.userName) {
       label.setAttribute('value', result.userName);
       label.setAttribute('style', 'font-weight: bold');
@@ -170,6 +171,13 @@ function onResultDoubleClick () {
     if (selectedItem) {
       var id = selectedItem.getAttribute('resultId');
       var result = Firesheep.results[id];
+      
+      if (result.handler.spoofUserAgent) {
+        // FIXME!
+        var errors = document.getElementById('errors');
+        errors.appendNotification('User agent spoofing not yet implemented.');
+        return;
+      }
 
       var ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
       var cookieUri = ios.newURI(result.siteUrl, null, null);

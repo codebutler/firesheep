@@ -35,8 +35,8 @@
         <button label="Edit" id="editButton" oncommand="editScript()" disabled="true" />
         <button label="Remove" id="removeButton" oncommand="removeScript()" disabled="true" />
         <spacer flex="1" />
-        <button label="Import" disabled="true" />
-        <button label="Export" disabled="true" />
+        <button label="Import" oncommand="importScript()" />
+        <button label="Export" id="exportButton" oncommand="exportScript()" disabled="true" />
       </hbox>
     </vbox>
   </prefpane>

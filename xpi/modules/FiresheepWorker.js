@@ -115,7 +115,9 @@ FiresheepWorker.prototype = {
       
       sessionId: null,
       
-      firstPacket: packet
+      firstPacket: packet,
+      
+      handler: handler
     });
     
     // Default session handling
@@ -141,8 +143,17 @@ FiresheepWorker.prototype = {
     }
     
     // Custom packet processing
-    if (handler && typeof(handler.processPacket) == 'function')
-      handler.processPacket.apply(result, [ packet ]);
+    if (handler && typeof(handler.processPacket) == 'function') {
+      try {
+        handler.processPacket.apply(result, [ packet ]);
+      } catch (e) {           
+        var errorText = 'Error in ' + handler.name + ' processPacket(): ' + e;
+        this._runOnMainThread(function () {
+          Observers.notify('Firesheep', { action: 'error', error: errorText });
+        });
+        return;
+      }
+    }
 
     // If no session after processPacket(), ignore packet.
     if (!result.sessionId) {
@@ -160,7 +171,7 @@ FiresheepWorker.prototype = {
         try {
           handler.identifyUser.apply(result);
         } catch (e) {
-          result.userError = e;
+          result.error = e;
         }
       });
     }
@@ -219,7 +230,7 @@ Result.prototype = {
   httpPost: function (url, data) {
     return this._createRequest('POST', url, data);
   },
-  _createRequest: function (method, url, data) {
+  _createRequest: function (method, url, data) {    
     var cookies = [];
     if (this.firstPacket.cookies) {
       for (var cookieName in this.firstPacket.cookies) {
@@ -230,10 +241,15 @@ Result.prototype = {
     
     var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance();
     req.open(method, url, false);
+    var channel = req.channel.QueryInterface(Ci.nsIHttpChannel);
+    
+    if (this.handler.spoofUserAgent) {
+      channel.setRequestHeader('User-Agent', this.firstPacket.userAgent, false);
+    }
+    
     if (cookies.length > 0) {
       // Simply setting the 'Cookie' header here does not work: cookies from the browser
-      // get appended later on. CookieMonster takes care of this problem. 
-      var channel = req.channel.QueryInterface(Ci.nsIHttpChannel);
+      // get appended later on. CookieMonster takes care of this problem.
       CookieMonster.addChannel(channel, cookies.join('; '));
     }
     
