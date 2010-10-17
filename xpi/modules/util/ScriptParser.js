@@ -49,22 +49,15 @@ var ScriptParser = {
       var register = function (obj) {
         registerCalled = true;
         var missingFields = [];
-
         if (obj && typeof(obj) == 'object') {
-          // Validate the object
-          var fields = [ 'name', 'domains' ];
-          for (var x in fields) {
-            var field = fields[x];
-            if (obj[field] == null) {
-              missingFields.push(field);
-            }
-          }
-
-          if (missingFields.length > 0) {
-            errorText = 'Missing required field(s): ' + missingFields.join(', ');
-          } else {
-            //objectValid = true;
-          }
+          if (!obj['name'])
+            missingFields.push('name');
+          if (!obj['domains'] && !obj.matchPacket)
+            missingFields.push('domains');
+          if (!obj['sessionCookieNames'] && !obj.matchPacket)
+            missingFields.push('sessionCookieNames');
+          if (missingFields.length > 0) 
+            errorText = 'Missing fields: ' + missingFields.push(',');
         } else {
           errorText = "register() requires one object parameter.";
         }
@@ -76,14 +69,15 @@ var ScriptParser = {
   
     try {
       scriptWrapper.apply({});
-    
       if (!registerCalled) {
         errorText = "Missing call to register()";
       }
-    
     } catch (e) {
       errorText = "Script Error: " + e;
     }
+    
+    if (errorText)
+      theObj = null;
   
     return [ !errorText, errorText, theObj ];
   }
