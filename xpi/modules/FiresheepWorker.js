@@ -143,8 +143,17 @@ FiresheepWorker.prototype = {
     }
     
     // Custom packet processing
-    if (handler && typeof(handler.processPacket) == 'function')
-      handler.processPacket.apply(result, [ packet ]);
+    if (handler && typeof(handler.processPacket) == 'function') {
+      try {
+        handler.processPacket.apply(result, [ packet ]);
+      } catch (e) {           
+        var errorText = 'Error in ' + handler.name + ' processPacket(): ' + e;
+        this._runOnMainThread(function () {
+          Observers.notify('Firesheep', { action: 'error', error: errorText });
+        });
+        return;
+      }
+    }
 
     // If no session after processPacket(), ignore packet.
     if (!result.sessionId) {
@@ -162,7 +171,7 @@ FiresheepWorker.prototype = {
         try {
           handler.identifyUser.apply(result);
         } catch (e) {
-          result.userError = e;
+          result.error = e;
         }
       });
     }
