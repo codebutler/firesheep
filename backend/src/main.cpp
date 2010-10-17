@@ -63,14 +63,14 @@ int main(int argc, const char *argv[])
 void received_packet(HttpPacket *packet)
 {
 	json_spirit::Object data_obj;
-	data_obj.push_back(json_spirit::Pair("from",       packet->from()));
-	data_obj.push_back(json_spirit::Pair("to",         packet->to()));
-	data_obj.push_back(json_spirit::Pair("method",     packet->method()));
-	data_obj.push_back(json_spirit::Pair("path",       packet->path()));
-	data_obj.push_back(json_spirit::Pair("query",      packet->query()));
-	data_obj.push_back(json_spirit::Pair("host",       packet->host()));
-	data_obj.push_back(json_spirit::Pair("cookies",    packet->cookies()));
-	data_obj.push_back(json_spirit::Pair("user_agent", packet->user_agent()));
+	data_obj.push_back(json_spirit::Pair("from",      packet->from()));
+	data_obj.push_back(json_spirit::Pair("to",        packet->to()));
+	data_obj.push_back(json_spirit::Pair("method",    packet->method()));
+	data_obj.push_back(json_spirit::Pair("path",      packet->path()));
+	data_obj.push_back(json_spirit::Pair("query",     packet->query()));
+	data_obj.push_back(json_spirit::Pair("host",      packet->host()));
+	data_obj.push_back(json_spirit::Pair("cookies",   packet->cookies()));
+	data_obj.push_back(json_spirit::Pair("userAgent", packet->user_agent()));
 	
 	string data = json_spirit::write_string(json_spirit::Value(data_obj), false);
 	cout << data << endl;		
