@@ -26,6 +26,9 @@ Components.utils.import('resource://firesheep/util/Observers.js');
 Components.utils.import('resource://firesheep/util/underscore.js');
 Components.utils.import('resource://firesheep/util/Utils.js');
 
+const Cc = Components.classes;
+const Ci = Components.interfaces;
+
 function loadScripts () {
   try {
     _.each(Firesheep.builtinScripts, function (scriptText, scriptId) {
@@ -66,6 +69,41 @@ function editScript () {
     var item = document.getElementById("scriptsList").selectedItem;
     if (item)
       window.openDialog('websiteEditor.xul', null, 'modal', item.value, item.isUser);
+  } catch (e) {
+    alert(e);
+  }
+}
+
+function importScript () {
+  try {
+    var nsIFilePicker = Ci.nsIFilePicker;
+    var fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+    fp.init(window, "Select a File", nsIFilePicker.modeOpen);
+    fp.appendFilter("Firesheep Scripts","*.js");
+    if (fp.show() == nsIFilePicker.returnOK) {    
+      var scriptId   = Utils.generateUUID();
+      var scriptText = Utils.readAllText(fp.file);
+      Firesheep.config.saveScript(scriptId, scriptText);
+    }
+  } catch (e) {
+    alert(e);
+  }
+}
+
+function exportScript () {
+  try {
+    var item = document.getElementById("scriptsList").selectedItem;
+    if (item) {
+      var nsIFilePicker = Ci.nsIFilePicker;
+      var fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+      fp.init(window, "Select a File", nsIFilePicker.modeSave);
+      fp.appendFilter("Firesheep Scripts","*.js");
+      fp.defaultString = item.nameLabel.value + '.js';
+      if (fp.show() == nsIFilePicker.returnOK) {
+        var text = Firesheep.config.userScripts[item.value];
+        Utils.writeAllText(fp.file, text)
+      }
+    }
   } catch (e) {
     alert(e);
   }
@@ -132,14 +170,18 @@ function onSelect()
 
   var editButton   = document.getElementById('editButton');
   var removeButton = document.getElementById('removeButton');
+  var exportButton = document.getElementById('exportButton');
 
   editButton.disabled = !item;
+  editButton.label = item.isUser ? 'Edit' : 'View';
+  exportButton.disabled = !(item && item.isUser);
   removeButton.disabled = !(item && item.isUser);
 }
 
 function scriptTemplate(name) {
   return "register({\n\
   name: \"" + name + "\",\n\
+  domains: [ /* FIXME */ ],\n\
   sessionCookieNames: [ /* FIXME */ ],\n\
   identifyUser: function () {\n\
     /* FIXME */\n\

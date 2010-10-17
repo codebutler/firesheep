@@ -57,7 +57,7 @@ var ScriptParser = {
           if (!obj['sessionCookieNames'] && !obj.matchPacket)
             missingFields.push('sessionCookieNames');
           if (missingFields.length > 0) 
-            errorText = 'Missing fields: ' + missingFields.push(',');
+            errorText = 'Missing fields: ' + missingFields.join(',');
         } else {
           errorText = "register() requires one object parameter.";
         }
