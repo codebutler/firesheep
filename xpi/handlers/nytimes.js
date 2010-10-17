@@ -8,7 +8,7 @@ register({
 
   processPacket: function () {
     var nyt_d = this.firstPacket.cookies['nyt-d'];
-    this.id = nyt_d;
+    this.sessionId = nyt_d;
   },
 
   identifyUser: function() {

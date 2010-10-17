@@ -113,7 +113,7 @@ FiresheepWorker.prototype = {
       siteUrl:  (handler && handler.url)  ? handler.url  : 'http://' + host + '/',
       siteIcon: (handler && handler.icon) ? handler.icon : 'http://' + host + '/favicon.ico',
       
-      session:  null,
+      sessionId: null,
       
       firstPacket: packet
     });
@@ -132,7 +132,7 @@ FiresheepWorker.prototype = {
       });
       
       if (foundAll) {
-        result.session = theSession;
+        result.sessionId = theSession;
       } else {
         // If sessionCookieNames was specified but all cookies weren't found,
         // ignore packet.
@@ -145,7 +145,7 @@ FiresheepWorker.prototype = {
       handler.processPacket.apply(result, [ packet ]);
 
     // If no session after processPacket(), ignore packet.
-    if (!result.session) {
+    if (!result.sessionId) {
       return;
     }
     
@@ -166,7 +166,7 @@ FiresheepWorker.prototype = {
     }
     
     // Check again if packet has been seen, identifyUser() could
-    // have set cache id.
+    // have changed sessionId.
     if (this._findResult(result)) {
       return;
     }
@@ -223,7 +223,7 @@ Result.prototype = {
     var cookies = [];
     if (this.firstPacket.cookies) {
       for (var cookieName in this.firstPacket.cookies) {
-        var cookieString = cookieName + '=' + this.session[cookieName];
+        var cookieString = cookieName + '=' + this.firstPacket.cookies[cookieName];
         cookies.push(cookieString);
       }
     }
@@ -292,11 +292,5 @@ function parseQuery(str) {
 }
 
 function makeCacheKey(result) {
-  var session = null;
-  if (result.id)
-    session = result.id;
-  else
-    session = result.session;
-  return Utils.md5(result.siteName + 
-    JSON.stringify(session));
+  return Utils.md5(result.siteName + JSON.stringify(result.sessionId));
 }

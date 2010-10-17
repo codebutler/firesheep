@@ -12,10 +12,10 @@ register({
     var cookie = this.firstPacket.cookies['_basecamp_session'];
     var railsSession = RailsHelper.parseSessionCookie(cookie);
     if (!railsSession.user_id) {
-      this.session = null;
+      this.sessionId = null;
       return;
     }
-    this.id = railsSession.session_id;
+    this.sessionId = railsSession.session_id;
     this.firstPacket._basecamp_session = railsSession;
   },
 

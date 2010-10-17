@@ -13,14 +13,14 @@ register({
   },
 
   processPacket: function () {
+    this.siteUrl += 'wp-admin/';
+  
     for (var cookieName in this.firstPacket.cookies) {
       if (cookieName.match(/^wordpress_[0-9a-fA-F]{32}$/)) {
-        this.session = {};
-        this.session[cookieName] = this.firstPacket.cookies[cookieName];
+        this.sessionId = this.firstPacket.cookies[cookieName];
+        break;
       }
     }
-
-    this.siteUrl += 'wp-admin/';
   },
 
   identifyUser: function () {

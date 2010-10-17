@@ -7,7 +7,7 @@ register({
 
   processPacket: function () {
     var cookie = this.firstPacket.cookies['ext_id'];
-    this.id = cookie;
+    this.sessionId = cookie;
   },
 
   identifyUser: function () {

@@ -9,14 +9,13 @@ register({
 
   processPacket: function () {
     var cookie = this.firstPacket.cookies['_twitter_sess'];
-    if (!cookie) return;
 
     var railsSession = RailsHelper.parseSessionCookie(cookie);
 
     // A Twitter session cookie contains information other than just user id,
     // and is constantly changing. Override ID to include only user info, 
     // avoiding duplicate results for the same person.
-    this.id = railsSession.user + railsSession.password_token;
+    this.sessionId = railsSession.user + railsSession.password_token;
     
     // Store around for debugging purposes.
     this.firstPacket._twitter_sess = railsSession;

@@ -8,7 +8,7 @@ register({
 
   processPacket: function () {
     var hsid = this.firstPacket.cookies['HSID'];
-    this.id = hsid;
+    this.sessionId = hsid;
   },
 
   identifyUser: function() {

@@ -10,13 +10,11 @@ register({
 
     var cookie = this.firstPacket.cookies['_enc_sess'];
     var railsSession = RailsHelper.parseSessionCookie(cookie);
-  
     if (!railsSession.user_id) {
-      this.session = null;
+      this.sessionId = null;
       return;
     }
-  
-    this.id = railsSession.session_id;
+    this.sessionId = railsSession.session_id;
     this.firstPacket._enc_sess = railsSession;
   },
 

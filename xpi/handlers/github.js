@@ -9,10 +9,10 @@ register({
     var cookie = this.firstPacket.cookies['_github_ses'];
     var railsSession = RailsHelper.parseSessionCookie(cookie);
     if (!railsSession.user) {
-      this.session = null;
+      this.sessionId = null;
       return;
     }
-    this.id = railsSession.fingerprint;
+    this.sessionId = railsSession.fingerprint;
     this.firstPacket._github_ses = railsSession;
   },
 
