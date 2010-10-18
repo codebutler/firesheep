@@ -24,13 +24,16 @@
 -->
 
 <overlay id="capturePaneOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <prefpane id="capturePane" label="Capture" flex="1">
+  <script src="capturePane.js" />
+  <prefpane id="capturePane" label="Capture" flex="1" onpaneload="loadInterfaces()">
     <preferences>
       <preference id="pref-interface" name="firesheep.capture_interface" type="string" />
     </preferences>
     <hbox flex="1" align="center">
       <label control="capture_interface" value="Interface:" />
-      <textbox id="captureInterfaceTextBox" preference="pref-interface" />
+      <menulist id="captureInterfaceMenuList" preference="pref-interface">
+        <menupopup />
+      </menulist>
     </hbox>
   </prefpane>
 </overlay>

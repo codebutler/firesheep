@@ -44,26 +44,17 @@ FiresheepSession.prototype = {
     try {
       if (this.isCapturing)
         return;
-
-      var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
-      
-      var file = em.getInstallLocation("firesheep@codebutler.com").location;
-      file.append("firesheep@codebutler.com");
-      file.append("backend");
-      file.append("firesheep-backend");
-      
-      var path = file.path;
       
       // Ensure the binary is actually executable.
       var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
       if (osString != 'WINNT') {
         // FIXME: This should really use chmod(2) directly.
-        Utils.runCommand('chmod', [ 'a+x', path ]);
+        Utils.runCommand('chmod', [ 'a+x', Firesheep.backendPath ]);
       }
       
       // Tell backend to repair owner/setuid. Wil return succesfully if everything is already OK.
       this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
-      this._process.Init(path, [ '--fix-permissions' ], 1);
+      this._process.Init(Firesheep.backendPath, [ '--fix-permissions' ], 1);
       this._process.Start();
       var exitCode = this._process.Wait();
       if (exitCode != 0) {
@@ -71,7 +62,7 @@ FiresheepSession.prototype = {
       }
       
       this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
-      this._process.Init(path, [ this._iface, this._filter ], 2);
+      this._process.Init(Firesheep.backendPath, [ this._iface, this._filter ], 2);
       this._process.Start();
       if (this._process.IsRunning()) {
         this._thread = Cc["@mozilla.org/thread-manager;1"].getService().newThread(0);

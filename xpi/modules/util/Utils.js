@@ -23,7 +23,7 @@
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 
-var EXPORTED_SYMBOLS = [ 'Utils' ];
+var EXPORTED_SYMBOLS = [ 'Utils', 'Cc', 'Ci' ];
 
 var Utils = {
   // http://code.google.com/p/extensiondev/

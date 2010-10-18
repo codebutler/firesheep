@@ -71,27 +71,30 @@ vector<InterfaceInfo> OSXPlatform::interfaces()
   
   int arraySize = CFArrayGetCount(services);
   for (int i = 0; i < arraySize; i++) {
-      SCNetworkServiceRef service = (SCNetworkServiceRef) CFArrayGetValueAtIndex(services, i);
+    SCNetworkServiceRef service = (SCNetworkServiceRef) CFArrayGetValueAtIndex(services, i);
+    
+    if (SCNetworkServiceGetEnabled(service)) {
       SCNetworkInterfaceRef iface = SCNetworkServiceGetInterface(service);
-      
+    
       CFStringRef serviceName = SCNetworkServiceGetName(service);
       char cServiceName[(CFStringGetLength(serviceName) * 4) + 1];
       CFStringGetCString(serviceName, cServiceName, sizeof(cServiceName), kCFStringEncodingUTF8);
-      
+    
       CFStringRef type = SCNetworkInterfaceGetInterfaceType(iface);
       if (CFStringCompare(type, CFSTR("Ethernet"), 0) == kCFCompareEqualTo ||
-          CFStringCompare(type, CFSTR("IEEE80211"), 0) == kCFCompareEqualTo) {
-            
-          char cType[(CFStringGetLength(type) * 4) + 1];
-          CFStringGetCString(type, cType, sizeof(cType), kCFStringEncodingUTF8);
+        CFStringCompare(type, CFSTR("IEEE80211"), 0) == kCFCompareEqualTo) {
+        
+        char cType[(CFStringGetLength(type) * 4) + 1];
+        CFStringGetCString(type, cType, sizeof(cType), kCFStringEncodingUTF8);
 
-          CFStringRef bsdName = SCNetworkInterfaceGetBSDName(iface);
-          char cBsdName[(CFStringGetLength(bsdName) * 4) + 1];
-          CFStringGetCString(bsdName, cBsdName, sizeof(cBsdName), kCFStringEncodingUTF8);
-          
-          InterfaceInfo info((string(cBsdName)), (string(cServiceName)), (string(cType)));          
-          result.push_back(info);
+        CFStringRef bsdName = SCNetworkInterfaceGetBSDName(iface);
+        char cBsdName[(CFStringGetLength(bsdName) * 4) + 1];
+        CFStringGetCString(bsdName, cBsdName, sizeof(cBsdName), kCFStringEncodingUTF8);
+      
+        InterfaceInfo info((string(cBsdName)), (string(cServiceName)), (string(cType)));          
+        result.push_back(info);
       }
+    }
   }
   
   CFRelease(services);

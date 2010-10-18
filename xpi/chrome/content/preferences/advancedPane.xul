@@ -36,7 +36,6 @@
         <label control="filterTextBox" value="Filter:" />
         <textbox id="filterTextBox" preference="filterPref" />
       </hbox>
-      <checkbox id="promiscCheckBox" label="Use promiscuous mode" preference="promiscPref" disabled="true" />
     </groupbox>
   </prefpane>
 </overlay>

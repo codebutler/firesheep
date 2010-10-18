@@ -26,9 +26,6 @@ Components.utils.import('resource://firesheep/util/Observers.js');
 Components.utils.import('resource://firesheep/util/underscore.js');
 Components.utils.import('resource://firesheep/util/Utils.js');
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-
 function loadScripts () {
   try {
     _.each(Firesheep.builtinScripts, function (scriptText, scriptId) {

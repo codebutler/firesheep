@@ -173,6 +173,21 @@ var Firesheep = {
     }
     return builtinScripts;
   },
+  
+  get backendPath () {
+    var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
+    
+    var file = em.getInstallLocation("firesheep@codebutler.com").location;
+    file.append("firesheep@codebutler.com");
+    file.append("backend");
+    file.append("firesheep-backend");
+    
+    return file.path;
+  },
+  
+  get networkInterfaces () {
+    return JSON.parse(Utils.runCommand(Firesheep.backendPath, [ '--list-interfaces' ]));
+  },
     
   _handleResult: function (result) {
     this._results.push(result);
