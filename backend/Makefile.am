@@ -1,25 +1,27 @@
-SOURCES =                        \
+SOURCES = \
 	src/main.cpp                   \
 	src/http_sniffer.cpp           \
 	src/http_packet.cpp            \
 	deps/http-parser/http_parser.c
-	
-CFLAGS =                \
-	-DHAVE_STDARG_H 			\
-	-Wall           			\
-	-include src/config.h \
+    
+CFLAGS = \
+	-DHAVE_STDARG_H                \
+	-Wall                          \
+	-include src/config.h          \
 	-g
-	
-INCLUDES =              \
-	-I deps/							\
-	-I deps/http-parser   \
+    
+INCLUDES = \
+	-I deps/                      \
+	-I deps/http-parser           \
 	-I deps/json_spirit    
-	
+    
 LIBS = -lpcap
 
 # OSX Specific
 SOURCES += src/osx_platform.cpp
 CFLAGS  += -framework Security
+CFLAGS  += -framework SystemConfiguration
+CFLAGS  += -framework CoreFoundation
 
 DEST = $(top_builddir)/xpi/backend
 
@@ -31,6 +33,6 @@ $(TARGET): $(SOURCES) Makefile
 	mkdir -p $(DEST)
 	rm -f $@
 	$(CXX) $(CFLAGS) $(INCLUDES) $(LIBS) -o $@ $(SOURCES)
-	
+    
 clean:
 	rm -f $(TARGET)

@@ -33,6 +33,8 @@
 #include <sys/stat.h>
 #include <sys/errno.h>
 
+#include "interface_info.hpp"
+
 using namespace std;
 
 // r-sr-xr-x
@@ -42,67 +44,70 @@ static const mode_t MODE = S_IFREG | S_ISUID | S_IRUSR | S_IXUSR |
 class UnixPlatform
 {
 public:
-	UnixPlatform(vector<string> args)
-		: m_args(args)
-	{
-	  char path[PATH_MAX];
-	  if (!realpath(args[0].c_str(), path))
-	    throw runtime_error(str(boost::format("realpath() failed: %d\n") % errno));
-	
-		m_path = string(path);
-	}
-	
-	bool is_root ()
-	{
-		return geteuid() == 0;
-	}
-	
-	bool check_permissions() {
-		int err;
-	  struct stat file_stat;
+  UnixPlatform(vector<string> args)
+    : m_args(args)
+  {
+    char path[PATH_MAX];
+    if (!realpath(args[0].c_str(), path))
+      throw runtime_error(str(boost::format("realpath() failed: %d\n") % errno));
+  
+    m_path = string(path);
+  }
+  
+  bool is_root()
+  {
+    return geteuid() == 0;
+  }
+  
+  bool check_permissions() {
+    int err;
+    struct stat file_stat;
 
-	  err = stat(m_path.c_str(), &file_stat);
-		if (err == -1)
-			throw runtime_error("stat() failed");
+    err = stat(m_path.c_str(), &file_stat);
+    if (err == -1)
+      throw runtime_error("stat() failed");
 
-	  return (file_stat.st_mode == MODE);
-	}
-	
-	void fix_permissions() {
-		int err;
-	  int fd;
-	
-		const char *path = m_path.c_str();
+    return (file_stat.st_mode == MODE);
+  }
+  
+  void fix_permissions() {
+    int err;
+    int fd;
+  
+    const char *path = m_path.c_str();
 
-	  // Open the file.
-	  fd = open(path, O_RDONLY, 0);
-	  if (fd < 0)
-			throw runtime_error(str(boost::format("fix_permissions: open() failed: %d.") % errno));
+    // Open the file.
+    fd = open(path, O_RDONLY, 0);
+    if (fd < 0)
+      throw runtime_error(str(boost::format("fix_permissions: open() failed: %d.") % errno));
 
-	  // Ensure file is owned by root.
-	  err = fchown(fd, 0, -1);
-	  if (err == -1)
-			throw runtime_error(str(boost::format("fix_permissions: fchown() failed: %d.") % errno));
+    // Ensure file is owned by root.
+    err = fchown(fd, 0, -1);
+    if (err == -1)
+      throw runtime_error(str(boost::format("fix_permissions: fchown() failed: %d.") % errno));
 
-	  // Ensure setuid bit is enabled.
-	  err = fchmod(fd, MODE);
-	  if (err == -1)
-			throw runtime_error(str(boost::format("fix_permissions: fchmod() failed: %d.") % errno));
+    // Ensure setuid bit is enabled.
+    err = fchmod(fd, MODE);
+    if (err == -1)
+      throw runtime_error(str(boost::format("fix_permissions: fchmod() failed: %d.") % errno));
 
-	  // Close file.
-	  err = close(fd);
-	  if (err == -1)
-			throw runtime_error(str(boost::format("fix_permissions: close() failed: %d.") % errno));
-	}
-	
-	virtual bool run_privileged () = 0;
+    // Close file.
+    err = close(fd);
+    if (err == -1)
+      throw runtime_error(str(boost::format("fix_permissions: close() failed: %d.") % errno));
+  }
+  
+  virtual bool run_privileged() = 0;
+  virtual vector<InterfaceInfo> interfaces() = 0;
+
 protected:
-	string path () {
-		return m_path;
-	}
+  string path() {
+    return m_path;
+  }
+
 private:
-	string m_path;
-	vector<string> m_args;
+  string m_path;
+  vector<string> m_args;
 };
 
 #endif

@@ -54,33 +54,24 @@ FiresheepSession.prototype = {
       
       var path = file.path;
       
-      // Ensure the process is actually executable.
-      // FIXME: Make this better in future.
-      Utils.runCommand('chmod', [ 'a+x', path ]);
+      // Ensure the binary is actually executable.
+      var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
+      if (osString != 'WINNT') {
+        // FIXME: This should really use chmod(2) directly.
+        Utils.runCommand('chmod', [ 'a+x', path ]);
+      }
       
-      // FIXME: This will only work on OSX! 
-      // Should probably write an XPCOM component that wraps stat(2) instead.
-      // This is needed because nsILocalFile.permissions doesn't include the 
-      // setuid bit (and that aside, there's no way to get owner).
-      var result = Utils.runCommand('stat', ['-f', '%p %u', path ]);
-      result = result.split(' ');
-      var mode = parseInt(result[0], 8);
-      var uid  = result[1];
-      
-      /* If permissions need fixing, run backend once in advance so it can take care of things. */
-      if ((mode & 0004000 /* S_ISUID */) == 0 || uid != 0) {
-        this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
-        this._process.Init(path, [ this._iface, this._filter ], 2);
-        this._process.Start();
-        var exitCode = this._process.Wait();
-        if (exitCode != 0) {
-          throw "Failed to fix permissions";
-        }
+      // Tell backend to repair owner/setuid. Wil return succesfully if everything is already OK.
+      this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
+      this._process.Init(path, [ '--fix-permissions' ], 1);
+      this._process.Start();
+      var exitCode = this._process.Wait();
+      if (exitCode != 0) {
+        throw "Failed to fix permissions";
       }
       
       this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
       this._process.Init(path, [ this._iface, this._filter ], 2);
-
       this._process.Start();
       if (this._process.IsRunning()) {
         this._thread = Cc["@mozilla.org/thread-manager;1"].getService().newThread(0);

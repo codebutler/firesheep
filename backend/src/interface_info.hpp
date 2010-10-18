@@ -1,5 +1,5 @@
 //
-// osx_platform.h: Mac OS X functions
+// interface_info.hpp: Information about a network interface.
 // Part of the Firesheep project.
 //
 // Copyright (C) 2010 Eric Butler
@@ -20,17 +20,39 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef FIRESHEEP_OSX_PLATFORM_H
-#define FIRESHEEP_OSX_PLATFORM_H
+#ifndef FIRESHEEP_INTERFACE_INFO_H
+#define FIRESHEEP_INTERFACE_INFO_H
 
-#include "unix_platform.hpp"
-#include "interface_info.hpp"
+#include <string>
+#include <boost/algorithm/string.hpp>
 
-class OSXPlatform : public UnixPlatform {
+using namespace std;
+
+class InterfaceInfo
+{
 public:
-  OSXPlatform(vector<string>);
-  bool run_privileged();
-  vector<InterfaceInfo> interfaces();
+  InterfaceInfo(string id, string name, string type)
+    : m_id(id), m_name(name), m_type(type)
+  {
+    boost::to_lower(m_type);
+  }
+  
+  string id() {
+    return m_id;
+  }
+  
+  string name() {
+    return m_name;
+  }
+  
+  string type() {
+    return m_type;
+  }
+  
+private:
+  string m_id;
+  string m_name;
+  string m_type;
 };
 
 #endif
