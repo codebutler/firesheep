@@ -16,8 +16,15 @@ register({
     this.userName = resp.body.querySelector(".gb4").textContent;
 
     // Grab avatar from Google Profiles page, if they have one
-    var profile = this.httpGet('http://www.google.com/profiles/me');
-    var avatar_element = profile.body.querySelector('.ll_profilephoto.photo');
+    var avatar_element;
+    try {
+	    var profile = this.httpGet('http://www.google.com/profiles/me');
+	    avatar_element = profile.body.querySelector('.ll_profilephoto.photo');
+    }
+    catch(err) {
+	    // They likley don't have a profile setup, no avatar for us :(
+	    avatar_element = null;
+    }
 
     if (avatar_element) {
 	    this.userAvatar = avatar_element.src;
