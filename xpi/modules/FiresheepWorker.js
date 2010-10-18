@@ -25,9 +25,6 @@ Components.utils.import('resource://firesheep/util/Utils.js');
 Components.utils.import('resource://firesheep/util/underscore.js');
 Components.utils.import('resource://firesheep/util/CookieMonster.js');
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-
 var EXPORTED_SYMBOLS = [ 'FiresheepWorker' ];
 
 var FiresheepWorker = function(captureSession) {

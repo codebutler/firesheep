@@ -27,9 +27,6 @@ Components.utils.import('resource://firesheep/FiresheepSession.js');
 Components.utils.import('resource://firesheep/util/Utils.js');
 Components.utils.import('resource://firesheep/util/underscore.js');
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-
 var EXPORTED_SYMBOLS = [ 'Firesheep' ];
 
 var Firesheep = {  

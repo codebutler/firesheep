@@ -24,9 +24,6 @@ Components.utils.import('resource://firesheep/util/Observers.js');
 Components.utils.import('resource://firesheep/util/Utils.js');
 Components.utils.import('resource://firesheep/util/ScriptParser.js');
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-
 var EXPORTED_SYMBOLS = [ 'FiresheepConfig' ];
 
 var FiresheepConfig = {

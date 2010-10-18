@@ -23,8 +23,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
+Components.utils.import('resource://firesheep/util/Utils.js');
 
 var EXPORTED_SYMBOLS = [ 'CookieMonster' ];
 

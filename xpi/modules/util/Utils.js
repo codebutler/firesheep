@@ -22,8 +22,10 @@
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
+const Cr = Components.results;
+const Cu = Components.utils;
 
-var EXPORTED_SYMBOLS = [ 'Utils', 'Cc', 'Ci' ];
+var EXPORTED_SYMBOLS = [ 'Utils', 'Cc', 'Ci', 'Cr', 'Cu' ];
 
 var Utils = {
   // http://code.google.com/p/extensiondev/

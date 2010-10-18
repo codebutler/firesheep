@@ -21,10 +21,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 Components.utils.import('resource://firesheep/Firesheep.js');
+Components.utils.import('resource://firesheep/util/Utils.js');
 Components.utils.import('resource://firesheep/util/Observers.js');
-
-const Cc = Components.classes;
-const Ci = Components.interfaces;
 
 var mainWindow = null;
 

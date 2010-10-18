@@ -20,14 +20,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-const Cc = Components.classes;
-const Ci = Components.interfaces;
-const Cr = Components.results;
-const Cu = Components.utils;
-
-Cu.import('resource://firesheep/util/Observers.js');
-Cu.import('resource://firesheep/util/Utils.js');
-Cu.import('resource://firesheep/FiresheepWorker.js');
+Components.utils.import('resource://firesheep/util/Observers.js');
+Components.utils.import('resource://firesheep/util/Utils.js');
+Components.utils.import('resource://firesheep/FiresheepWorker.js');
 
 var EXPORTED_SYMBOLS = [ 'FiresheepSession' ];
 
@@ -49,12 +44,12 @@ FiresheepSession.prototype = {
       var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
       if (osString != 'WINNT') {
         // FIXME: This should really use chmod(2) directly.
-        Utils.runCommand('chmod', [ 'a+x', Firesheep.backendPath ]);
+        Utils.runCommand('chmod', [ 'a+x', this._core.backendPath ]);
       }
-      
+
       // Tell backend to repair owner/setuid. Wil return succesfully if everything is already OK.
       this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
-      this._process.Init(Firesheep.backendPath, [ '--fix-permissions' ], 1);
+      this._process.Init(this._core.backendPath, [ '--fix-permissions' ], 1);
       this._process.Start();
       var exitCode = this._process.Wait();
       if (exitCode != 0) {
@@ -62,7 +57,7 @@ FiresheepSession.prototype = {
       }
       
       this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
-      this._process.Init(Firesheep.backendPath, [ this._iface, this._filter ], 2);
+      this._process.Init(this._core.backendPath, [ this._iface, this._filter ], 2);
       this._process.Start();
       if (this._process.IsRunning()) {
         this._thread = Cc["@mozilla.org/thread-manager;1"].getService().newThread(0);

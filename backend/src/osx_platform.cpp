@@ -44,7 +44,8 @@ bool OSXPlatform::run_privileged()
   if (err != errAuthorizationSuccess)
     throw runtime_error(str(boost::format("osx_run_privileged: AuthorizationCreate() failed: %ld.") % (long int)err));
   
-  char *args[] = { "--fix-permissions" };
+  char *args[] = { "--fix-permissions", NULL };
+  
   err = AuthorizationExecuteWithPrivileges(auth, path, kAuthorizationFlagDefaults, args, NULL);
   AuthorizationFree(auth, kAuthorizationFlagDefaults);
   if (err == errAuthorizationCanceled)
