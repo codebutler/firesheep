@@ -4,7 +4,7 @@ SOURCES = \
 	src/http_packet.cpp            \
 	deps/http-parser/http_parser.c
     
-CFLAGS = \
+CFLAGS += \
 	-DHAVE_STDARG_H                \
 	-Wall                          \
 	-include src/config.h          \
@@ -21,6 +21,7 @@ CFLAGS  += -DPLATFORM_OSX
 CFLAGS  += -framework Security
 CFLAGS  += -framework SystemConfiguration
 CFLAGS  += -framework CoreFoundation
+CFLAGS  += -I/usr/local/include
 LIBS    += -lpcap
 DEST     = $(top_builddir)/xpi/platform/Darwin_x86-gcc3
 endif

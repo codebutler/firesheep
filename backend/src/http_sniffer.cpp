@@ -33,7 +33,7 @@ void HttpSniffer::start()
 		throw runtime_error(str(boost::format("%s is not an Ethernet device") % m_iface));
 
 	/* compile the filter expression */
-	if (pcap_compile(handle, &fp, m_filter.c_str(), 0, net) == -1)
+	if (pcap_compile(handle, &fp, (char *)m_filter.c_str(), 0, net) == -1)
 		throw runtime_error(str(boost::format("Couldn't parse filter %s: %s") % m_filter % pcap_geterr(handle)));
 
 	/* apply the compiled filter */

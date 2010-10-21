@@ -32,7 +32,7 @@ case "$host_os" in
 		TARGET=WIN32
 	;;
 	darwin*)
-		CFLAGS="-arch i386"
+		CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch i386 -mmacosx-version-min=10.5"
 		TARGET=OSX
 	;;
 	*)
