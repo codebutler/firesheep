@@ -174,10 +174,18 @@ var Firesheep = {
   get backendPath () {
     var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
     
+    var xulRuntime = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime);
+    var platformName = [ xulRuntime.OS, xulRuntime.XPCOMABI ].join('_');
+
     var file = em.getInstallLocation("firesheep@codebutler.com").location;
     file.append("firesheep@codebutler.com");
-    file.append("backend");
-    file.append("firesheep-backend");
+    file.append("platform");
+    file.append(platformName);
+    if (xulRuntime.OS == "WINNT") {
+      file.append("firesheep-backend.exe");
+    } else {
+      file.append("firesheep-backend");
+    }
     
     return file.path;
   },

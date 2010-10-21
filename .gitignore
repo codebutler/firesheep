@@ -13,6 +13,14 @@ missing
 
 xpi/components
 xpi/backend
+xpi/platform
 mozpopen/MozPopen.h
+mozpopen/Debug
 
 build/
+
+*.suo
+*.ncb
+*.user
+*.swp
+*~

@@ -24,6 +24,26 @@ AC_INIT([Firesheep], [0.1], [eric@codebutler.com],
 AC_PREREQ([2.61])
 AM_INIT_AUTOMAKE
 
+AC_PROG_CXX
+
+AC_CANONICAL_HOST
+case "$host_os" in
+	cygwin)
+		TARGET=WIN32
+	;;
+	darwin*)
+		CFLAGS="-arch i386"
+		TARGET=OSX
+	;;
+	*)
+		TARGET=LINUX
+;;
+esac
+
+AM_CONDITIONAL(PLATFORM_WIN32, test x$TARGET = xWIN32)
+AM_CONDITIONAL(PLATFORM_OSX, test x$TARGET = xOSX)
+AM_CONDITIONAL(PLATFORM_LINUX, test x$TARGET = xLINUX)
+
 # BEGIN MOZILLA STUFF
 # Mozilla doesn't provide pkg-config files for OSX, hence all this mess.
 
@@ -32,6 +52,10 @@ AC_ARG_WITH([xulrunner-sdk],
 	[xulrunner_sdk="$withval"],
 	[xulrunner_sdk=""])
 
+if test "x$TARGET" = "xWIN32"; then
+        xulrunner_sdk=`readlink -f $xulrunner_sdk`
+fi
+	
 AS_IF([test -d $xulrunner_sdk], [], [AC_MSG_FAILURE([Specify --with-xulrunner-sdk=<path>.])])
 
 MOZ_SDK=$xulrunner_sdk
@@ -57,15 +81,12 @@ AC_SUBST(MOZ_LIBS)
 
 # END MOZILLA STUFF
 
-CFLAGS="-arch i386"
 AC_SUBST(CFLAGS)
-
-AC_PROG_CXX
 
 AC_CONFIG_FILES([
 Makefile
 backend/Makefile
 mozpopen/Makefile
 ])
-AC_OUTPUT
 
+AC_OUTPUT
