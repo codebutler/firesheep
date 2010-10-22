@@ -20,11 +20,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-// FIXME: This isn't good enough.
-pref("firesheep.capture_interface", "en1");
-
-pref("firesheep.promiscuous_mode", true);
+pref("firesheep.capture_interface", "");
 pref("firesheep.capture_filter", "tcp port 80");
 
 // https://developer.mozilla.org/en/Localizing_extension_descriptions

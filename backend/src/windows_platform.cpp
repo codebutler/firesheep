@@ -20,10 +20,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <iostream>
 #include <stdbool.h>
 #include "windows_platform.hpp"
 #include "interface_info.hpp"
-
+#include "pcap.h"
 using namespace std;
 
 WindowsPlatform::WindowsPlatform(vector<string>)
@@ -55,6 +56,25 @@ bool WindowsPlatform::run_privileged() {
 vector<InterfaceInfo> WindowsPlatform::interfaces()
 {
   vector<InterfaceInfo> results;
-  // FIXME
+  
+  pcap_if_t *alldevs;
+  pcap_if_t *d;
+  char errbuf[PCAP_ERRBUF_SIZE+1];
+  
+  if (pcap_findalldevs(&alldevs, errbuf) == -1) {
+    throw runtime_error(str(boost::format("Error in pcap_findalldevs: %s") % errbuf));
+  }
+  
+  for (d = alldevs; d; d = d->next) {
+    string id(d->name);
+    boost::replace_all(id, "\\", "\\\\");
+    boost::replace_all(id, "{", "\\{");
+    boost::replace_all(id, "}", "\\}");
+    InterfaceInfo info(id, (string(d->description)), "ethernet");
+    results.push_back(info);
+  }
+
+  pcap_freealldevs(alldevs);
+  
   return results;
 }

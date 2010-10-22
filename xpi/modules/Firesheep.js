@@ -43,6 +43,19 @@ var Firesheep = {
       this.config.load();
       
       this.clearSession();
+     
+      var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+      if (!prefs.prefHasUserValue('firesheep.capture_interface')) {
+        var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
+        if (osString == 'Darwin') {
+          prefs.setCharPref('firesheep.capture_interface', 'en1');
+        } else {
+          for (var id in this.networkInterfaces) {
+            prefs.setCharPref('firesheep.capture_interface', id);
+            break;
+          }
+        }
+      }
       
       this._loaded = true;
       
