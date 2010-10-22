@@ -22,6 +22,7 @@
 
 pref("firesheep.capture_interface", "");
 pref("firesheep.capture_filter", "tcp port 80");
+pref("firesheep.first_run", true);
 
 // https://developer.mozilla.org/en/Localizing_extension_descriptions
 pref("extensions.firesheep@codebutler.com.description", "chrome://firesheep/locale/overlay.properties");
