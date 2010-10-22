@@ -44,7 +44,7 @@
   </menupopup>
 
   <keyset id="mainKeyset">
-    <key id="key_openSidebar_firesheep" command="viewSidebar_firesheep" key="s" modifiers="meta shift control" />
+    <key id="key_openSidebar_firesheep" command="viewSidebar_firesheep" key="s" modifiers="shift control" />
   </keyset>
 
   <broadcasterset id="mainBroadcasterSet">
