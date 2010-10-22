@@ -1,18 +1,9 @@
+prefwindow {
+  height: 350px;
+}
+
 caption {
   font-weight: bold;
-}
-
-#websitesPane {
- /* padding: 0; */
-}
-
-#websitesPane listbox {
-/*  
-  margin: 0;
-  -moz-appearance: none; 
-  border: 0;
-  background: #DEE4EA;
-  */
 }
 
 #websitesPane splitter {

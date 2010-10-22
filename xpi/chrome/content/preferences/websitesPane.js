@@ -65,7 +65,7 @@ function editScript () {
   try {
     var item = document.getElementById("scriptsList").selectedItem;
     if (item)
-      window.openDialog('websiteEditor.xul', null, 'modal', item.value, item.isUser);
+      window.openDialog('websiteEditor.xul', null, 'modal,centerscreen', item.value, item.isUser);
   } catch (e) {
     alert(e);
   }

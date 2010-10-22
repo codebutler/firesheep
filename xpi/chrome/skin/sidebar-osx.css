@@ -1,0 +1,45 @@
+firesheepSidebar {
+  -moz-appearance: none;
+  background: transparent;
+}
+
+#firesheepSidebar #toolbar {
+  background: -moz-linear-gradient(top, #EDEDED, #D8D8D8);
+  border-bottom: 1px solid #B8B8B8;
+}
+
+#firesheepSidebar #toolbar button {
+  -moz-appearance: none;
+  border: 1px solid #7F7F7F;
+  -moz-border-radius: 10px;
+  background: -moz-linear-gradient(top, #FFF, #BBB);
+  min-width: 0px;
+  min-height: 0px;
+  -moz-padding-start: 5px;
+  -moz-padding-end: 5px;
+  margin: 0;
+  padding: 2px 0;
+}
+
+#firesheepSidebar #toolbar button:active {
+  background: -moz-linear-gradient(top, #BBB, #FFF);
+}
+
+#firesheepSidebar richlistbox {
+  background: transparent;
+}
+
+#bottombar {
+  background: white url(chrome://firesheep/skin/bottombar_bg.png) repeat-x;
+  border-top: 0 !important;
+}
+
+#bottombar button {
+}
+
+#splitterHandle {
+  background: url(chrome://firesheep/skin/bottombar_handle.png) no-repeat;
+  min-width: 15px;
+  max-width: 15px;
+	display: block !important;	
+}
