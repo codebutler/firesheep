@@ -22,17 +22,27 @@
 
 #include "http_sniffer.hpp"
 #include "http_packet.hpp"
-#include "osx_platform.hpp"
+#include "abstract_platform.hpp"
 #include "json_spirit_writer_template.h"
 
+#ifdef PLATFORM_WIN32
+#include "windows_platform.hpp"
+#else
+#include "osx_platform.hpp"
+#endif
+
 void received_packet(HttpPacket *packet);
-void list_interfaces(UnixPlatform *platform);
+void list_interfaces(AbstractPlatform *platform);
 
 int main(int argc, const char *argv[]) 
 {
   vector<string>sargv(argv, argv + argc);
   
+#ifdef PLATFORM_WIN32
+  WindowsPlatform platform(sargv);
+#else
   OSXPlatform platform(sargv);
+#endif
   
   if (argc > 1) {
     if (argv[1] == string("--fix-permissions")) {
@@ -58,7 +68,7 @@ int main(int argc, const char *argv[])
     cerr << "Run --fix-permissions first." << endl;
     return EXIT_FAILURE;
   }
-  
+
   if (argc < 3) {
     cerr << "Syntax: " << argv[0] << " <iface> <capture filter>" << endl;
     return EXIT_FAILURE;
@@ -94,7 +104,7 @@ void received_packet(HttpPacket *packet)
   cout << data << endl;   
 }
 
-void list_interfaces(UnixPlatform *platform)
+void list_interfaces(AbstractPlatform *platform)
 {
   json_spirit::Object data_obj;
   

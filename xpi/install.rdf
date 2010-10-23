@@ -11,6 +11,7 @@
     <em:optionsURL>chrome://firesheep/content/preferences/prefsWindow.xul</em:optionsURL>
     <em:unpack>true</em:unpack>
     <em:targetPlatform>Darwin_x86-gcc3</em:targetPlatform>
+    <em:targetPlatform>WINNT_x86-msvc</em:targetPlatform>
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- Firefox -->

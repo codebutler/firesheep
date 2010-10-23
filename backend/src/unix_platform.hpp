@@ -32,7 +32,7 @@
 #include <sys/syslimits.h>
 #include <sys/stat.h>
 #include <sys/errno.h>
-
+#include "abstract_platform.hpp"
 #include "interface_info.hpp"
 
 using namespace std;
@@ -41,7 +41,7 @@ using namespace std;
 static const mode_t MODE = S_IFREG | S_ISUID | S_IRUSR | S_IXUSR | 
                            S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 
-class UnixPlatform
+class UnixPlatform : public AbstractPlatform
 {
 public:
   UnixPlatform(vector<string> args)

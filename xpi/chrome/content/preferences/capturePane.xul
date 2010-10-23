@@ -29,9 +29,9 @@
     <preferences>
       <preference id="pref-interface" name="firesheep.capture_interface" type="string" />
     </preferences>
-    <hbox flex="1" align="center">
+    <hbox align="center">
       <label control="capture_interface" value="Interface:" />
-      <menulist id="captureInterfaceMenuList" preference="pref-interface">
+      <menulist id="captureInterfaceMenuList" preference="pref-interface" oncommand="setInterface()">
         <menupopup />
       </menulist>
     </hbox>

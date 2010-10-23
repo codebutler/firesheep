@@ -24,19 +24,38 @@ Components.utils.import('resource://firesheep/Firesheep.js');
 Components.utils.import('resource://firesheep/util/Utils.js');
 
 function loadInterfaces () {
-  var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-  var currentId = prefs.getCharPref('firesheep.capture_interface');
-  
-  var list = document.getElementById('captureInterfaceMenuList');
-  
-  var ifaces = Firesheep.networkInterfaces;
-  for (var id in ifaces) {
-    var item = document.createElement('menuitem');
-    item.setAttribute('label', ifaces[id].name + ' (' + id + ')');
-    item.setAttribute('value', id);
-    list.menupopup.appendChild(item);
+  try {
+    var currentId = null;
     
-    if (id == currentId)
-      list.selectedItem = item;
+    var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+    if (prefs.prefHasUserValue('firesheep.capture_interface')) {
+      currentId = prefs.getCharPref('firesheep.capture_interface');
+    }
+  
+    var list = document.getElementById('captureInterfaceMenuList');
+    
+    var ifaces = Firesheep.networkInterfaces;
+    for (var id in ifaces) {
+      var name = ifaces[id].name;
+      var label = (id.length > 4) ? name : (name + ' (' + id + ')');
+      
+      var item = document.createElement('menuitem');
+      item.setAttribute('label', label);
+      item.setAttribute('value', id);
+      list.menupopup.appendChild(item);
+      
+      if (id == currentId)
+        list.selectedItem = item;
+    }
+  } catch (e) {
+    alert(e);
   }
+}
+
+function setInterface () {
+  var list = document.getElementById('captureInterfaceMenuList');
+  var id = list.selectedItem.value;
+  
+  var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+  prefs.setCharPref('firesheep.capture_interface', id);
 }

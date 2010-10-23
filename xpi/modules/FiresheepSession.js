@@ -45,15 +45,15 @@ FiresheepSession.prototype = {
       if (osString != 'WINNT') {
         // FIXME: This should really use chmod(2) directly.
         Utils.runCommand('chmod', [ 'a+x', this._core.backendPath ]);
-      }
 
-      // Tell backend to repair owner/setuid. Wil return succesfully if everything is already OK.
-      this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
-      this._process.Init(this._core.backendPath, [ '--fix-permissions' ], 1);
-      this._process.Start();
-      var exitCode = this._process.Wait();
-      if (exitCode != 0) {
-        throw "Failed to fix permissions";
+        // Tell backend to repair owner/setuid. Wil return succesfully if everything is already OK.
+        this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
+        this._process.Init(this._core.backendPath, [ '--fix-permissions' ], 1);
+        this._process.Start();
+        var exitCode = this._process.Wait();
+        if (exitCode != 0) {
+          throw "Failed to fix permissions";
+        }
       }
       
       this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
@@ -94,7 +94,7 @@ FiresheepSession.prototype = {
   
   handleError: function (e) {
     dump('Error: ' + e + '\n');
-    this.stop();
     Observers.notify('Firesheep', { action: 'error', error: e });
+    this.stop();
   }
 };

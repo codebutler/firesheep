@@ -33,7 +33,7 @@ function startup() {
                      .rootTreeItem
                      .QueryInterface(Ci.nsIInterfaceRequestor)
                      .getInterface(Ci.nsIDOMWindow);
-                     
+  
   reloadSession();
   updateState();
 }
@@ -172,9 +172,11 @@ function onResultDoubleClick () {
       
       if (result.handler.spoofUserAgent) {
         // FIXME!
-        var errors = document.getElementById('errors');
-        errors.appendNotification('User agent spoofing not yet implemented.');
-        return;
+        if (window.navigator.userAgent != result.firstPacket.userAgent) {
+          var errors = document.getElementById('errors');
+          errors.appendNotification('User agent spoofing not yet implemented.');
+          return;
+        }
       }
 
       var ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
@@ -188,7 +190,7 @@ function onResultDoubleClick () {
         var cookieString = cookieName + '=' + cookieValue + ';domain=.' + cookieUri.host;
         cookieSvc.setCookieString(cookieUri, null, cookieString, null);
       }
-    
+      
       mainWindow.gBrowser.selectedTab = mainWindow.gBrowser.addTab(result.siteUrl);
     }
   } catch (e) {
