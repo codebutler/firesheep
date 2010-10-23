@@ -22,9 +22,19 @@
 
 var FiresheepUI = {
   onLoad: function() {
-    // initialization code
+    if (this.initialized)
+      return;
+      
     this.initialized = true;
     this.strings = document.getElementById("firesheep-strings");
+    
+    var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+    if (prefs.getBoolPref('firesheep.first_run')) {
+      toggleSidebar('viewSidebar_firesheep', true);
+      var welcomeUrl = "http://codebutler.github.com/firesheep/welcome.html";
+      window.gBrowser.selectedTab = window.gBrowser.addTab(welcomeUrl);
+      prefs.setBoolPref('firesheep.first_run', false);
+    }
   },
   
   toggleSidebar: function (e) {
