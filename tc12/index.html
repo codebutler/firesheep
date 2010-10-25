@@ -1,0 +1,411 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title></title>
+
+  <link rel="stylesheet" href="./css/reset.css" type="text/css"/>
+  <link rel="stylesheet" href="./css/showoff.css" type="text/css"/>
+
+  <script type="text/javascript" src="./js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="./js/jquery.cycle.all.js"></script>
+	<script type="text/javascript" src="./js/jquery-print.js"></script>
+  <script type="text/javascript" src="./js/jquery.batchImageLoad.js"></script>
+
+  <script type="text/javascript" src="./js/jquery.doubletap-0.1.js"></script>
+
+  <script type="text/javascript" src="./js/fg.menu.js"></script>
+  <script type="text/javascript" src="./js/showoff.js"></script>
+  <script type="text/javascript" src="./js/jTypeWriter.js"> </script>
+  <script type="text/javascript" src="./js/sh_main.min.js"></script>
+  <script type="text/javascript" src="./js/core.js"></script>
+  <script type="text/javascript" src="./js/showoffcore.js"></script>
+
+  <link type="text/css" href="./css/fg.menu.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href="./css/theme/ui.all.css" media="screen" rel="stylesheet" />
+  <link type="text/css" href="./css/sh_style.css" rel="stylesheet" >
+
+  
+
+  
+
+  <script type="text/javascript">
+  $(function(){
+    setupPreso(false, '.');
+  });
+  </script>
+</head>
+
+<body>
+
+
+<a tabindex="0" href="#search-engines" class="fg-button fg-button-icon-right ui-widget ui-state-default ui-corner-all" id="navmenu"><span class="ui-icon ui-icon-triangle-1-s"></span>slides</a>
+<div id="navigation" class="hidden"></div>
+
+<div id="help">
+  <table>
+    <tr><td class="key">space, &rarr;</td><td>next slide</td></tr>
+    <tr><td class="key">&larr;</td><td>previous slide</td></tr>
+    <tr><td class="key">d</td><td>debug mode</td></tr>
+    <tr><td class="key">## &lt;ret&gt;</td><td>go to slide #</td></tr>
+    <tr><td class="key">c</td><td>table of contents (vi)</td></tr>
+    <tr><td class="key">f</td><td>toggle footer</td></tr>
+    <tr><td class="key">r</td><td>reload slides</td></tr>
+    <tr><td class="key">z</td><td>toggle help (this)</td></tr>
+  </table>
+</div>
+
+<div id="preso">loading presentation...</div>
+<div id="footer">
+  <span id="slideInfo"></span>
+  <span id="debugInfo"></span>
+</div>
+
+<div id="slides" class="offscreen" style="display:none;">
+<div class="slide" data-transition="none"><div class="content" ref="intro/intro">
+<h1>Hey Web 2.0: <br/>Start protecting user privacy instead of pretending to</h1>
+
+<h2>Eric Butler</h2>
+
+<h2>Ian 'craSH' Gallagher</h2>
+
+<h3>Toorcon 12 San Diego - October 2010</h3>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="http/http/1">
+<h1>HTTP</h1>
+
+<ul>
+<li>Request, Response</li>
+<li>Send username/password once</li>
+<li>Receive cookie</li>
+<li>Use cookie for all future requests</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content" ref="http/http/2">
+<h1>"Logged In"</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="http/http/3">
+<h1>Cookies need to be kept secret</h1>
+
+<ul>
+<li>But they usually aren't.</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="http/http/4">
+<h1>WiFi</h1>
+
+<ul>
+<li>Cookies shouted through the air.</li>
+<li>Someone just has to start listening.</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content command incremental" ref="http/http/5">
+<h1>$ sudo tcpdump -A -i en1 tcp port 80</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content code" ref="http/http/6">
+<h1>Request</h1>
+
+<pre><code>POST /login.php?login_attempt=1 HTTP/1.1
+Host: login.facebook.com
+</code></pre>
+
+<pre>email=<b>sheep@example.com</b>&amp;pass=<b>supersecure</b></pre>
+
+
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content code" ref="http/http/7">
+<h1>Response</h1>
+
+<pre>HTTP/1.1 302 Found
+Location: http://www.facebook.com/home.php?
+Set-Cookie: xs=<b>a1cac26e11645bca984ea98f98a6a19c</b>; path=/; domain=.facebook.com; httponly
+</pre>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="http/http/8">
+<h1>"Session hijacking"</h1>
+
+<ul>
+<li>"sidejacking"</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="safe/safe/1">
+<h1>How to stay safe?</h1>
+
+<ul>
+<li>Lots of things work against you.</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="safe/safe/2">
+<h1>Avoiding insecure sites when on wifi?</h1>
+
+<ul>
+<li>Good luck.</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="safe/safe/3">
+<p><img src="/firesheep/tc12/images/addressbar.png" alt=""/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="safe/safe/4">
+<p><img src="/firesheep/tc12/images/metrix1.png" alt=""/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="safe/safe/5">
+<p><img src="/firesheep/tc12/images/metrix2.png" alt=""/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="safe/safe/6">
+<p><img src="/firesheep/tc12/images/metrix3.png" alt=""/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="safe/safe/7">
+<p><img src="/firesheep/tc12/images/techcrunch.png" alt=""/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="safe/safe/8">
+<h1>Avoiding insecure sites when on wifi?</h1>
+
+<ul>
+<li>Doesn't matter in the end.</li>
+<li>Active attacker can redirect your browser. <br/>(SSLStrip)</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="safe/safe/9">
+<h1>Log out</h1>
+
+<ul>
+<li>But don't forget.</li>
+<li>Logging out doesn't guarantee session is invalidated.</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="safe/safe/10">
+<h1>Use only secure wifi</h1>
+
+<ul>
+<li>WPA2 designed to protect clients from each other.</li>
+<li>No more coffee shops for you.</li>
+<li>Wifi has long history of problems. (Hole 196)</li>
+<li>Do you trust the network operator?</li>
+<li>What about ISP?</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="safe/safe/11">
+<h1>VPN</h1>
+
+<ul>
+<li>Good, but:</li>
+<li>Doesn't come up right away.</li>
+<li>What happens when it drops?</li>
+<li>Pushes problem to the other side.</li>
+<li>Slow, annoying.</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="safe/safe/12">
+<h1>Need <em>end-to-end</em> encryption</h1>
+
+<ul>
+<li>Traffic should be private between you and destination.</li>
+<li>Other solutions just move problem, don't fix.</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="safe/safe/13">
+<p><img src="/firesheep/tc12/images/dude.jpg" alt="Dude, where's my SSL?"/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content smbullets incremental" ref="fail/excuses/1">
+<h1>Excuses:</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content" ref="fail/excuses/2">
+<h1>1. Ignorance</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="fail/excuses/3">
+<p><img src="/firesheep/tc12/images/dropbox.png" alt=""/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="fail/excuses/4">
+<h1>2. IP Addresses</h1>
+
+<ul>
+<li>Server Name Indication (RFC 3546)</li>
+<li>Allows virtual hosting with SSL/TLS</li>
+<li>Firefox 2+, Opera 8+, IE 7+, Chrome, Safari, iPhone, Android<br/><br/>(XP users: Firefox only)</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="fail/excuses/5">
+<h1>3. Scaling</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="fail/excuses/6">
+<h1>Gmail</h1>
+
+<ul>
+<li>Went full SSL in January 2010.</li>
+<li><i>"we had to deploy no additional machines and no special hardware."</i><br/><br/>- http://www.imperialviolet.org/2010/06/25/overclocking-ssl.html</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="fail/excuses/7">
+<ul>
+<li>If you can't scale securely, you're not scaling!</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="fail/excuses/8">
+<h1>Web 2.0 Privacy Concerns</h1>
+
+<ul>
+<li>Facebook under fire for new features.</li>
+<li>Irrelevant if someone can just take over your account.</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="fail/excuses/9">
+<h1>Does it all matter?</h1>
+
+<ul>
+<li>Sites like Facebook are many people's primary form of communication.</li>
+<li>Email isn't always better (Hotmail).</li>
+<li>Lots and lots of sites do it wrong (Enom!).</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="fail/excuses/10">
+<p><img src="/firesheep/tc12/images/elephant-in-the-room.jpeg" alt="Elephant in the room"/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="firesheep/firesheep/1">
+<h1>Widely known problem</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="firesheep/firesheep/2">
+<p><img src="/firesheep/tc12/images/elephant_rave.jpg" alt="Elephant in the room"/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="firesheep/firesheep/3">
+<h1>Enough is enough.</h1>
+
+<ul>
+<li>How to make people understand risk?</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="firesheep/firesheep/4">
+<h1>Firesheep</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content" ref="firesheep/firesheep/5">
+<h1>Firefox extension</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="firesheep/firesheep/6">
+<h1><em>One-click</em> session hijacking</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="firesheep/firesheep/7">
+<p><img src="/firesheep/tc12/images/1sheep.png" alt="Firesheep in Stopped State"/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="firesheep/firesheep/8">
+<p><img src="/firesheep/tc12/images/2sheep.png" alt="Firesheep in Started State"/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content center" ref="firesheep/firesheep/9">
+<p><img src="/firesheep/tc12/images/3sheep.png" alt="Firesheep with Hijacked Facebook"/></p>
+</div>
+</div><div class="slide" data-transition="none"><div class="content" ref="firesheep/firesheep/10">
+<h1>Extensible via javascript</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content code" ref="firesheep/firesheep/11">
+<pre class="sh_javascript"><code>register({
+  name: 'Hacker News',
+  domains: [ 'news.ycombinator.com' ],
+  sessionCookieNames: [ 'user' ],
+
+  identifyUser: function () {
+    var resp = this.httpGet(this.siteUrl);
+    this.userName = resp.body
+      .querySelectorAll(".pagetop a")[7]
+      .textContent;
+  }
+});</code></pre>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="firesheep/firesheep/12">
+<h1>Firesheep</h1>
+
+<ul>
+<li>Free</li>
+<li>Open Source</li>
+<li>Mac OS X</li>
+<li>Windows (Beta)</li>
+<li>Linux (Soon)</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="firesheep/firesheep/13">
+<h1>Available Now</h1>
+
+<ul>
+<li>http://codebutler.github.com/firesheep</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="finish/finish/1">
+<h1>Known problem.</h1>
+
+<ul>
+<li>For attacker, has always been easy.</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="finish/finish/2">
+<h1>Companies have a responsibility to protect you.</h1>
+
+<ul>
+<li>But they don't</li>
+</ul>
+
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets incremental" ref="finish/finish/3">
+<h1><em>DEMAND</em> SSL Everywhere!</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content" ref="finish/finish/4">
+<h1>Until then...</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content" ref="finish/finish/5">
+<h1>Enjoy the wifi!</h1>
+</div>
+</div><div class="slide" data-transition="none"><div class="content bullets" ref="finish/finish/6">
+<h1>Questions?</h1>
+
+<ul>
+<li>Download Firesheep at<br/>http://codebutler.github.com/firesheep</li>
+<li>Ian Gallagher</li>
+</ul>
+
+
+<div align="center" style="font-size: 2em">
+  @cdine
+  <br/>
+  crash@neg9.org
+  <br/>
+  igallagher@securityinnovation.com
+</div>
+
+
+<ul>
+<li>Eric Butler</li>
+</ul>
+
+
+<div align="center" style="font-size: 2em">
+  @codebutler
+  <br/>
+  eric@codebutler.com
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>
