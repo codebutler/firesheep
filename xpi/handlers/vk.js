@@ -1,5 +1,5 @@
 // Authors:
-//   ech0 <nua@x25.cc>
+//  ech0 <nua@x25.cc>
 register({
   name: 'vkontakte',
   domains: [ 'vkontakte.ru', 'vk.com' ],
