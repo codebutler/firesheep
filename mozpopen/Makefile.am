@@ -39,3 +39,27 @@ $(LIB): $(SOURCES)
 clean:
 	rm -f $(COMPONENT).xpt $(COMPONENT).dylib
 endif
+if PLATFORM_LINUX
+SOURCES  = MozPopenModule.cpp unix/MozPopenProcess.cpp
+PLAT_DEST = $(top_builddir)/xpi/platform/Linux_x86_64-gcc3/components
+CFLAGS  += -Iunix/ -I.
+COMPONENT_NAME = MozPopen
+XPT = $(DEST)/$(COMPONENT_NAME).xpt
+LIB = $(PLAT_DEST)/$(COMPONENT_NAME).so
+
+all: $(XPT) $(COMPONENT_NAME).h $(LIB)
+
+$(COMPONENT_NAME).h: $(COMPONENT_NAME).idl
+	$(XPIDL) -m header $(XPIDL_FLAGS) -e $@ $(COMPONENT_NAME).idl
+
+$(XPT): $(COMPONENT_NAME).idl
+	mkdir -p $(DEST)
+	$(XPIDL) -m typelib $(XPIDL_FLAGS) -e $@ $(COMPONENT_NAME).idl
+
+$(LIB): $(SOURCES)
+	mkdir -p $(PLAT_DEST)
+	$(CXX) -shared -fno-rtti -fPIC $(SOURCES) $(CFLAGS) $(MOZ_CFLAGS) $(MOZ_LIBS) -o $@
+
+clean:
+	rm -f $(COMPONENT).xpt $(COMPONENT).so
+endif

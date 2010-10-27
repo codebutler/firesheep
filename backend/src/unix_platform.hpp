@@ -29,7 +29,11 @@
 #include <fcntl.h>
 #include <stdbool.h>
 #include <unistd.h>
+#ifdef PLATFORM_LINUX
+#include <limits.h>
+#else
 #include <sys/syslimits.h>
+#endif
 #include <sys/stat.h>
 #include <sys/errno.h>
 #include "abstract_platform.hpp"

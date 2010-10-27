@@ -27,8 +27,12 @@
 
 #ifdef PLATFORM_WIN32
 #include "windows_platform.hpp"
-#else
+#elif PLATFORM_OSX
 #include "osx_platform.hpp"
+#elif PLATFORM_LINUX
+#include "linux_platform.hpp"
+#else
+#error "no suitable platform"
 #endif
 
 void received_packet(HttpPacket *packet);
@@ -40,8 +44,10 @@ int main(int argc, const char *argv[])
   
 #ifdef PLATFORM_WIN32
   WindowsPlatform platform(sargv);
-#else
+#elif PLATFORM_OSX
   OSXPlatform platform(sargv);
+#else
+  LinuxPlatform platform(sargv);
 #endif
   
   if (argc > 1) {
@@ -112,7 +118,7 @@ void list_interfaces(AbstractPlatform *platform)
   vector<InterfaceInfo>::iterator iter;
   for (iter = interfaces.begin(); iter != interfaces.end(); ++iter) {
     InterfaceInfo iface = *iter;
-    
+ 
     json_spirit::Object iface_obj;
     iface_obj.push_back(json_spirit::Pair("name", iface.name()));
     iface_obj.push_back(json_spirit::Pair("type", iface.type()));
