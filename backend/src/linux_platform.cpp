@@ -1,11 +1,11 @@
 //
-// osx_platform.cpp: Mac OS X functions
+// linux_platform.cpp: Linux functions, though more unix/pcap general
 // Part of the Firesheep project.
 //
 // Copyright (C) 2010 Eric Butler
 //
 // Authors:
-//   Eric Butler <eric@codebutler.com>
+//   Michajlo Matijkiw
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
