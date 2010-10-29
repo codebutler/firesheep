@@ -154,6 +154,15 @@ function addResult (result) {
   label = document.createElement('label');
   label.setAttribute('value', result.siteName);
   vbox.appendChild(label);
+
+  //Testing, add uglu stuff
+  if (result.connections){
+    for (var i = 0; i < result.connections.length; i++) {	
+	  var icon = document.createElement('image');
+	  icon.setAttributes('src', result.connections[i].getNamedItem("image").value);
+	}
+	
+  }
   
   hbox.appendChild(vbox);
   

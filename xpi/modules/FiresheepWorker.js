@@ -172,6 +172,18 @@ FiresheepWorker.prototype = {
         }
       });
     }
+
+    // If the application has authentication connections, grab them.
+    if (handler && typeof(handler.getAuthConnections) == 'function') {
+      this._runOnMainThread(function () {
+        try {
+          handler.getAuthConnections.apply(result);
+        } catch (e) {
+          result.error = e;
+        }
+      });
+    }
+
     
     // Check again if packet has been seen, identifyUser() could
     // have changed sessionId.

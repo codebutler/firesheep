@@ -4,9 +4,9 @@
     <em:id>firesheep@codebutler.com</em:id>
     <em:type>2</em:type>
     <em:name>Firesheep</em:name>
-    <em:version>0.1</em:version>
+    <em:version>0.2</em:version>
     <em:creator>Eric Butler</em:creator>
-    <em:contributor></em:contributor>
+    <em:contributor>Patrick Tescher</em:contributor>
     <em:aboutURL>chrome://firesheep/content/about.xul</em:aboutURL>
     <em:optionsURL>chrome://firesheep/content/preferences/prefsWindow.xul</em:optionsURL>    
     <em:homepageURL>http://codebutler.github.com/firesheep</em:homepageURL>
