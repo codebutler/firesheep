@@ -199,7 +199,8 @@ FiresheepWorker.prototype = {
 		
 	$H(theSession).each(function(cookie){
 	 	if(mgr.cookieExists(cookie)){
-			alert("This site just sent your login cookie to everyone on your network.")
+			alert("This site just sent your login cookie to everyone on your network.");
+			return;
 		}
 	});
 
