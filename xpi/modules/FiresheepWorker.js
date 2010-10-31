@@ -194,6 +194,15 @@ FiresheepWorker.prototype = {
     // Cache information about this packet for lookup later.
     this._cacheResult(result);
 
+	//Check to see if cookie already exists for this user
+	var mgr = Components.classes['@mozilla.org/cookiemanager;1'].getService(Components.interfaces.nsICookieManager2);
+		
+	$H(theSession).each(function(cookie){
+	 	if(mgr.cookieExists(cookie)){
+			alert("This site just sent your login cookie to everyone on your network.")
+		}
+	});
+
     this._runOnMainThread(function () {
       this._captureSession.postResult(result);
     })
