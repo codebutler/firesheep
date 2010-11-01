@@ -196,12 +196,19 @@ FiresheepWorker.prototype = {
 
 	//Check to see if cookie already exists for this user
 	var mgr = Components.classes['@mozilla.org/cookiemanager;1'].getService(Components.interfaces.nsICookieManager2);
-		
-	$H(theSession).each(function(cookie){
-	 	if(mgr.cookieExists(cookie)){
+	
+	for (var cookie in theSession) {
+		alert("session key: " + cookie + ", value: " + theSession[cookie] );
+		if(mgr.cookieExists(cookie)){
 			alert("This site just sent your login cookie to everyone on your network.");
 			return;
 		}
+	}	
+//	$H(theSession).each(function(cookie){
+//	 	if(mgr.cookieExists(cookie)){
+//			alert("This site just sent your login cookie to everyone on your network.");
+//			return;
+//		}
 	});
 
     this._runOnMainThread(function () {
