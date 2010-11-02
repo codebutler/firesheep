@@ -41,7 +41,7 @@ clean:
 endif
 if PLATFORM_LINUX
 SOURCES  = MozPopenModule.cpp unix/MozPopenProcess.cpp
-PLAT_DEST = $(top_builddir)/xpi/platform/Linux_x86_64-gcc3/components
+PLAT_DEST = $(top_builddir)/xpi/platform/Linux_$(build_cpu)-gcc3/components
 CFLAGS  += -Iunix/ -I.
 COMPONENT_NAME = MozPopen
 XPT = $(DEST)/$(COMPONENT_NAME).xpt

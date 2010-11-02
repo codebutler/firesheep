@@ -38,7 +38,7 @@ if PLATFORM_LINUX
 SOURCES += src/linux_platform.cpp
 CFLAGS  += -DPLATFORM_LINUX
 CFLAGS  += -lpcap
-DEST     = $(top_builddir)/xpi/platform/Linux_x86_64-gcc3
+DEST     = $(top_builddir)/xpi/platform/Linux_$(build_cpu)-gcc3
 endif
 
 
