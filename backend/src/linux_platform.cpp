@@ -47,7 +47,7 @@ vector<InterfaceInfo> LinuxPlatform::interfaces()
       }
 
       if (pcap_datalink(interface) == DLT_EN10MB) {
-        const char *description = (dev->description) ? dev->description : "";
+        const char *description = (dev->description) ? dev->description : dev->name;
         InterfaceInfo info(dev->name, description, "ethernet");
         result.push_back(info);
       }
