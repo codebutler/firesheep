@@ -215,8 +215,9 @@ FiresheepWorker.prototype = {
 	}
 	while (enum.hasMoreElements()){
 	   	var cookie = enum.getNext();
-		cookie = cookie.wrappedJSObject;
-		dump("the cookie '"+cookie.name+"' has value '"+cookie.value+"'. From a cookie of: "+cookie+"\n");
+		if (cookie instanceof Components.interfaces.nsICookie){
+			dump("the cookie '"+cookie.name+"' has value '"+cookie.value+"'. From a cookie of: "+cookie+"\n");
+		}
 		if (theSession.hasOwnProperty(cookie.name)){
 			dump("The session theSession.hasOwnProperty(cookie.name)) \n");
 		}
