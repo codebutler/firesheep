@@ -204,7 +204,7 @@ FiresheepWorker.prototype = {
 
 	//get all cookies from host, if cookie matches current cookie from host then inform user
 	dump("START The host is: "+ host+"\n")
-	var enum = mgr.getCookiesFromHost(host); 
+	var enum = mgr.getCookiesFromHost("."+host); 
 	dump("Enum is: "+enum+"\n");
 	
 	//dump session
