@@ -111,7 +111,7 @@ FiresheepWorker.prototype = {
       siteIcon: (handler && handler.icon) ? handler.icon : 'http://' + host + '/favicon.ico',
       
       sessionId: null,
-	  connections: null,
+	  connections: [],
       
       firstPacket: packet,
       
