@@ -203,8 +203,9 @@ FiresheepWorker.prototype = {
 	var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
 
 	//get all cookies from host, if cookie matches current cookie from host then inform user
-	dump("START The host is: "+ host+"\n")
-	var enum = mgr.getCookiesFromHost("."+host); 
+	var newHost = "."+host
+	dump("START The newHost is: "+ newHost+"\n")
+	var enum = mgr.getCookiesFromHost(newHost); 
 	dump("Enum is: "+enum+"\n");
 	
 	//dump session
@@ -214,7 +215,7 @@ FiresheepWorker.prototype = {
 	}
 	while (enum.hasMoreElements()){
 	   	var cookie = enum.getNext();
-		dump("the cookie '"+cookie.name+"' has value '"+cookie.value+"'. \n");
+		dump("the cookie '"+cookie.name+"' has value '"+cookie.value+"'. From a cookie of: "+cookie+"\n");
 		if (theSession.hasOwnProperty(cookie.name)){
 			dump("The session theSession.hasOwnProperty(cookie.name)) \n");
 		}
