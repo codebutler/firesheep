@@ -207,7 +207,7 @@ FiresheepWorker.prototype = {
 			prompts.alert(null, "Cookie info", "Cookie is an instanceof Components.interfaces.nsICookie");
 		}
 		if (theSession.hasOwnProperty(cookie.name)){
-			prompts.alert(null, "Cookie info", "The session theSession.hasOwnProperty(cookie.name))");
+			prompts.alert(null, "Session info", "The session theSession.hasOwnProperty(cookie.name))");
 		}
 	   	
 	   	if ((cookie instanceof Components.interfaces.nsICookie) && (theSession.hasOwnProperty(cookie.name))){
