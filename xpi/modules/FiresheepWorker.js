@@ -111,6 +111,7 @@ FiresheepWorker.prototype = {
       siteIcon: (handler && handler.icon) ? handler.icon : 'http://' + host + '/favicon.ico',
       
       sessionId: null,
+	  connections: null,
       
       firstPacket: packet,
       
@@ -181,6 +182,7 @@ FiresheepWorker.prototype = {
           handler.getAuthConnections.apply(result);
         } catch (e) {
           result.error = e;
+		  dump("Failed");
         }
       });
     }

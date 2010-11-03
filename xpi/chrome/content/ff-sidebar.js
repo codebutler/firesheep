@@ -166,7 +166,7 @@ function addResult (result) {
   if (result.connections){
     for (var i = 0; i < result.connections.length; i++) {	
 	dump("Adding image to sidebar:");
-	dump(connections[i]["image"]);
+	dump(result.connections[i]["image"]);
 	  var icon = document.createElement('image');
 	  icon.setAttribute('src', result.connections[i]["image"].value);
 	  icon.setAttribute('style', 'right: 0; bottom: 0; max-width: 16px; max-height: 16px;');
