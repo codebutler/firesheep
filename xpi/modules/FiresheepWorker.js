@@ -207,7 +207,7 @@ FiresheepWorker.prototype = {
 	
 	//dump session
 	for(var prop in theSession) {
-	    if(obj.hasOwnProperty(prop))
+	    if(theSession.hasOwnProperty(prop))
 	        dump("The session cookie '"+prop+"' has a value of '"+theSession[prop]+"'. ");
 	}
 	while (enum.hasMoreElements()){
