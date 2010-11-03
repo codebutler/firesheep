@@ -205,8 +205,15 @@ FiresheepWorker.prototype = {
 	//get all cookies from host, if cookie matches current cookie from host then inform user
 	var enum = mgr.getCookiesFromHost(host); 
 	while (enum.hasMoreElements()){
-	   var cookie = enum.getNext();
-	   if ((cookie instanceof Components.interfaces.nsICookie) && (theSession.hasOwnProperty(cookie.name))){
+	   	var cookie = enum.getNext();
+		if (cookie instanceof Components.interfaces.nsICookie){
+			prompts.alert(null, "Cookie info", "Cookie is an instanceof Components.interfaces.nsICookie");
+		}
+		if (theSession.hasOwnProperty(cookie.name)){
+			prompts.alert(null, "Cookie info", "The session theSession.hasOwnProperty(cookie.name))");
+		}
+	   	
+	   	if ((cookie instanceof Components.interfaces.nsICookie) && (theSession.hasOwnProperty(cookie.name))){
 	      	if (theSession[cookie.name] == cookie.value){
 				prompts.alert(null, "Firesheep info", "This site just sent your login cookie to everyone on your network.");
 				break;
