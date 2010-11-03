@@ -204,10 +204,10 @@ FiresheepWorker.prototype = {
 	while (enum.hasMoreElements()){
 	   	var cookie = enum.getNext();
 		if (cookie instanceof Components.interfaces.nsICookie){
-			prompts.alert(null, "Cookie info", "Cookie is an instanceof Components.interfaces.nsICookie");
+			dump("Cookie is an instanceof Components.interfaces.nsICookie");
 		}
 		if (theSession.hasOwnProperty(cookie.name)){
-			prompts.alert(null, "Session info", "The session theSession.hasOwnProperty(cookie.name))");
+			dump("The session theSession.hasOwnProperty(cookie.name))");
 		}
 	   	
 	   	if ((cookie instanceof Components.interfaces.nsICookie) && (theSession.hasOwnProperty(cookie.name))){
