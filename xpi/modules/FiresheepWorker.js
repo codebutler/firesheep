@@ -203,7 +203,8 @@ FiresheepWorker.prototype = {
 	var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
 
 	//get all cookies from host, if cookie matches current cookie from host then inform user
-	var enum = mgr.getCookiesFromHost(result.siteName); 
+	var enum = mgr.getCookiesFromHost(host); 
+	dump(enum);
 	
 	//dump session
 	for(var prop in theSession) {
