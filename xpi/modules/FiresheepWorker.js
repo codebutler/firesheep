@@ -196,15 +196,22 @@ FiresheepWorker.prototype = {
     this._cacheResult(result);
 
 	//Check to see if cookie already exists for this user
+	//set up cookie manager and prompt service
 	var mgr = Components.classes['@mozilla.org/cookiemanager;1'].getService(Components.interfaces.nsICookieManager2);
-		
-	for (var cookie in theSession) {
-		alert("session key: " + cookie + ", value: " + theSession[cookie] );
-		if(mgr.cookieExists(cookie)){
-			alert("This site just sent your login cookie to everyone on your network.");
-			return;
+	var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
+
+	//get all cookies from host, if cookie matches current cookie from host then inform user
+	var enum = mgr.getCookiesFromHost(host); 
+	while (enum.hasMoreElements()){
+	   var cookie = enum.getNext();
+	   if ((cookie instanceof Components.interfaces.nsICookie) && (theSession.hasOwnProperty(cookie.name))){
+	      	if (theSession[cookie.name] == cookie.value){
+				prompts.alert(null, "Firesheep info", "This site just sent your login cookie to everyone on your network.");
+				break;
+		  	}
 		}
-	};
+	}; 
+	
 
     this._runOnMainThread(function () {
       this._captureSession.postResult(result);
