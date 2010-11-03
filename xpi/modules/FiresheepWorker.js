@@ -177,6 +177,7 @@ FiresheepWorker.prototype = {
     if (handler && typeof(handler.getAuthConnections) == 'function') {
       this._runOnMainThread(function () {
         try {
+	      dump("Tring to grab connections");
           handler.getAuthConnections.apply(result);
         } catch (e) {
           result.error = e;
