@@ -111,6 +111,7 @@ FiresheepWorker.prototype = {
       siteIcon: (handler && handler.icon) ? handler.icon : 'http://' + host + '/favicon.ico',
       
       sessionId: null,
+	  connections: [],
       
       firstPacket: packet,
       
@@ -172,6 +173,20 @@ FiresheepWorker.prototype = {
         }
       });
     }
+
+    // If the application has authentication connections, grab them.
+    if (handler && typeof(handler.getAuthConnections) == 'function') {
+      this._runOnMainThread(function () {
+        try {
+	      dump("Tring to grab connections");
+          handler.getAuthConnections.apply(result);
+        } catch (e) {
+          result.error = e;
+		  dump("Failed");
+        }
+      });
+    }
+
     
     // Check again if packet has been seen, identifyUser() could
     // have changed sessionId.
@@ -181,6 +196,40 @@ FiresheepWorker.prototype = {
     
     // Cache information about this packet for lookup later.
     this._cacheResult(result);
+
+	//Check to see if cookie already exists for this user
+	//set up cookie manager and prompt service
+	var mgr = Components.classes['@mozilla.org/cookiemanager;1'].getService(Components.interfaces.nsICookieManager2);
+	var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
+
+	//get all cookies from host, if cookie matches current cookie from host then inform user
+	var newHost = "."+host
+	dump("START The newHost is: "+ newHost+"\n")
+	var enum = mgr.getCookiesFromHost(newHost); 
+	dump("Enum is: "+enum+"\n");
+	
+	//dump session
+	for(var prop in theSession) {
+	    if(theSession.hasOwnProperty(prop))
+	        dump("The session cookie '"+prop+"' has a value of '"+theSession[prop]+"'. \n");
+	}
+	while (enum.hasMoreElements()){
+	   	var cookie = enum.getNext();
+		if (cookie instanceof Components.interfaces.nsICookie){
+			dump("the cookie '"+cookie.name+"' has value '"+cookie.value+"'. From a cookie of: "+cookie+"\n");
+		}
+		if (theSession.hasOwnProperty(cookie.name)){
+			dump("The session theSession.hasOwnProperty(cookie.name)) \n");
+		}
+	   	
+	   	if ((cookie instanceof Components.interfaces.nsICookie) && (theSession.hasOwnProperty(cookie.name))){
+	      	if (theSession[cookie.name] == cookie.value){
+				prompts.alert(null, "Firesheep info", "This site just sent your login cookie to everyone on your network.");
+				break;
+		  	}
+		}
+	}; 
+	
 
     this._runOnMainThread(function () {
       this._captureSession.postResult(result);

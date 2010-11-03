@@ -32,5 +32,19 @@ register({
       this.userName   = resp.body.querySelector('#screen-name').innerHTML.replace(/^\s+|\s+$/g, "");
       this.userAvatar = resp.body.querySelector('#profile-image img').src;
     }
+  },
+  getAuthConnections: function() {
+    var resp = this.httpGet('http://twitter.com/settings/connections');
+    var connectionElements = resp.body.querySelectorAll("ul>li.oauth-application");
+    var connections = new Array();
+    for (var i = 0; i < connectionElements.length; i++) {
+		var connection = new Array();
+		connection['url'] = connectionElements[i].children[0].attributes.getNamedItem("href").value;
+		connection['image'] = connectionElements[i].children[0].children[0].attributes.getNamedItem("src").value;
+		connections.push(connection);
+		connectionElements[i].attributes;
+	  }
+	this.connections = connections;
   }
+  
 });

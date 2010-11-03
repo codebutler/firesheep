@@ -154,12 +154,28 @@ function addResult (result) {
   label = document.createElement('label');
   label.setAttribute('value', result.siteName);
   vbox.appendChild(label);
+
   
   hbox.appendChild(vbox);
   
   item.appendChild(hbox);
   
   list.appendChild(item);
+
+  //Testing, add ugluy stuff
+  if (result.connections){
+    for (var i = 0; i < result.connections.length; i++) {	
+	dump("Adding image to sidebar:");
+	dump(result.connections[i]["image"]);
+	  var icon = document.createElement('image');
+	  icon.setAttribute('src', result.connections[i]["image"].value);
+	  icon.setAttribute('style', 'right: 0; bottom: 0; max-width: 16px; max-height: 16px;');
+	  list.appendChild(icon)
+	}
+	
+  }
+
+
 }
  
 function onResultDoubleClick () {
