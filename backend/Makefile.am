@@ -34,6 +34,13 @@ CFLAGS  += -L"deps/winpcap/lib"
 LIBS    += -lwpcap
 DEST     = $(top_builddir)/xpi/platform/WINNT_x86-msvc
 endif
+if PLATFORM_LINUX
+SOURCES += src/linux_platform.cpp
+CFLAGS  += -DPLATFORM_LINUX $(BUILD_TARGET)
+CFLAGS  += -lpcap
+DEST     = $(top_builddir)/xpi/platform/Linux_$(BUILD_ARCH)-gcc3
+endif
+
 
 TARGET = $(DEST)/firesheep-backend
 

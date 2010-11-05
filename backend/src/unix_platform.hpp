@@ -1,5 +1,5 @@
 //
-// osx_platform.h: Functions for unix-like platforms.
+// unix_platform.h: Functions for unix-like platforms.
 // Part of the Firesheep project.
 //
 // Copyright (C) 2010 Eric Butler
@@ -29,7 +29,11 @@
 #include <fcntl.h>
 #include <stdbool.h>
 #include <unistd.h>
+#ifdef PLATFORM_LINUX
+#include <limits.h>
+#else
 #include <sys/syslimits.h>
+#endif
 #include <sys/stat.h>
 #include <sys/errno.h>
 #include "abstract_platform.hpp"
