@@ -55,6 +55,12 @@ vector<InterfaceInfo> LinuxPlatform::interfaces()
 				result.push_back(info);
 			}
 
+			if (pcap_datalink(interface) == DLT_IEEE802_11_RADIO) {
+				const char *description = (dev->description) ? dev->description : dev->name;
+				InterfaceInfo info(dev->name, description, "802.11 monitor");
+				result.push_back(info);
+			}
+
 			pcap_close(interface);
 			dev = dev->next;
 		}

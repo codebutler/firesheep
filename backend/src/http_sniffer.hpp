@@ -6,6 +6,7 @@
 //
 // Authors:
 //   Eric Butler <eric@codebutler.com>
+//   Nick kossifidis <mickflemm@gmail.com>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,9 +39,10 @@ public:
 	void start();
 
 protected:
-	string         m_iface;
-	string         m_filter;
-	http_packet_cb m_callback;
+	string		m_iface;
+	string		m_filter;
+	http_packet_cb	m_callback;
+	bool		wifimon;
 	
 	static void got_packet_wrapper(u_char *user, const struct pcap_pkthdr *header, const u_char *packet) {
 		HttpSniffer *sniffer = (HttpSniffer *) user;
