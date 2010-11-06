@@ -78,14 +78,14 @@ void HttpSniffer::start()
 void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *packet)
 {
 	/* Declare pointers to packet headers */
-	const struct radiotap_header *radiotap; /* The Radiotap header */
-	const struct wifi_header *hdr80211; 	/* The 802.11 header */
-	const struct snap_llc_header *snap_llc; /* The SNAP LLC header */
-	const struct sniff_ethernet *ethernet;  /* The Ethernet header [1] */
-	const struct sniff_ip  *ip;             /* The IP header */
-	const struct sniff_ip6 *ip6;            /* The IPv6 header */
-	const struct sniff_tcp *tcp;            /* The TCP header */
-	const char *payload;                    /* Packet payload */
+	const struct radiotap_header *radiotap;	/* The Radiotap header */
+	const struct wifi_header *hdr80211;	/* The 802.11 header */
+	const struct snap_llc_header *snap_llc;	/* The SNAP LLC header */
+	const struct sniff_ethernet *ethernet;	/* The Ethernet header [1] */
+	const struct sniff_ip  *ip = NULL;	/* The IP header */
+	const struct sniff_ip6 *ip6 = NULL;	/* The IPv6 header */
+	const struct sniff_tcp *tcp;		/* The TCP header */
+	const char *payload;	/* Packet payload */
 
 	/* Declare header lengths */
 	int size_ip;		/* Size of IP header in bytes */
@@ -120,6 +120,9 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
 			if (DATA_FRAME_IS_QOS(FC_SUBTYPE(fc))) {
 				size_80211 += 2;
 			}
+		} else {
+			cout << (boost::format("Ignoring non-data frame 0x%x\n") % fc);
+			return;
 		}
 
 		/* Set Layer 3 header offset (snap_llc_header has standard length) */
