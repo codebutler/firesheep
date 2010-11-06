@@ -42,8 +42,10 @@ SOURCES	+= src/linux_platform.cpp
 CFLAGS	+= -DPLATFORM_LINUX $(BUILD_TARGET)
 CFLAGS	+= $(PCAP_CFLAGS)
 CFLAGS	+= $(BOOST_CPPFLAGS)
+CFLAGS	+= $(HAL_CFLAGS)
 LIBS	+= $(PCAP_LIBS)
 LIBS	+= $(BOOST_FORMAT_LIBS) $(BOOST_STRING_ALGO_LIBS)
+LIBS	+= $(HAL_LIBS)
 DEST	= $(top_builddir)/xpi/platform/Linux_$(BUILD_ARCH)-gcc3
 endif
 
