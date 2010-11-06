@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I.
+ACLOCAL_AMFLAGS = -I .
 
 SUBDIRS = mozpopen backend
 
