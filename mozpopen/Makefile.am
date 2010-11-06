@@ -18,7 +18,7 @@ endif
 if PLATFORM_OSX
 SOURCES_OSX  = MozPopenModule.cpp unix/MozPopenProcess.cpp
 PLAT_DEST = $(top_builddir)/xpi/platform/Darwin_x86-gcc3/components
-CFLAGS  += -Iunix/ -I.
+CFLAGS  += -I $(top_builddir)/mozpopen -I $(top_builddir)/mozpopen/unix
 COMPONENT_NAME = MozPopen
 XPT = $(DEST)/$(COMPONENT_NAME).xpt
 LIB = $(PLAT_DEST)/$(COMPONENT_NAME).dylib
@@ -42,7 +42,7 @@ endif
 if PLATFORM_LINUX
 SOURCES_LINUX  = MozPopenModule.cpp unix/MozPopenProcess.cpp
 PLAT_DEST = $(top_builddir)/xpi/platform/Linux_$(BUILD_ARCH)-gcc3/components
-CFLAGS  += -Iunix/ -I.
+CFLAGS  += -I $(top_builddir)/mozpopen -I $(top_builddir)/mozpopen/unix
 COMPONENT_NAME = MozPopen
 XPT = $(DEST)/$(COMPONENT_NAME).xpt
 LIB = $(PLAT_DEST)/$(COMPONENT_NAME).so
