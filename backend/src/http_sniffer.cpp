@@ -31,7 +31,7 @@
 #include "tcpip.h"
 
 HttpSniffer::HttpSniffer (string iface, string filter, http_packet_cb callback)
-	: m_iface(iface), m_filter(filter), m_callback(callback) { wifimon = 0; }
+	: m_iface(iface), m_filter(filter), m_callback(callback) { m_wifimon = 0; }
 
 void HttpSniffer::start()
 {
@@ -51,7 +51,7 @@ void HttpSniffer::start()
 	
 	/* Make sure we're capturing on an Ethernet or 802.11 monitor device */
 	if (pcap_datalink(handle) == DLT_IEEE802_11_RADIO)
-		wifimon = true;
+		m_wifimon = true;
 	else if (pcap_datalink(handle) != DLT_EN10MB) {
 		throw runtime_error(str(boost::format("%s is not supported (unsupported data link)") % m_iface));
 
@@ -106,7 +106,7 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
 	string to;
 
 	/* 802.11 monitor support... */
-	if (wifimon) {
+	if (m_wifimon) {
 		/* Get Radiotap header length (variable) */
 		radiotap = (struct radiotap_header*)(packet);
 		size_radiotap = radiotap->it_len;
@@ -121,7 +121,7 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
 				size_80211 += 2;
 			}
 		} else {
-			cout << (boost::format("Ignoring non-data frame 0x%x\n") % fc);
+			cerr << (boost::format("Ignoring non-data frame 0x%x\n") % fc);
 			return;
 		}
 
@@ -132,7 +132,7 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
 		snap_llc = (struct snap_llc_header*)(packet + size_80211 + size_radiotap);
 		ether_type = ntohs(snap_llc->ether_type);
 		if (ether_type != ETHERTYPE_IP) {
-			cout << (boost::format("Ignoring unknown ethernet packet with type 0x%x\n") % ether_type);
+			cerr << (boost::format("Ignoring unknown ethernet packet with type 0x%x\n") % ether_type);
 			return;
 		}
 
@@ -142,7 +142,7 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
 		if (size_ip < 20) {
 			/* Don't throw exception because on 802.11 monitor interfaces
 			 * we can have malformed packets, just skip it */
-			cout << (boost::format("Bad IP length: %d\n") % size_ip);
+			cerr << (boost::format("Bad IP length: %d\n") % size_ip);
 			return;
 		}
 		ip_len = ntohs(ip->ip_len);
@@ -169,7 +169,7 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
 				ip_len = ntohs(ip6->ip6_plen);
 				break;
 			default:
-				cout << (boost::format("Ignoring unknown ethernet packet with type %x\n") % ether_type);
+				cerr << (boost::format("Ignoring unknown ethernet packet with type %x\n") % ether_type);
 				return;
 		}
 	}
@@ -184,10 +184,10 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
 	if (size_tcp < 20) {
 		/* Don't throw exception because on 802.11 monitor interfaces
 		 * we can have malformed packets, just skip it */
-		if (!wifimon)
+		if (!m_wifimon)
 			throw runtime_error(str(boost::format("Invalid TCP header length: %u bytes") % size_tcp));
 		else
-			cout << (boost::format("Invalid TCP header length: %u bytes") % size_tcp);
+			cerr << (boost::format("Invalid TCP header length: %u bytes") % size_tcp);
 		return;
 	}
 
