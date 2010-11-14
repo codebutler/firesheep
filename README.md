@@ -9,6 +9,7 @@ Created by:
 Contributors:
 
   * Ian Gallagher <crash@neg9.org>
+  * Michajlo Matijkiw <michajlo.matijkiw@gmail.com>
   * Nick Kossifidis <mickflemm@gmail.com>
 
 ## Building

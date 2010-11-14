@@ -5,7 +5,7 @@
 // Copyright (C) 2010 Eric Butler
 //
 // Authors:
-//   Michajlo Matijkiw
+//   Michajlo Matijkiw <michajlo.matijkiw@gmail.com>
 //   Eric Butler <eric@codebutler.com>
 //
 // This program is free software: you can redistribute it and/or modify
