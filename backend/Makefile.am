@@ -22,10 +22,10 @@ CFLAGS  += -framework Security
 CFLAGS  += -framework SystemConfiguration
 CFLAGS  += -framework CoreFoundation
 CFLAGS  += -I/usr/local/include
-CFLAGS	+= $(PCAP_CFLAGS)
-CFLAGS	+= $(BOOST_CPPFLAGS)
+CFLAGS  += $(PCAP_CFLAGS)
+CFLAGS  += $(BOOST_CPPFLAGS)
 LIBS    += $(PCAP_LIBS)
-LIBS	+= $(BOOST_FORMAT_LIBS) $(BOOST_STRING_ALGO_LIBS)
+LIBS    += $(BOOST_FORMAT_LIBS) $(BOOST_STRING_ALGO_LIBS)
 DEST     = $(top_builddir)/xpi/platform/Darwin_x86-gcc3
 endif
 if PLATFORM_WIN32
@@ -38,15 +38,15 @@ LIBS    += -lwpcap
 DEST     = $(top_builddir)/xpi/platform/WINNT_x86-msvc
 endif
 if PLATFORM_LINUX
-SOURCES	+= src/linux_platform.cpp
-CFLAGS	+= -DPLATFORM_LINUX $(BUILD_TARGET)
-CFLAGS	+= $(PCAP_CFLAGS)
-CFLAGS	+= $(BOOST_CPPFLAGS)
-CFLAGS	+= $(HAL_CFLAGS)
-LIBS	+= $(PCAP_LIBS)
-LIBS	+= $(BOOST_FORMAT_LIBS) $(BOOST_STRING_ALGO_LIBS)
-LIBS	+= $(HAL_LIBS)
-DEST	= $(top_builddir)/xpi/platform/Linux_$(BUILD_ARCH)-gcc3
+SOURCES += src/linux_platform.cpp
+CFLAGS  += -DPLATFORM_LINUX $(BUILD_TARGET)
+CFLAGS  += $(PCAP_CFLAGS)
+CFLAGS  += $(BOOST_CPPFLAGS)
+CFLAGS  += $(HAL_CFLAGS)
+LIBS    += $(PCAP_LIBS)
+LIBS    += $(BOOST_FORMAT_LIBS) $(BOOST_STRING_ALGO_LIBS)
+LIBS    += $(HAL_LIBS)
+DEST     = $(top_builddir)/xpi/platform/Linux_$(BUILD_ARCH)-gcc3
 endif
 
 

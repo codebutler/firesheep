@@ -21,129 +21,109 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include <stdio.h>
+#include <iostream>
+#include <cstdio>
 #include <pcap/pcap.h>
 #include "linux_platform.hpp"
 #include <libhal.h>
 
+using namespace std;
+using namespace boost;
 
 LinuxPlatform::LinuxPlatform(vector<string> argv) : UnixPlatform(argv) { }
 
 bool LinuxPlatform::run_privileged() {
   const char *path = this->path().c_str();
-  execl("/usr/bin/pkexec","pkexec",path,"--fix-permissions",NULL);
+  execl("/usr/bin/pkexec", "pkexec", path, "--fix-permissions", NULL);
   return true;
 }
 
-static char*
-get_hal_interface_description(char* ifname)
+string device_get_property_string(LibHalContext *context, string device, string key, DBusError *error)
 {
-  int num_udis;
-  char **udis;
-  const char *key = NULL;
-  char *value = NULL;
-  DBusError error;
-  LibHalContext *hal_ctx;
-
-  /* Initialize dbus connection */
-  dbus_error_init (&error); 
-  if ((hal_ctx = libhal_ctx_new()) == NULL) {
-    fprintf(stderr, "error: libhal_ctx_new\n");
-    return NULL;
+  char *buf = libhal_device_get_property_string(context, device.c_str(), key.c_str(), error);
+  if (dbus_error_is_set(error)) {
+    runtime_error ex(str(format("libhal_device_get_property_string failed: %s %s") % error->name % error->message));
+    dbus_error_free(error);
+    throw ex;
   }
-  if (!libhal_ctx_set_dbus_connection(hal_ctx,
-  dbus_bus_get(DBUS_BUS_SYSTEM, &error))) {
-    fprintf(stderr,
-      "error: libhal_ctx_set_dbus_connection: %s: %s\n",
-      error.name, error.message);
-    LIBHAL_FREE_DBUS_ERROR (&error);
-    return NULL;
-  }
-  /* Initialize hal context */
-  if (!libhal_ctx_init (hal_ctx, &error)) {
-    if (dbus_error_is_set(&error)) {
-      fprintf(stderr,
-        "error: libhal_ctx_init: %s: %s\n",
-        error.name, error.message);
-      dbus_error_free (&error);
-    }
-    fprintf(stderr,
-      "Could not initialise connection to hald.\n"
-      "Is hald running ?\n");
-    return NULL;
-  }
-
-
-  /* Search device uid by property */
-  key="net.interface";
-  udis = libhal_manager_find_device_string_match (hal_ctx, key,
-            ifname, &num_udis, &error);
-
-  if (dbus_error_is_set (&error)) {
-    fprintf (stderr, "error: %s: %s\n",
-      error.name, error.message);
-    dbus_error_free (&error);
-    return NULL;
-  }
-
-  /* No devices found */
-  if (num_udis == 0) {
-    return NULL;
-  }
-
-  /* Get info.product for this device */
-  key="info.product";
-  value = libhal_device_get_property_string(hal_ctx, udis[0],
-              key, &error);
-  libhal_free_string_array (udis);
-
-  return value;
+  return string(buf);
 }
 
 vector<InterfaceInfo> LinuxPlatform::interfaces()
 {
   vector<InterfaceInfo> result;
-  char err_buff[PCAP_ERRBUF_SIZE];
-  const char *description;
-  const char *type;
-  pcap_if_t *all_devs;
   
-    if (pcap_findalldevs(&all_devs, err_buff) != 0) {
-        throw runtime_error(boost::str(boost::format("Error in pcap_findalldevs: %s") % err_buff));
-    }
-  
-  pcap_if_t *dev = all_devs;
-  while (dev) {
-    pcap_t *interface = pcap_open_live(dev->name,
-            1024 ,1, 100,
-            err_buff);
+  DBusError     error;
+  LibHalContext *context;
+  char          **devices;
+  int           num_devices;
 
-    if (interface == NULL) {
-      dev = dev->next;
-      continue;
-    }
-
-    switch (pcap_datalink(interface)) {
-    case DLT_EN10MB:
-      type = "ethernet";
-      break;
-    case DLT_IEEE802_11_RADIO:
-      type = "802.11 monitor";
-      break;
-    default:
-      pcap_close(interface);
-      dev = dev->next;
-      continue;
-    }
-
-    description = (dev->description) ? dev->description :
-        get_hal_interface_description(dev->name);
-    InterfaceInfo info(dev->name, description, type);
-    result.push_back(info);
-
-    pcap_close(interface);
-    dev = dev->next;
+  /* Create HAL context */
+  context = libhal_ctx_new();
+  if (context == NULL)
+    throw runtime_error("libhal_ctx_new() failed");
+    
+  /* Initialize DBus connection */
+  dbus_error_init(&error); 
+  if (!libhal_ctx_set_dbus_connection(context, dbus_bus_get(DBUS_BUS_SYSTEM, &error))) {
+    runtime_error ex(str(format("libhal_ctx_set_dbus_connection failed: %s: %s") % error.name % error.message));
+    LIBHAL_FREE_DBUS_ERROR(&error);
+    throw ex;
   }
-  pcap_freealldevs(all_devs);
+    
+  /* Initialize HAL context */
+  if (!libhal_ctx_init(context, &error)) {
+    if (dbus_error_is_set(&error)) {
+      runtime_error ex(str(format("Could not initialize connection to hald, is it running? %s %s") % error.name % error.message));
+      dbus_error_free (&error);
+      throw ex;
+    } else {
+      throw runtime_error("Could not initialize connection to hald, is it running?");
+    }
+  }
+
+  /* Find all network devices */
+  devices = libhal_find_device_by_capability(context, "net", &num_devices, &error);
+  if (!devices)
+    throw runtime_error("Failed to list network devices.");
+
+  for (int i = 0; i < num_devices; i++) {
+    char *device = devices[i];
+    
+    /* Get basic device information */
+    string iface    = device_get_property_string(context, devices[i], "net.interface", &error);
+    string category = device_get_property_string(context, devices[i], "info.category", &error);
+
+    string type;
+    if (category == "net.80211")
+      type = "ieee80211";
+    else if (category == "net.80211control")
+      type = "ieee80211_monitor";
+    else if (category == "net.80203")
+      type = "ethernet";
+    else
+      continue;
+      
+    /* Get parent physical device */
+    string parent = device_get_property_string(context, devices[i], "net.originating_device", &error);
+
+    /* Originating_device of USB interfaces is an interface, the parent of that is the actual device */
+    string parent_subsystem = device_get_property_string(context, parent, "info.subsystem", &error);
+    if (parent_subsystem == "usb")
+      parent = device_get_property_string(context, parent, "info.parent", &error);
+
+    /* Get device properties */
+    string vendor  = device_get_property_string(context, parent, "info.vendor", &error);
+    string product = device_get_property_string(context, parent, "info.product", &error);
+    string description(str(format("%s %s") % vendor % product));
+    
+    InterfaceInfo info(iface, description, type);
+    result.push_back(info);
+  }
+  
+  /* Free devices */
+  libhal_free_string_array(devices);
+
   return result; 
 }
+
