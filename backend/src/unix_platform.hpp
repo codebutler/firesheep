@@ -58,8 +58,7 @@ public:
     m_path = string(path);
   }
   
-  bool is_root()
-  {
+  bool is_root() {
     return geteuid() == 0;
   }
   
@@ -71,7 +70,7 @@ public:
     if (err == -1)
       throw runtime_error("stat() failed");
 
-    return (file_stat.st_mode == MODE);
+    return (file_stat.st_uid == 0 && file_stat.st_mode == MODE);
   }
   
   void fix_permissions() {
