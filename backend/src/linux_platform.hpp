@@ -29,9 +29,9 @@
 
 class LinuxPlatform : public UnixPlatform {
 public:
-	LinuxPlatform(vector<string>);
-	bool run_privileged();
-	vector<InterfaceInfo> interfaces();
+  LinuxPlatform(vector<string>);
+  bool run_privileged();
+  vector<InterfaceInfo> interfaces();
 };
 
 #endif
