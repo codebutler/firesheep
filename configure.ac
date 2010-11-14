@@ -23,7 +23,7 @@
 AC_INIT([Firesheep], [0.1], [eric@codebutler.com],
         [firesheep], [http://codebutler.github.com/firesheep])
 AC_PREREQ([2.61])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign])
 
 AC_PROG_CXX
 
