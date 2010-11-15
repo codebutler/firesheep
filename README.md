@@ -38,18 +38,15 @@ See instructions for your platform below. When done, an xpi will be created insi
 This has so far only been tested on Windows XP (32-bit), however the binaries work fine on Windows 7 too. If you can help simplify this process please let me know.
 
 1. You'll need Microsoft Visual Studio 2005. The express edition should work too, but this hasn't been tested. Newer versions of Visual Studio should also work, but the Makefiles might need a bit of tweaking. Patches in this area greatly appreciated.
-2. Install [Cygwin][3], selecting the following packages:
-  * `automake-1.11`
-  * `gcc-g++`
+2. Install [Cygwin][3], selecting the following packages: `automake-1.11`, `gcc-g++`.
 3. Install [BoostPro][4]. Choose *Visual C++ 8.0* and *Multithreaded debug, static runtime*.
 4. Install [WinPcap][6].
 4. Download and extract the [Mozilla SDK][2] (Gecko 1.9.2). 
-5. Run autogen, specifying the path where you extracted the Mozilla SDK to (`./autogen.sh --with-xulrunner-sdk=/path/to/sdk`).
-6. Run `make`!
+5. From a Cygwin command prompt: Run autogen, specifying the path where you extracted the Mozilla SDK to (`./autogen.sh --with-xulrunner-sdk=/path/to/sdk`) then run `make`!
 
 [1]: http://mxcl.github.com/homebrew/
 [2]: https://developer.mozilla.org/en/gecko_sdk#Downloading
-[3]: cygin
+[3]: http://www.cygwin.com/
 [4]: http://www.boostpro.com/download/
 [5]: http://en.wikipedia.org/wiki/Promiscuous_mode
 [6]: http://www.winpcap.org/install/default.htm
