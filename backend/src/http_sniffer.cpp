@@ -78,21 +78,21 @@ void HttpSniffer::start()
 void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *packet)
 {
   /* Declare pointers to packet headers */
-  const struct radiotap_header *radiotap; /* The Radiotap header */
-  const struct wifi_header *hdr80211; /* The 802.11 header */
-  const struct snap_llc_header *snap_llc; /* The SNAP LLC header */
-  const struct sniff_ethernet *ethernet;  /* The Ethernet header [1] */
-  const struct sniff_ip  *ip = NULL;  /* The IP header */
-  const struct sniff_ip6 *ip6 = NULL; /* The IPv6 header */
-  const struct sniff_tcp *tcp;    /* The TCP header */
-  const char *payload;  /* Packet payload */
+  const struct radiotap_header *radiotap;   /* The Radiotap header */
+  const struct wifi_header     *hdr80211;   /* The 802.11 header */
+  const struct snap_llc_header *snap_llc;   /* The SNAP LLC header */
+  const struct sniff_ethernet  *ethernet;   /* The Ethernet header [1] */
+  const struct sniff_ip        *ip = NULL;  /* The IP header */
+  const struct sniff_ip6       *ip6 = NULL; /* The IPv6 header */
+  const struct sniff_tcp       *tcp;        /* The TCP header */
+  const char                   *payload;    /* Packet payload */
 
   /* Declare header lengths */
-  int size_ip;    /* Size of IP header in bytes */
-  int size_tcp;   /* Size of TCP header << */
-  int size_payload; /* Size of data in bytes  << */
-  int size_radiotap;  /* Size of Radiotap header  << */
-  int size_80211;   /* Size of 802.11 header << */
+  int size_ip;       /* Size of IP header in bytes */
+  int size_tcp;      /* Size of TCP header */
+  int size_payload;  /* Size of data in bytes */
+  int size_radiotap; /* Size of Radiotap header */
+  int size_80211;    /* Size of 802.11 header */
 
   /* Layer 3 header offset */
   int l3hdr_off = SIZE_ETHERNET;
@@ -105,10 +105,12 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
   string from;
   string to;
 
+  WifiInfo wifi_info;
+
   /* 802.11 monitor support... */
   if (m_wifimon) {
     /* Get Radiotap header length (variable) */
-    radiotap = (struct radiotap_header*)(packet);
+    radiotap      = (struct radiotap_header*)(packet);
     size_radiotap = radiotap->it_len;
 
     /* Calculate 802.11 header length (variable) */
@@ -146,6 +148,8 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
       return;
     }
     ip_len = ntohs(ip->ip_len);
+
+    wifi_info = WifiInfo(hdr80211, radiotap);
   } else {
     /* Define ethernet header */
     ethernet = (struct sniff_ethernet*)(packet);
@@ -222,9 +226,9 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
   PacketCacheMap::iterator iter;
   iter = m_pending_packets.find(key);
   
-  if (iter == m_pending_packets.end())
-    http_packet = new HttpPacket(from, to);
-  else {
+  if (iter == m_pending_packets.end()) {
+    http_packet = new HttpPacket(from, to, wifi_info);
+  } else {
     http_packet = iter->second;
     m_pending_packets.erase(iter);
   }

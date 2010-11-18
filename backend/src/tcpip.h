@@ -21,6 +21,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef TCPIP_H
+#define TCPIP_H
+
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -71,9 +74,9 @@ PACK_START
 struct wifi_header {
 	u_int16_t fc;
 	u_int16_t duration;
-	u_int8_t da[6];
-	u_int8_t sa[6];
-	u_int8_t bssid[6];
+	u_int8_t addr1[6];
+	u_int8_t addr2[6];
+	u_int8_t addr3[6];
 	u_int16_t seq_ctrl;
 }PACK_END;
 
@@ -172,3 +175,5 @@ struct sniff_tcp {
 
 #undef PACK_START
 #undef PACK_END
+
+#endif

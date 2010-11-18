@@ -29,6 +29,7 @@
 #include <vector>
 #include <boost/algorithm/string.hpp>
 #include "http-parser/http_parser.h"
+#include "wifi_info.hpp"
 
 using namespace std;
 
@@ -50,7 +51,7 @@ typedef map<string, string> HeaderMap;
 
 class HttpPacket {
 public:
-  HttpPacket(string from, string to);
+  HttpPacket(string from, string to, WifiInfo wifiInfo);
   bool parse(const char *payload, int payload_size);
   
   bool isComplete();
@@ -65,6 +66,8 @@ public:
   string cookies();
   
   HeaderMap headers();
+
+  WifiInfo wifi_info();
   
 private:
   http_parser          m_parser;
@@ -78,6 +81,7 @@ private:
   string               m_tmp_header_name;
   string               m_tmp_header_value;
   bool                 m_complete;
+  WifiInfo             m_wifi_info;
 
   HTTP_PARSER_DATA_CALLBACK(url);
   HTTP_PARSER_DATA_CALLBACK(header_field);
