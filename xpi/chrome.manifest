@@ -2,9 +2,11 @@ content   firesheep                 chrome/content/
 skin      firesheep   classic/1.0   chrome/skin/
 locale    firesheep   en-US         chrome/locale/en-US/
 
-overlay   chrome://browser/content/browser.xul                     chrome://firesheep/content/ff-overlay.xul
-style     chrome://firesheep/content/ff-sidebar.xul                chrome://firesheep/skin/sidebar-osx.css      OS=Darwin
-style     chrome://firesheep/content/preferences/prefsWindow.xul   chrome://firesheep/skin/preferences-osx.css  OS=Darwin
+overlay   chrome://browser/content/browser.xul                   chrome://firesheep/content/browserOverlay.xul
+overlay   chrome://global/content/customizeToolbar.xul           chrome://firesheep/content/customizeToolbarOverlay.xul
+
+style     chrome://firesheep/content/sidebar.xul                 chrome://firesheep/skin/sidebar-osx.css      OS=Darwin
+style     chrome://firesheep/content/preferences/prefsWindow.xul chrome://firesheep/skin/preferences-osx.css  OS=Darwin
 
 resource firesheep modules/
 

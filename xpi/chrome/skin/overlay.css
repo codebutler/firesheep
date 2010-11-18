@@ -1,0 +1,9 @@
+#firesheep-toolbar-button {
+	list-style-image: url('chrome://firesheep/skin/toolbar-button.png');
+}
+
+toolbar[iconsize="small"] #firesheep-toolbar-button > .toolbarbutton-icon {
+	list-style-image: url('chrome://firesheep/skin/toolbar-button.png');
+    width: 16px;
+    height: 16px;
+}

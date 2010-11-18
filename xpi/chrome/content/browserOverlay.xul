@@ -2,7 +2,7 @@
 <?xml-stylesheet href="chrome://firesheep/skin/overlay.css" type="text/css"?>
 
 <!--
-  ff-overlay.xul
+  browserOverlay.xul
   Part of the Firesheep project.
   
   Copyright (C) 2010 Eric Butler
@@ -27,15 +27,18 @@
 <!DOCTYPE overlay SYSTEM "chrome://firesheep/locale/overlay.dtd">
 
 <overlay id="firesheep-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <script src="ff-overlay.js"/>
+  <script src="browserOverlay.js"/>
 
   <stringbundleset id="stringbundleset">
     <stringbundle id="firesheep-strings" src="chrome://firesheep/locale/overlay.properties"/>
   </stringbundleset>
 
   <toolbarpalette id="BrowserToolbarPalette">
-  <toolbarbutton id="firesheep-toolbar-button" class="toolbarbutton-1 chromeclass-toolbar-additional"
-    label="&firesheepToolbarButton.label;" tooltiptext="&firesheepToolbarButton.tooltip;"
+    <toolbarbutton 
+      id="firesheep-toolbar-button" 
+      class="toolbarbutton-1 chromeclass-toolbar-additional"
+      label="&firesheepToolbarButton.label;" 
+      tooltiptext="&firesheepToolbarButton.tooltip;"
     oncommand="FiresheepUI.toggleSidebar()"/>
   </toolbarpalette>
 
@@ -53,7 +56,7 @@
                  autoCheck="false"
                  type="checkbox"
                  group="sidebar"
-                 sidebarurl="chrome://firesheep/content/ff-sidebar.xul"
+                 sidebarurl="chrome://firesheep/content/sidebar.xul"
                  sidebartitle="&firesheepSidebar.label;"
                  oncommand="FiresheepUI.toggleSidebar()" />
   </broadcasterset>
