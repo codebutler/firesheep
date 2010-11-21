@@ -2,8 +2,17 @@ content   firesheep                 chrome/content/
 skin      firesheep   classic/1.0   chrome/skin/
 locale    firesheep   en-US         chrome/locale/en-US/
 
-overlay   chrome://browser/content/browser.xul                     chrome://firesheep/content/ff-overlay.xul
-style     chrome://firesheep/content/ff-sidebar.xul                chrome://firesheep/skin/sidebar-osx.css      OS=Darwin
-style     chrome://firesheep/content/preferences/prefsWindow.xul   chrome://firesheep/skin/preferences-osx.css  OS=Darwin
+overlay   chrome://browser/content/browser.xul                   chrome://firesheep/content/browserOverlay.xul
+overlay   chrome://global/content/customizeToolbar.xul           chrome://firesheep/content/customizeToolbarOverlay.xul
+
+style     chrome://firesheep/content/sidebar.xul                 chrome://firesheep/skin/sidebar-osx.css      OS=Darwin
+style     chrome://firesheep/content/preferences/prefsWindow.xul chrome://firesheep/skin/preferences-osx.css  OS=Darwin
 
 resource firesheep modules/
+
+interfaces components/MozPopen.xpt
+binary-component platform/WINNT_x86-msvc/components/MozPopen.dll ABI=WINNT_x86-msvc
+binary-component platform/Darwin_x86-gcc3/components/MozPopen.dylib ABI=Darwin_x86-gcc3
+binary-component platform/Darwin_x86-64-gcc3/components/MozPopen.dylib ABI=Darwin_x86-64-gcc3
+binary-component platform/Linux_x86-gcc3/components/MozPopen.so ABI=Linux_x86-gcc3
+binary-component platform/Linux_x86_64-gcc3/components/MozPopen.so ABI=Linux_x86_64-gcc3

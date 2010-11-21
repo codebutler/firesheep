@@ -1,5 +1,5 @@
 //
-// osx_platform.h: Functions for unix-like platforms.
+// unix_platform.h: Functions for unix-like platforms.
 // Part of the Firesheep project.
 //
 // Copyright (C) 2010 Eric Butler
@@ -29,7 +29,11 @@
 #include <fcntl.h>
 #include <stdbool.h>
 #include <unistd.h>
+#ifdef PLATFORM_LINUX
+#include <limits.h>
+#else
 #include <sys/syslimits.h>
+#endif
 #include <sys/stat.h>
 #include <sys/errno.h>
 #include "abstract_platform.hpp"
@@ -54,8 +58,7 @@ public:
     m_path = string(path);
   }
   
-  bool is_root()
-  {
+  bool is_root() {
     return geteuid() == 0;
   }
   
@@ -67,7 +70,7 @@ public:
     if (err == -1)
       throw runtime_error("stat() failed");
 
-    return (file_stat.st_mode == MODE);
+    return (file_stat.st_uid == 0 && file_stat.st_mode == MODE);
   }
   
   void fix_permissions() {

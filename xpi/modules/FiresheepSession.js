@@ -46,7 +46,7 @@ FiresheepSession.prototype = {
         // FIXME: This should really use chmod(2) directly.
         Utils.runCommand('chmod', [ 'a+x', this._core.backendPath ]);
 
-        // Tell backend to repair owner/setuid. Wil return succesfully if everything is already OK.
+        // Tell backend to repair owner/setuid. Will return succesfully if everything is already OK.
         this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
         this._process.Init(this._core.backendPath, [ '--fix-permissions' ], 1);
         this._process.Start();

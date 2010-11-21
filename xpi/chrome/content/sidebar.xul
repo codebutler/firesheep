@@ -3,7 +3,7 @@
 <?xml-stylesheet href="chrome://firesheep/skin/sidebar.css" type="text/css"?>
 
 <!--
-  ff-sidebar.xul
+  sidebar.xul
   Part of the Firesheep project.
   
   Copyright (C) 2010 Eric Butler
@@ -30,8 +30,8 @@
 <page id="firesheepSidebar" title="&firesheepSidebar.label;"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-  <script src="ff-sidebar.js"/>
-  <script src="ff-overlay.js"/>
+  <script src="sidebar.js"/>
+  <script src="browserOverlay.js"/>
 
   <vbox flex="1">
     <hbox id="toolbar">

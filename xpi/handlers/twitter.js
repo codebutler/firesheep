@@ -1,9 +1,11 @@
 // Authors:
 //   Eric Butler <eric@codebutler.com>
+//   Ian Gallagher <crash@neg9.org>
 Components.utils.import('resource://firesheep/util/RailsHelper.js');
 
 register({
   name: 'Twitter',
+  url: 'https://twitter.com/',
   domains: [ 'twitter.com' ],
   sessionCookieNames: [ '_twitter_sess', 'auth_token' ],
 

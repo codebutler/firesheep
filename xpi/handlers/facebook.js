@@ -1,8 +1,9 @@
 // Authors:
 //   Eric Butler <eric@codebutler.com>
+//   Ian Gallagher <crash@neg9.org>
 register({
   name: 'Facebook',
-  url: 'http://www.facebook.com/home.php',
+  url: 'https://www.facebook.com/home.php',
   domains: [ 'facebook.com' ],
   sessionCookieNames: [ 'xs', 'c_user', 'sid' ],
 

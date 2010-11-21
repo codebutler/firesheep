@@ -8,10 +8,15 @@
     <em:creator>Eric Butler</em:creator>
     <em:contributor></em:contributor>
     <em:aboutURL>chrome://firesheep/content/about.xul</em:aboutURL>
-    <em:optionsURL>chrome://firesheep/content/preferences/prefsWindow.xul</em:optionsURL>
+    <em:optionsURL>chrome://firesheep/content/preferences/prefsWindow.xul</em:optionsURL>    
+    <em:homepageURL>http://codebutler.github.com/firesheep</em:homepageURL>
+    <em:updateURL>http://codebutler.github.com/firesheep/update.rdf</em:updateURL>
+    <em:updateKey>MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCx0jVpi2A7WnvIDJlqYFlSk+9Ny6ccmRSFShlcpmjqfEGYDJFNLnXERSHhNGIVYArBhHkunwWyZJ4Es4kUZ6BGE0IbEIPhJPgD18DCdgRwFL+ts9sn+2DWxd0KrU62P9phCNcsvrlL+G+O/znSoBYDeiMS0OrGN5HcftwdReHaMQIDAQAB</em:updateKey>
     <em:unpack>true</em:unpack>
     <em:targetPlatform>Darwin_x86-gcc3</em:targetPlatform>
     <em:targetPlatform>WINNT_x86-msvc</em:targetPlatform>
+    <em:targetPlatform>Linux_x86-gcc3</em:targetPlatform>
+    <em:targetPlatform>Linux_x86_64-gcc3</em:targetPlatform>
     <em:targetApplication>
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- Firefox -->

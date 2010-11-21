@@ -27,8 +27,12 @@
 
 #ifdef PLATFORM_WIN32
 #include "windows_platform.hpp"
-#else
+#elif PLATFORM_OSX
 #include "osx_platform.hpp"
+#elif PLATFORM_LINUX
+#include "linux_platform.hpp"
+#else
+#error "no suitable platform"
 #endif
 
 void received_packet(HttpPacket *packet);
@@ -40,8 +44,10 @@ int main(int argc, const char *argv[])
   
 #ifdef PLATFORM_WIN32
   WindowsPlatform platform(sargv);
-#else
+#elif PLATFORM_OSX
   OSXPlatform platform(sargv);
+#elif PLATFORM_LINUX
+  LinuxPlatform platform(sargv);
 #endif
   
   if (argc > 1) {

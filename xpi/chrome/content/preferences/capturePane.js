@@ -37,7 +37,7 @@ function loadInterfaces () {
     var ifaces = Firesheep.networkInterfaces;
     for (var id in ifaces) {
       var name = ifaces[id].name;
-      var label = (id.length > 4) ? name : (name + ' (' + id + ')');
+      var label = (id.length > 10) ? name : (name + ' (' + id + ')');
       
       var item = document.createElement('menuitem');
       item.setAttribute('label', label);

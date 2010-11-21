@@ -18,7 +18,7 @@ register({
     // Grab avatar from Google Profiles page, if they have one
     var avatar_element;
     try {
-	    var profile = this.httpGet('http://www.google.com/profiles/me');
+	    var profile = this.httpGet('https://www.google.com/profiles/me');
 	    avatar_element = profile.body.querySelector('.ll_profilephoto.photo');
     }
     catch(err) {

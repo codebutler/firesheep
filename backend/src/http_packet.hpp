@@ -32,63 +32,63 @@
 
 using namespace std;
 
-#define HTTP_PARSER_DATA_CALLBACK(NAME) 																						\
-static int NAME##_cb_wrapper (http_parser *parser, const char *buf, size_t len) { 	\
-	HttpPacket *packet = (HttpPacket *)parser;																				\
-	return packet->NAME##_cb(buf, len);																								\
-}																																										\
+#define HTTP_PARSER_DATA_CALLBACK(NAME)                                             \
+static int NAME##_cb_wrapper (http_parser *parser, const char *buf, size_t len) {   \
+  HttpPacket *packet = (HttpPacket *)parser;                                        \
+  return packet->NAME##_cb(buf, len);                                               \
+}                                                                                   \
 int NAME##_cb(const char *buf, size_t len);
 
-#define HTTP_PARSER_CALLBACK(NAME) 										\
-static int NAME##_cb_wrapper (http_parser *parser) { 	\
-	HttpPacket *packet = (HttpPacket *)parser;					\
-	return packet->NAME##_cb();													\
-}																											\
+#define HTTP_PARSER_CALLBACK(NAME)                    \
+static int NAME##_cb_wrapper (http_parser *parser) {  \
+  HttpPacket *packet = (HttpPacket *)parser;          \
+  return packet->NAME##_cb();                         \
+}                                                     \
 int NAME##_cb();
 
 typedef map<string, string> HeaderMap;
 
 class HttpPacket {
 public:
-	HttpPacket(string from, string to);
-	bool parse(const char *payload, int payload_size);
-	
-	bool isComplete();
-	
-	string from();
-	string to();
-	string host();
-	string method();
-	string path();
-	string user_agent();
-	string query();
-	string cookies();
-	
-	HeaderMap headers();
-	
+  HttpPacket(string from, string to);
+  bool parse(const char *payload, int payload_size);
+  
+  bool isComplete();
+  
+  string from();
+  string to();
+  string host();
+  string method();
+  string path();
+  string user_agent();
+  string query();
+  string cookies();
+  
+  HeaderMap headers();
+  
 private:
-	http_parser          m_parser;
-	http_parser_settings m_settings;
-	string               m_from;
-	string               m_to;
-	string               m_url;
-	string               m_path;
-	string               m_query;
-	HeaderMap	           m_headers;
-	string               m_tmp_header_name;
-	string               m_tmp_header_value;
-	bool                 m_complete;
+  http_parser          m_parser;
+  http_parser_settings m_settings;
+  string               m_from;
+  string               m_to;
+  string               m_url;
+  string               m_path;
+  string               m_query;
+  HeaderMap            m_headers;
+  string               m_tmp_header_name;
+  string               m_tmp_header_value;
+  bool                 m_complete;
 
-	HTTP_PARSER_DATA_CALLBACK(url);
-	HTTP_PARSER_DATA_CALLBACK(header_field);
-	HTTP_PARSER_DATA_CALLBACK(header_value);
-	HTTP_PARSER_DATA_CALLBACK(path);
-	HTTP_PARSER_DATA_CALLBACK(query_string);
-	HTTP_PARSER_CALLBACK(headers_complete);
-	HTTP_PARSER_CALLBACK(message_complete);
-	
-	void add_header(string name, string value);
-	string get_header(string name);
+  HTTP_PARSER_DATA_CALLBACK(url);
+  HTTP_PARSER_DATA_CALLBACK(header_field);
+  HTTP_PARSER_DATA_CALLBACK(header_value);
+  HTTP_PARSER_DATA_CALLBACK(path);
+  HTTP_PARSER_DATA_CALLBACK(query_string);
+  HTTP_PARSER_CALLBACK(headers_complete);
+  HTTP_PARSER_CALLBACK(message_complete);
+  
+  void add_header(string name, string value);
+  string get_header(string name);
 };
 
 typedef void (*http_packet_cb) (HttpPacket*);

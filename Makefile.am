@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I .
+
 SUBDIRS = mozpopen backend
 
 all: zip

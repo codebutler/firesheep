@@ -38,6 +38,8 @@ var Firesheep = {
   
   _results: null,
   
+  _myDir: null,
+  
   load: function () {
     if (!this._loaded) {
       this.config.load();
@@ -64,6 +66,19 @@ var Firesheep = {
         if (data.action == 'scripts_changed')
           Firesheep.reloadScripts();
       });
+      
+      if ("@mozilla.org/extensions/manager;1" in Cc) {
+        var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
+        var file = em.getInstallLocation('firesheep@codebutler.com').location;
+        file.append('firesheep@codebutler.com');
+        Firesheep._myDir = file;
+      } else { /* FF 4 */
+        // FIXME: There's almost certainly a race condition here. A better solution is required.
+        Components.utils.import("resource://gre/modules/AddonManager.jsm");
+        AddonManager.getAddonByID('firesheep@codebutler.com', function (addon) {
+          Firesheep._myDir = addon.getResourceURI('/').QueryInterface(Components.interfaces.nsIFileURL).file;
+        });
+      }      
     }
   },
   
@@ -163,9 +178,7 @@ var Firesheep = {
   },
   
   get _scriptsDir () {
-    var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
-    var file = em.getInstallLocation('firesheep@codebutler.com').location;
-    file.append('firesheep@codebutler.com');
+    var file = this._myDir.clone();
     file.append('handlers');
     return file;
   },
@@ -184,14 +197,11 @@ var Firesheep = {
     return builtinScripts;
   },
   
-  get backendPath () {
-    var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
-    
+  get backendPath () {    
     var xulRuntime = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime);
     var platformName = [ xulRuntime.OS, xulRuntime.XPCOMABI ].join('_');
 
-    var file = em.getInstallLocation("firesheep@codebutler.com").location;
-    file.append("firesheep@codebutler.com");
+    var file = this._myDir.clone();
     file.append("platform");
     file.append(platformName);
     if (xulRuntime.OS == "WINNT") {

@@ -1,5 +1,5 @@
 //
-// ff-overlay.js
+// browserOverlay.js
 // Part of the Firesheep project.
 //
 // Copyright (C) 2010 Eric Butler

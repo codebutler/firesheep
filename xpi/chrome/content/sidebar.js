@@ -1,5 +1,5 @@
 //
-// ff-sidebar.js
+// sidebar.js
 // Part of the Firesheep project.
 //
 // Copyright (C) 2010 Eric Butler
