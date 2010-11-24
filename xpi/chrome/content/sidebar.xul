@@ -36,6 +36,7 @@
   <vbox flex="1">
     <hbox id="toolbar">
       <button label="Start Capturing" id="captureButton" oncommand="Firesheep.toggleCapture()" flex="1" />
+      <button label="Submit" id="submitButton" oncommand="submitCookies()" flex="1" />
     </hbox>
 
     <notificationbox flex="1" id="errors">

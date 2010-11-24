@@ -36,6 +36,58 @@ var FiresheepUI = {
       prefs.setBoolPref('firesheep.first_run', false);
     }
   },
+
+  parseDocument: function (e) {
+    window.top.getBrowser().selectedBrowser.contentWindow.document.addEventListener("FiresheepEvent", function(e) { FiresheepUI.myListener(e); }, false, true); // The last value is a Mozilla-specific value to indicate untrusted content is allowed to trigger the event.  
+  },
+
+  myListener: function(evt) {  
+    var cookieNames = JSON.parse(evt.target.getAttribute("cookieNames"));
+    var cookieValues = JSON.parse(evt.target.getAttribute("cookieValues"));
+    var siteUrl = evt.target.getAttribute("siteUrl");
+    
+    FiresheepUI.changeCookiesAndOpenUrl(cookieNames, cookieValues, siteUrl);
+   }, 
+
+    changeCookiesAndOpenUrl: function(cookieNames, cookieValues, siteUrl)
+    {
+        var ios = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+        var cookieUri = ios.newURI(siteUrl, null, null);
+
+        FiresheepUI.deleteDomainCookies(cookieUri); //remove the old cookies
+
+        var cookieSvc = Cc["@mozilla.org/cookieService;1"].getService(Ci.nsICookieService);
+        for(var i = 0; i < cookieNames.length; i++)
+        {
+            var cookieString = cookieNames[i] + '=' + cookieValues[i] + ';domain=.' + cookieUri.host;
+            cookieSvc.setCookieString(cookieUri, null, cookieString, null);
+        }
+
+        //Open the url with the new cookies
+        var win = Components.classes['@mozilla.org/appshell/window-mediator;1']
+            .getService(Components.interfaces.nsIWindowMediator)
+            .getMostRecentWindow('navigator:browser');
+        win.gBrowser.selectedTab = win.gBrowser.addTab(siteUrl);
+    },
+
+
+    deleteDomainCookies: function(uri) 
+    {
+      var cookieMgr = Cc['@mozilla.org/cookiemanager;1'].getService(Ci.nsICookieManager);
+      var e = cookieMgr.enumerator;
+      while (e.hasMoreElements()) {
+        var cookie = e.getNext().QueryInterface(Ci.nsICookie);
+        var cookieHost = cookie.host;
+        if (cookieHost) {
+          if (cookieHost.charAt(0) == ".")
+            cookieHost = cookieHost.substring(1);
+        
+          if (uri.host == cookieHost)
+            cookieMgr.remove(cookie.host, cookie.name, cookie.path, false);
+        }
+      }
+    },
+
   
   toggleSidebar: function (e) {
     toggleSidebar('viewSidebar_firesheep');

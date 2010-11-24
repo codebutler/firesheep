@@ -46,6 +46,10 @@
     <menuitem key="key_openSidebar_firesheep" observes="viewSidebar_firesheep" />
   </menupopup>
 
+  <menupopup id="menu_ToolsPopup">
+	<menuitem label="Parse Firesheep Website" oncommand="FiresheepUI.parseDocument()"/>
+  </menupopup>
+
   <keyset id="mainKeyset">
     <key id="key_openSidebar_firesheep" command="viewSidebar_firesheep" key="s" modifiers="shift control" />
   </keyset>

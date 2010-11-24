@@ -28,12 +28,17 @@
   <prefpane id="capturePane" label="Capture" flex="1" onpaneload="loadInterfaces()">
     <preferences>
       <preference id="pref-interface" name="firesheep.capture_interface" type="string" />
+      <preference id="pref-interface2" name="firesheep.server_submit_url" type="string" />
     </preferences>
     <hbox align="center">
       <label control="capture_interface" value="Interface:" />
       <menulist id="captureInterfaceMenuList" preference="pref-interface" oncommand="setInterface()">
         <menupopup />
       </menulist>
+    </hbox>
+    <hbox align="center">
+      <label control="serverUrl" value="Server Submit Url:" />
+      <textbox id="serverUrlTextBox" preference="pref-interface2" type="string" />
     </hbox>
   </prefpane>
 </overlay>
