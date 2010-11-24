@@ -105,13 +105,18 @@ vector<InterfaceInfo> LinuxPlatform::interfaces()
     else
       continue;
       
-    /* Get parent physical device */
-    string parent = device_get_property_string(context, devices[i], "net.originating_device", &error);
+    /* device points to a 'network inteface', get parent (physical?) device */
+    string parent = device_get_property_string(context, device, "net.originating_device", &error);
 
-    /* Originating_device of USB interfaces is an interface, the parent of that is the actual device */
-    string parent_subsystem = device_get_property_string(context, parent, "info.subsystem", &error);
-    if (parent_subsystem == "usb")
-      parent = device_get_property_string(context, parent, "info.parent", &error);
+    if (parent != "/org/freedesktop/Hal/devices/computer") {
+      /* Might need to go up one more level to actually find physical device */
+      string parent_subsystem = device_get_property_string(context, parent, "info.subsystem", &error);
+      if (parent_subsystem == "usb")
+        parent = device_get_property_string(context, parent, "info.parent", &error);
+    } else {
+        /* Some virtual network interfaces have no device parent. */
+        parent = devices[i];
+    }
 
     /* Get device properties */
     string vendor  = device_get_property_string(context, parent, "info.vendor", &error);
