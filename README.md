@@ -30,7 +30,7 @@ See instructions for your platform below. When done, an xpi will be created insi
 
 ### Ubuntu Linux (10.10 Maverick)
 
-1. Install build dependencies (`sudo apt-get install autconf libtool libpcap-dev libboost-all-dev libhal-dev xulrunner-1.9.2-dev`).
+1. Install build dependencies (`sudo apt-get install autoconf libtool libpcap-dev libboost-all-dev libhal-dev xulrunner-1.9.2-dev`).
 2. Run `./autogen.sh` then `make`.
 
 ### Windows
