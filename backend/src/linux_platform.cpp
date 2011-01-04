@@ -43,11 +43,12 @@ string device_get_property_string(LibHalContext *context, string device, string 
 {
   char *buf = libhal_device_get_property_string(context, device.c_str(), key.c_str(), error);
   if (dbus_error_is_set(error)) {
-    runtime_error ex(str(format("libhal_device_get_property_string failed: %s %s") % error->name % error->message));
     dbus_error_free(error);
-    throw ex;
+    return string("Unknown");
   }
-  return string(buf);
+  else {
+    return string(buf);
+  }
 }
 
 vector<InterfaceInfo> LinuxPlatform::interfaces()
