@@ -5,7 +5,12 @@ register({
   name: 'Facebook',
   url: 'https://www.facebook.com/home.php',
   domains: [ 'facebook.com' ],
-  sessionCookieNames: [ 'xs', 'c_user', 'sid' ],
+  sessionCookieNames: [ 'datr', 'c_user', 'lu', 'sct' ],
+
+  processPacket: function () {
+    var cookies = this.firstPacket.cookies;
+    this.sessionId = cookies.c_user + cookies.sct;
+  },
 
   identifyUser: function () {
     var resp = this.httpGet(this.siteUrl);
