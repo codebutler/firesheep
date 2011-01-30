@@ -27,6 +27,9 @@ AM_INIT_AUTOMAKE([foreign])
 
 AC_PROG_CXX
 
+# OSX doesn't come wiht pkg-config, but PKG_CHECK_MODULES has to be defined to something to avoid errors.
+m4_define_default([PKG_CHECK_MODULES], [AC_MSG_FAILURE([pkg-config was not found])])
+
 AC_CANONICAL_HOST
 case "$host_os" in
 	cygwin)
