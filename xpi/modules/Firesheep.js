@@ -212,7 +212,22 @@ var Firesheep = {
     } else {
       file.append("firesheep-backend");
     }
-    
+
+    // Hack for filevault
+    var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
+    if (osString == 'Darwin') {
+      var username = Utils.runCommand('whoami', []).trim();
+      var vaultFile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+      vaultFile.initWithPath("/Users/." + username + "/" + username + ".sparsebundle");
+      if (vaultFile.exists()) {
+        var tmpFile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+        tmpFile.initWithPath("/tmp/firesheep-backend");
+        if (!tmpFile.exists()) 
+          file.copyTo(tmpFile.parent, tmpFile.leafName);
+        return tmpFile.path;
+      }
+    }
+
     return file.path;
   },
   
