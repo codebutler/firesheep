@@ -175,7 +175,7 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
   }
   
   /* Ignore non tcp packets */
-  if (ip->ip_p != IPPROTO_TCP && ip6->ip6_nxt != IPPROTO_TCP)
+  if (!((ip && ip->ip_p == IPPROTO_TCP) || (ip6 && ip6->ip6_nxt == IPPROTO_TCP)))
     return;
   
   /* Check and set TCP header size */
