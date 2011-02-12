@@ -28,7 +28,9 @@
 
 #include <fcntl.h>
 #include <stdbool.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 
 #include "interface_info.hpp"
 

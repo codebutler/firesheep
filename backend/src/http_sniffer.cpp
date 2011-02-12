@@ -197,10 +197,10 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
     to   = str(boost::format("%s:%d") % inet_ntoa(ip->ip_dst) % ntohs(tcp->th_dport));
   } else {  
     char src_addr_buf[INET6_ADDRSTRLEN];
-    inet_ntop(AF_INET6, &ip6->ip6_src, src_addr_buf, sizeof(src_addr_buf));
+    inet_ntop(AF_INET6, (PVOID) &ip6->ip6_src, src_addr_buf, sizeof(src_addr_buf));
     
     char dst_addr_buf[INET6_ADDRSTRLEN];
-    inet_ntop(AF_INET6, &ip6->ip6_dst, dst_addr_buf, sizeof(src_addr_buf));
+    inet_ntop(AF_INET6, (PVOID) &ip6->ip6_dst, dst_addr_buf, sizeof(src_addr_buf));
     
     from = str(boost::format("[%s]:%d") % string(src_addr_buf) % ntohs(tcp->th_sport));
     to   = str(boost::format("[%s]:%d") % string(dst_addr_buf) % ntohs(tcp->th_dport));

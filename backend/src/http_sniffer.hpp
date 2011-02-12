@@ -26,6 +26,10 @@
 
 #include <string>
 #include <sys/types.h>
+#ifdef WIN32
+#include <map>
+#include <Winsock2.h>
+#endif
 #include "http_packet.hpp"
 
 using namespace std;

@@ -22,8 +22,13 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <sys/types.h>
+#ifdef WIN32
+#include <Winsock2.h>
+#define PLATFORM_WIN32
+#else
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#endif
 
 /* default snap length (maximum bytes per packet to capture) */
 #define SNAP_LEN 1518

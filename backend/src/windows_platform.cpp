@@ -67,9 +67,12 @@ vector<InterfaceInfo> WindowsPlatform::interfaces()
   
   for (d = alldevs; d; d = d->next) {
     string id(d->name);
+#ifndef WIN32
+	//Wrong for Windows native
     boost::replace_all(id, "\\", "\\\\");
     boost::replace_all(id, "{", "\\{");
     boost::replace_all(id, "}", "\\}");
+#endif
     InterfaceInfo info(id, (string(d->description)), "ethernet");
     results.push_back(info);
   }
