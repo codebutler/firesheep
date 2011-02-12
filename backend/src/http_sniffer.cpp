@@ -31,7 +31,7 @@
 #include "tcpip.h"
 
 HttpSniffer::HttpSniffer (string iface, string filter, http_packet_cb callback)
-  : m_iface(iface), m_filter(filter), m_callback(callback) { m_wifimon = 0; }
+  : m_iface(iface), m_filter(filter), m_callback(callback) { m_wifimon = 0;}
 
 void HttpSniffer::start()
 {
@@ -43,7 +43,7 @@ void HttpSniffer::start()
   /* XXX: IPv6 has longer net/mask ! */
   bpf_u_int32 mask = 0;     /* subnet mask */
   bpf_u_int32 net  = 0;     /* ip */
-
+  
   /* Open capture device in promisc mode */
   handle = pcap_open_live(m_iface.c_str(), SNAP_LEN, 1, 1000, errbuf);
   if (handle == NULL)
@@ -75,13 +75,44 @@ void HttpSniffer::start()
   pcap_close(handle);
 }
 
+int HttpSniffer::handle_HTTP_packet(const char *packet, int len, const string from, const string to)
+{
+  string key;
+	int parsed_len;
+  key.append(from);
+  key.append("-");
+  key.append(to);
+  
+  HttpPacket *http_packet = 0;
+  
+  PacketCacheMap::iterator iter;
+  iter = m_pending_packets.find(key);
+  
+  if (iter == m_pending_packets.end())
+    http_packet = new HttpPacket(from, to);
+  else {
+    http_packet = iter->second;
+    m_pending_packets.erase(iter);
+  }
+  
+  if (http_packet->parse(packet, len, &parsed_len)) {
+    if (http_packet->isComplete()) {
+      m_callback(http_packet);
+      delete http_packet;
+    } else {
+      m_pending_packets[key] = http_packet;
+    }
+		return parsed_len;
+  } else {
+    delete http_packet;
+		//invalid packet --> ignore rest
+		return len;
+  }
+}
+
 void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *packet)
 {
   /* Declare pointers to packet headers */
-  const struct radiotap_header *radiotap; /* The Radiotap header */
-  const struct wifi_header *hdr80211; /* The 802.11 header */
-  const struct snap_llc_header *snap_llc; /* The SNAP LLC header */
-  const struct sniff_ethernet *ethernet;  /* The Ethernet header [1] */
   const struct sniff_ip  *ip = NULL;  /* The IP header */
   const struct sniff_ip6 *ip6 = NULL; /* The IPv6 header */
   const struct sniff_tcp *tcp;    /* The TCP header */
@@ -104,14 +135,29 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
   u_short ether_type;
   string from;
   string to;
+	// sometimes pcap returns more than asked for...
+	int input_len = (header->caplen > SNAP_LEN) ? SNAP_LEN : header->caplen;
 
   /* 802.11 monitor support... */
   if (m_wifimon) {
-    /* Get Radiotap header length (variable) */
+		const struct radiotap_header *radiotap; /* The Radiotap header */
+    const struct wifi_header *hdr80211; /* The 802.11 header */
+    const struct snap_llc_header *snap_llc; /* The SNAP LLC header */
+
+		/* Get Radiotap header length (variable) */
+		if(input_len < sizeof(struct radiotap_header)){
+      cerr << (boost::format("Ignoring to small packet (Radiotap)\n"));
+      return;
+		}
     radiotap = (struct radiotap_header*)(packet);
     size_radiotap = radiotap->it_len;
+		input_len -= size_radiotap;
 
     /* Calculate 802.11 header length (variable) */
+		if(input_len < sizeof(struct wifi_header)){
+      cerr << (boost::format("Ignoring to small packet (wifi)\n"));
+      return;
+		}
     hdr80211 = (struct wifi_header*)(packet + size_radiotap);
     fc = hdr80211->fc;
 
@@ -124,55 +170,64 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
       cerr << (boost::format("Ignoring non-data frame 0x%x\n") % fc);
       return;
     }
-
+		input_len -= size_80211;
     /* Set Layer 3 header offset (snap_llc_header has standard length) */
     l3hdr_off = size_80211 + size_radiotap + sizeof(struct snap_llc_header);
 
     /* Check ether_type */
+		input_len -= sizeof(struct snap_llc_header);
+		if(input_len < 0){
+      cerr << (boost::format("Ignoring to small packet (snap_llc)\n"));
+      return;
+		}
     snap_llc = (struct snap_llc_header*)(packet + size_80211 + size_radiotap);
     ether_type = ntohs(snap_llc->ether_type);
-    if (ether_type != ETHERTYPE_IP) {
-      cerr << (boost::format("Ignoring unknown ethernet packet with type 0x%x\n") % ether_type);
-      return;
-    }
-
-    /* Check and set IP header size and total packet length */
-    ip = (struct sniff_ip*)(packet + l3hdr_off);
-      size_ip = IP_HL(ip)*4;
-    if (size_ip < 20) {
-      /* Don't throw exception because on 802.11 monitor interfaces
-       * we can have malformed packets, just skip it */
-      cerr << (boost::format("Bad IP length: %d\n") % size_ip);
-      return;
-    }
-    ip_len = ntohs(ip->ip_len);
   } else {
+		const struct sniff_ethernet *ethernet;  /* The Ethernet header [1] */
+		input_len -= l3hdr_off;
+		if(input_len < 0){
+      cerr << (boost::format("Ignoring to small packet (ethernet)\n"));
+      return;
+		}
     /* Define ethernet header */
     ethernet = (struct sniff_ethernet*)(packet);
 
     /* Check ether_type */
     ether_type = ntohs(ethernet->ether_type);
-    switch (ether_type) {
-      case ETHERTYPE_IP:
-        /* Check and set IP header size and total packet length */
-        ip = (struct sniff_ip*)(packet + l3hdr_off);
-        size_ip = IP_HL(ip)*4;
-        if (size_ip < 20)
-          throw runtime_error(str(boost::format("Invalid IPv4 header length: %u bytes") % size_ip));
-        ip_len = ntohs(ip->ip_len);
-        break;
-      case ETHERTYPE_IPV6:
-        /* Check and set IP header size and total packet length */
-        // FIXME: Support IPv6 extension headers?
-        ip6 = (struct sniff_ip6*)(packet + l3hdr_off);
-        size_ip = 40;
-        ip_len = ntohs(ip6->ip6_plen);
-        break;
-      default:
-        cerr << (boost::format("Ignoring unknown ethernet packet with type %x\n") % ether_type);
-        return;
-    }
   }
+
+  switch (ether_type) {
+	  case ETHERTYPE_IP:
+			/* Check and set IP header size and total packet length */
+			ip = (struct sniff_ip*)(packet + l3hdr_off);
+			size_ip = IP_HL(ip)*4;
+			if (size_ip < 20){
+				if(m_wifimon){
+					/* Don't throw exception because on 802.11 monitor interfaces
+					 * we can have malformed packets, just skip it */
+					cerr << (boost::format("Bad IP length: %d\n") % size_ip);
+					return;
+				}
+				throw runtime_error(str(boost::format("Invalid IPv4 header length: %u bytes") % size_ip));
+			}
+			ip_len = ntohs(ip->ip_len);
+			break;
+	  case ETHERTYPE_IPV6:
+			/* Check and set IP header size and total packet length */
+			// FIXME: Support IPv6 extension headers?
+			ip6 = (struct sniff_ip6*)(packet + l3hdr_off);
+			size_ip = 40;
+			ip_len = ntohs(ip6->ip6_plen);
+			break;
+		default:
+			cerr << (boost::format("Ignoring unknown ethernet packet with type %x\n") % ether_type);
+			return;
+  }
+
+	if(input_len < ip_len){
+    cerr << (boost::format("Ignoring to small packet (content)\n"));
+    return;
+	}
   
   /* Ignore non tcp packets */
   if (!((ip && ip->ip_p == IPPROTO_TCP) || (ip6 && ip6->ip6_nxt == IPPROTO_TCP)))
@@ -190,6 +245,7 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
       cerr << (boost::format("Invalid TCP header length: %u bytes") % size_tcp);
     return;
   }
+	if(ntohs(tcp->th_dport) != 80) return; //no Request
 
   /* Get source/dest */
   if (ether_type == ETHERTYPE_IP) {
@@ -212,31 +268,10 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
   /* Compute tcp payload (segment) size */
   size_payload = ip_len - (size_ip + size_tcp);
   
-  string key;
-  key.append(from);
-  key.append("-");
-  key.append(to);
-  
-  HttpPacket *http_packet = 0;
-  
-  PacketCacheMap::iterator iter;
-  iter = m_pending_packets.find(key);
-  
-  if (iter == m_pending_packets.end())
-    http_packet = new HttpPacket(from, to);
-  else {
-    http_packet = iter->second;
-    m_pending_packets.erase(iter);
-  }
-  
-  if (http_packet->parse(payload, size_payload)) {
-    if (http_packet->isComplete()) {
-      m_callback(http_packet);
-      delete http_packet;
-    } else {
-      m_pending_packets[key] = http_packet;
-    }
-  } else {
-    delete http_packet;
-  }
+	while (size_payload > 0){
+		int used_len = handle_HTTP_packet(payload, size_payload, from, to);
+		if(!used_len) break; //avoid deadlock
+		size_payload -= used_len;
+		payload += used_len;
+	}
 }

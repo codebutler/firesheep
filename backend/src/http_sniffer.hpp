@@ -56,6 +56,7 @@ protected:
 private:
   PacketCacheMap m_pending_packets;
   void got_packet(const struct pcap_pkthdr *header, const u_char *packet);
+  int handle_HTTP_packet(const char *packet, int len, const string from, const string to);
 };
 
 #endif

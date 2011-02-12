@@ -37,11 +37,12 @@ HttpPacket::HttpPacket(string from, string to)
   m_parser.data = this;
 }
 
-bool HttpPacket::parse(const char *payload, int payload_size)
+bool HttpPacket::parse(const char *payload, int payload_size, int *parsed_len)
 {
   if (payload_size > 0) {
-    int len = http_parser_execute(&m_parser, &m_settings, payload, payload_size);
-    return (m_parser.state != 1 && len == payload_size);
+    *parsed_len = http_parser_execute(&m_parser, &m_settings, payload, payload_size);
+		if(isComplete()) (*parsed_len)++;
+    return (m_parser.state != 1 && (*parsed_len == payload_size || isComplete()));
   }
   return false;
 }
@@ -163,11 +164,11 @@ int HttpPacket::headers_complete_cb()
     m_tmp_header_name.clear();
     m_tmp_header_value.clear();
   }
-  return 1; // Skip body
+  return 0; // Do not skip body (POST data...)
 }
 
 int HttpPacket::message_complete_cb()
 {
   m_complete = true;
-  return 0;
+  return 1; //abort parser
 }
