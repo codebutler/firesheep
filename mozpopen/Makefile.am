@@ -34,10 +34,10 @@ $(XPT): $(COMPONENT_NAME).idl
 
 $(LIB): $(SOURCES_OSX)
 	mkdir -p $(PLAT_DEST)
-	$(CXX) -shared -fno-rtti -fPIC $(SOURCES_OSX) $(CFLAGS) $(MOZ_CFLAGS) $(MOZ_LIBS) -o $@
+	$(CXX) -bundle -fno-rtti -fPIC $(SOURCES_OSX) $(CFLAGS) $(MOZ_CFLAGS) $(MOZ_LIBS) -o $@
 
 clean:
-	rm -f $(COMPONENT).xpt $(COMPONENT).dylib
+	rm -f $(COMPONENT_NAME).h $(XPT) $(LIB)
 endif
 if PLATFORM_LINUX
 SOURCES_LINUX  = MozPopenModule.cpp unix/MozPopenProcess.cpp

@@ -27,7 +27,7 @@ AM_INIT_AUTOMAKE([foreign])
 
 AC_PROG_CXX
 
-# OSX doesn't come wiht pkg-config, but PKG_CHECK_MODULES has to be defined to something to avoid errors.
+# OSX doesn't come with pkg-config, but PKG_CHECK_MODULES has to be defined to something to avoid errors.
 m4_define_default([PKG_CHECK_MODULES], [AC_MSG_FAILURE([pkg-config was not found])])
 
 AC_CANONICAL_HOST
@@ -66,10 +66,10 @@ if test x$TARGET = xOSX; then
 	MOZ_SDK=$xulrunner_sdk
 	AC_SUBST(MOZ_SDK)
 
-	MOZ_PATH="${xulrunner_sdk}/bin"
+	MOZ_PATH="${xulrunner_sdk}/host/bin"
 	AC_SUBST(MOZ_PATH)
 
-	AC_PATH_PROG([XPIDL], [xpidl], [no], [$MOZ_PATH:$PATH])
+	AC_PATH_PROG([XPIDL], [host_xpidl], [no], [$MOZ_PATH:$PATH])
 	if test "x$XPIDL" = "xno"; then
 	        AC_MSG_ERROR([xpidl compiler not found])
 	fi
@@ -78,10 +78,10 @@ if test x$TARGET = xOSX; then
 	XPIDL_FLAGS="-I ${xulrunner_sdk}/idl"
 	AC_SUBST(XPIDL_FLAGS)
 
-	MOZ_CFLAGS="-fshort-wchar -I${MOZ_SDK}/include"
+	MOZ_CFLAGS="-fshort-wchar -I${MOZ_SDK}/include -DMOZ_NO_MOZALLOC"
 	AC_SUBST(MOZ_CFLAGS)
 
-	MOZ_LIBS="-L${MOZ_SDK}/lib -L${MOZ_SDK}/bin -Wl,-executable_path,${MOZ_SDK}/bin/xulrunner-bin -lxpcomglue_s -lxpcom -lplds4 -lplc4 -lnspr4 -lpthread -ldl"
+	MOZ_LIBS="-L${MOZ_SDK}/lib -L${MOZ_SDK}/bin -Wl,-executable_path,${MOZ_SDK}/bin/xulrunner-bin -lxpcomglue_s -lxpcom -lplds4 -lplc4 -lnspr4 -lpthread -ldl -lmozalloc"
 	AC_SUBST(MOZ_LIBS)
 else
 	PKG_CHECK_MODULES(MOZ, [libxul >= 1.9.2])

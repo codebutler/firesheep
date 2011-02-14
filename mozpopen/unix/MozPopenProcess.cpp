@@ -22,10 +22,13 @@
  */
  
 #include "nsStringAPI.h"
+#include "nsIClassInfoImpl.h"
+#include "nsMemory.h"
 #include "MozPopen.h"
 #include "MozPopenProcess.h"
 
-NS_IMPL_ISUPPORTS1(MozPopenProcess, IMozPopenProcess)
+NS_IMPL_CLASSINFO(MozPopenProcess, NULL, nsIClassInfo::THREADSAFE, MOZPOPEN_PROCESS_CID)
+NS_IMPL_ISUPPORTS1_CI(MozPopenProcess, IMozPopenProcess)
 
 MozPopenProcess::MozPopenProcess() { }
 

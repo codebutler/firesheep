@@ -36,7 +36,7 @@ var Firesheep = {
   
   _loaded: false,
   
-  _results: null,
+  _results: [],
   
   _myDir: null,
   
@@ -54,7 +54,7 @@ var Firesheep = {
         Components.utils.import("resource://gre/modules/AddonManager.jsm");
         AddonManager.getAddonByID('firesheep@codebutler.com', function (addon) {
           Firesheep._myDir = addon.getResourceURI('/').QueryInterface(Components.interfaces.nsIFileURL).file;
-          this._finishLoading();
+          Firesheep._finishLoading();
         });
       }
     }  
@@ -233,6 +233,12 @@ var Firesheep = {
   
   get networkInterfaces () {
     return JSON.parse(Utils.runCommand(Firesheep.backendPath, [ '--list-interfaces' ]));
+  },
+
+  get canaryText () {
+    if (this._canaryText == null)
+      this._canaryText = Utils.md5(Utils.generateUUID());
+    return this._canaryText;
   },
     
   _handleResult: function (result) {

@@ -104,6 +104,10 @@ var Utils = {
       output += line;
     }
     process.Wait();
+    var exitCode = process.Wait();
+    if (exitCode != 0) {
+      throw "Command failed"; 
+    }
     return output;
   },
   
@@ -130,5 +134,36 @@ var Utils = {
     var uuidGenerator = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
     var uuid = uuidGenerator.generateUUID();
     return uuid.toString();
+  },
+
+  parseCookies: function (str) {
+    var cookies = {};
+    if (str) {
+      str.split("; ").forEach(function (pair) {
+        var index = pair.indexOf("=");
+        if (index > 0) {
+            var name  = pair.substring(0, index);
+            var value = pair.substr(index+1);
+            if (name.length && value.length)
+              cookies[name] = value;
+        }
+      });
+    }
+    return cookies;
+  },
+
+  parseQuery: function (str) {
+    var query = {}
+    if (str) {
+      str.split('&').forEach(function (pair) {
+        var pair = pair.split('=');
+        query[unescape(pair[0])] = unescape(pair[1]);
+      });
+    }
+    return query;
+  },
+
+  makeCacheKey: function (result) {
+    return Utils.md5(result.siteName + JSON.stringify(result.sessionId));
   }
 };

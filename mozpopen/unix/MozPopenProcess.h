@@ -23,6 +23,7 @@
 
 #include "MozPopen.h"
 #include "nsStringAPI.h"
+#include "nsIClassInfo.h"
 #include "pstream.h"
 
 #define MOZPOPEN_PROCESS_CONTRACTID \

@@ -33,7 +33,8 @@ using namespace boost;
 
 LinuxPlatform::LinuxPlatform(vector<string> argv) : UnixPlatform(argv) { }
 
-bool LinuxPlatform::run_privileged() {
+bool LinuxPlatform::run_privileged() 
+{
   const char *path = this->path().c_str();
   execl("/usr/bin/pkexec", "pkexec", path, "--fix-permissions", NULL);
   return true;

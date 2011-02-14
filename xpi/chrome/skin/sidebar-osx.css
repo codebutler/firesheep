@@ -1,10 +1,11 @@
-firesheepSidebar {
+#firesheepSidebar {
   -moz-appearance: none;
   background: transparent;
 }
 
 #firesheepSidebar #toolbar {
-  background: -moz-linear-gradient(top, #EDEDED, #D8D8D8);
+  -moz-appearance: none;
+  background: transparent !important;
   border-bottom: 1px solid #B8B8B8;
 }
 
@@ -26,7 +27,7 @@ firesheepSidebar {
 }
 
 #firesheepSidebar richlistbox {
-  background: transparent;
+  background: white;
 }
 
 #bottombar {

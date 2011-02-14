@@ -21,21 +21,33 @@
  *
  */
 
-#include "nsIGenericFactory.h"
-#include "nsIModule.h"
+#include "mozilla/ModuleUtils.h"
 #include "MozPopen.h"
 #include "MozPopenProcess.h"
+#include "nsIClassInfoImpl.h"
 
 NS_GENERIC_FACTORY_CONSTRUCTOR(MozPopenProcess)
 
-static const nsModuleComponentInfo components[] =
-{
-	{
-		MOZPOPEN_PROCESS_CLASSNAME,
-		MOZPOPEN_PROCESS_CID,
-		MOZPOPEN_PROCESS_CONTRACTID,
-		MozPopenProcessConstructor
-	}
+
+NS_DEFINE_NAMED_CID(MOZPOPEN_PROCESS_CID);
+
+static const mozilla::Module::CIDEntry kMozPopenCIDs[] = {
+	{ &kMOZPOPEN_PROCESS_CID, false, NULL, MozPopenProcessConstructor },
+	{ NULL }	
 };
 
-NS_IMPL_NSGETMODULE(MozPopenModule, components)
+static const mozilla::Module::ContractIDEntry kMozPopenContracts[] = {
+	{ MOZPOPEN_PROCESS_CONTRACTID, &kMOZPOPEN_PROCESS_CID },
+	{ NULL }
+};
+
+static const mozilla::Module kMozPopenModule = {
+	mozilla::Module::kVersion,
+	kMozPopenCIDs,
+	kMozPopenContracts,
+	NULL
+};
+
+NSMODULE_DEFN(MozPopenModule) = &kMozPopenModule;
+
+NS_IMPL_MOZILLA192_NSGETMODULE(&kMozPopenModule);
