@@ -164,7 +164,12 @@ int HttpPacket::headers_complete_cb()
     m_tmp_header_name.clear();
     m_tmp_header_value.clear();
   }
-  return 0; // Do not skip body (POST data...)
+	if(method()=="GET"){
+		if(get_header("content-length")!=""){
+			return 2;
+		}
+		return 1;
+	}else return 0; // Do not skip body (POST data...)
 }
 
 int HttpPacket::message_complete_cb()

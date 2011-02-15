@@ -91,7 +91,12 @@ int HttpSniffer::handle_HTTP_packet(const char *packet, int len, const string fr
   if (iter == m_pending_packets.end())
     http_packet = new HttpPacket(from, to);
   else {
-    http_packet = iter->second;
+		if((len>=4 && *((int*)packet) == ' TEG') //detect GET requests
+			|| (len>=5 &&  *((int*)packet) == 'TSOP' && packet[4] == ' ')){ //detect POST requests
+			http_packet = new HttpPacket(from, to);
+		} else {
+			http_packet = iter->second;
+		}
     m_pending_packets.erase(iter);
   }
   
@@ -245,7 +250,7 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
       cerr << (boost::format("Invalid TCP header length: %u bytes") % size_tcp);
     return;
   }
-	if(ntohs(tcp->th_dport) != 80) return; //no Request
+	//if(ntohs(tcp->th_dport) != 80) return; //no Request
 
   /* Get source/dest */
   if (ether_type == ETHERTYPE_IP) {
