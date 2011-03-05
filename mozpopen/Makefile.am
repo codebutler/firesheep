@@ -17,7 +17,7 @@ clean:
 endif
 if PLATFORM_OSX
 SOURCES_OSX  = MozPopenModule.cpp unix/MozPopenProcess.cpp
-PLAT_DEST = $(top_builddir)/xpi/platform/Darwin_x86-gcc3/components
+PLAT_DEST = $(top_builddir)/xpi/platform/$(MOZ_ABI)/components
 CFLAGS  += -I $(top_builddir)/mozpopen -I $(top_builddir)/mozpopen/unix
 COMPONENT_NAME = MozPopen
 XPT = $(DEST)/$(COMPONENT_NAME).xpt

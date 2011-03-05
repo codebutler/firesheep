@@ -34,15 +34,25 @@ AC_CANONICAL_HOST
 case "$host_os" in
 	cygwin)
 		TARGET=WIN32
+		MOZ_ABI="WINNT_x86-msvc"
 	;;
 	darwin*)
-		CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch i386 -mmacosx-version-min=10.5"
 		TARGET=OSX
+		
+		CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch i386 -mmacosx-version-min=10.5"
+		MOZ_ABI="Darwin_x86-gcc3"
+		
+		# FIXME: Need an option to choose architecture.
+		# CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5"
+		# MOZ_ABI="Darwin_x86-64-gcc3"
 	;;
 	linux*)
 		TARGET=LINUX
+		MOZ_ABI="Linux_$(BUILD_ARCH)-gcc3"
 	;;
 esac
+
+AC_SUBST(MOZ_ABI)
 
 AM_CONDITIONAL(PLATFORM_WIN32, test x$TARGET = xWIN32)
 AM_CONDITIONAL(PLATFORM_OSX, test x$TARGET = xOSX)
@@ -58,7 +68,7 @@ if test x$TARGET = xOSX; then
 		[xulrunner_sdk=""])
 
 	if test x$TARGET = xWIN32; then
-	        xulrunner_sdk=`readlink -f $xulrunner_sdk`
+		xulrunner_sdk=`readlink -f $xulrunner_sdk`
 	fi
 	
 	AS_IF([test -d "$xulrunner_sdk"], [], [AC_MSG_FAILURE([Specify --with-xulrunner-sdk=<path>.])])
@@ -66,12 +76,12 @@ if test x$TARGET = xOSX; then
 	MOZ_SDK=$xulrunner_sdk
 	AC_SUBST(MOZ_SDK)
 
-	MOZ_PATH="${xulrunner_sdk}/host/bin"
+	MOZ_PATH="${xulrunner_sdk}/bin:${xulrunner_sdk}/host/bin"
 	AC_SUBST(MOZ_PATH)
 
-	AC_PATH_PROG([XPIDL], [host_xpidl], [no], [$MOZ_PATH:$PATH])
+	AC_PATH_PROGS([XPIDL], [xpidl host_xpidl], [no], [$MOZ_PATH:$PATH])
 	if test "x$XPIDL" = "xno"; then
-	        AC_MSG_ERROR([xpidl compiler not found])
+		AC_MSG_ERROR([xpidl compiler not found])
 	fi
 	AC_SUBST(XPIDL)
 
