@@ -296,8 +296,25 @@ function deleteDomainCookies(uri)
   }
 }
 
-function showMenu() {
+function showMenu() 
+{
   var button = document.getElementById('showMenuButton');
   var menu = document.getElementById('bottomMenu');
   menu.openPopup(button, "after_start", 0, 0, false, false);
+}
+
+function onDetailsContextMenu()
+{
+  var detailsTree = document.getElementById('detailsTree');
+  var copyDetailsItem = document.getElementById('copyDetailsItem');
+  copyDetailsItem.setAttribute('disabled', (detailsTree.currentIndex < 0));
+}
+
+function copyDetailValue()
+{
+  var detailsTree = document.getElementById('detailsTree');
+  var valueText   = detailsTree.view.getCellText(detailsTree.currentIndex, detailsTree.columns.getColumnAt(1));
+
+  var clipboard = Cc["@mozilla.org/widget/clipboardhelper;1"].getService(Ci.nsIClipboardHelper);
+  clipboard.copyString(valueText);
 }

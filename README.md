@@ -21,16 +21,18 @@ Start by grabbing the code using Git. If you're planning to contribute, fork the
 
 See instructions for your platform below. When done, an xpi will be created inside the `build` directory. Load the extension into Firefox by dragging it into the Addons dialog.
 
-### OSX
+### Mac OS X
 
 1. Install boost using [Homebrew][1] (`brew install boost`).
 2. Download and extract the [Mozilla SDK][2]. You'll probably want the *i386 Gecko 1.9.2* download.
 3. Run autogen, specifying the path where you extracted the Mozilla SDK to (`./autogen.sh --with-xulrunner-sdk=/path/to/sdk`).
 4. Run `make`!
 
+If you're using 10.6 (Snow Leopard) and xpidl complains about libIDL, copy everything in contrib/osx/ to ~/lib/.
+
 ### Ubuntu Linux (10.10 Maverick)
 
-1. Install build dependencies (`sudo apt-get install autconf libtool libpcap-dev libboost-all-dev libhal-dev xulrunner-1.9.2-dev`).
+1. Install build dependencies (`sudo apt-get install autoconf libtool libpcap-dev libboost-all-dev libhal-dev xulrunner-1.9.2-dev`).
 2. Run `./autogen.sh` then `make`.
 
 ### Windows

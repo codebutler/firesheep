@@ -36,8 +36,6 @@ bool OSXPlatform::run_privileged()
   OSStatus           err;
   AuthorizationFlags flags;
   
-  // FIXME: Throw exception if process is setuid but owner is not root! Right now this fails badly!
-  
   const char *path = this->path().c_str();
   
   flags = kAuthorizationFlagExtendRights | kAuthorizationFlagInteractionAllowed;

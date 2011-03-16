@@ -43,7 +43,7 @@
         <vbox flex="1">
           <richlistbox flex="1" id="resultsList" ondblclick="onResultDoubleClick()" onselect="onResultSelect()" />
           <splitter id="splitter" style="display: none" />
-          <tree id="detailsTree" style="display: none">
+          <tree id="detailsTree" style="display: none" context="detailsMenu">
             <treecols>
               <treecol label="Name" flex="1" primary="true" />
               <treecol label="Value" flex="2" />
@@ -65,5 +65,9 @@
     <menuitem label="Clear" oncommand="Firesheep.clearSession()"/>
     <menuseparator/>
     <menuitem label="Preferences" oncommand="FiresheepUI.showPrefs()"/>
+  </menupopup>
+
+  <menupopup id="detailsMenu" onpopupshowing="onDetailsContextMenu()">
+    <menuitem id="copyDetailsItem" label="Copy Value" oncommand="copyDetailValue()" />
   </menupopup>
 </page>
