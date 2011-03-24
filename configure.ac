@@ -27,6 +27,11 @@ AM_INIT_AUTOMAKE([foreign])
 
 AC_PROG_CXX
 
+# A common source of problems.
+if test ! -d backend/deps/http-parser; then
+	AC_MSG_ERROR([http-parser missing, did you read the README?])
+fi
+
 # OSX doesn't come with pkg-config, but PKG_CHECK_MODULES has to be defined to something to avoid errors.
 m4_define_default([PKG_CHECK_MODULES], [AC_MSG_FAILURE([pkg-config was not found])])
 
@@ -35,24 +40,18 @@ case "$host_os" in
 	cygwin)
 		TARGET=WIN32
 		MOZ_ABI="WINNT_x86-msvc"
+		AC_SUBST(MOZ_ABI)
 	;;
 	darwin*)
 		TARGET=OSX
-		
-		CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch i386 -mmacosx-version-min=10.5"
-		MOZ_ABI="Darwin_x86-gcc3"
-		
-		# FIXME: Need an option to choose architecture.
-		# CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5"
-		# MOZ_ABI="Darwin_x86-64-gcc3"
+		CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6"
 	;;
 	linux*)
 		TARGET=LINUX
 		MOZ_ABI="Linux_$(BUILD_ARCH)-gcc3"
+		AC_SUBST(MOZ_ABI)
 	;;
 esac
-
-AC_SUBST(MOZ_ABI)
 
 AM_CONDITIONAL(PLATFORM_WIN32, test x$TARGET = xWIN32)
 AM_CONDITIONAL(PLATFORM_OSX, test x$TARGET = xOSX)
@@ -84,6 +83,20 @@ if test x$TARGET = xOSX; then
 		AC_MSG_ERROR([xpidl compiler not found])
 	fi
 	AC_SUBST(XPIDL)
+
+        # Hack to figure out architecture of SDK.
+        AC_PATH_PROG([XULRUNNER], [xulrunner], [no], [$MOZ_PATH:$PATH])
+	if test "x$XPIDL" = "xno"; then
+		AC_MSG_ERROR([xulrunner not found])
+	fi
+        if test "x$(file -b $XULRUNNER)" = "xMach-O 64-bit executable x86_64"; then
+		MOZ_ABI="Darwin_x86-64-gcc3"
+		CFLAGS="$CFLAGS -arch x86_64"
+	else
+		MOZ_ABI="Darwin_x86-gcc3"
+		CFLAGS="$CFLAGS -arch i386"
+	fi
+	AC_SUBST(MOZ_ABI)
 
 	XPIDL_FLAGS="-I ${xulrunner_sdk}/idl"
 	AC_SUBST(XPIDL_FLAGS)
@@ -175,3 +188,10 @@ mozpopen/Makefile
 ])
 
 AC_OUTPUT
+
+echo "
+Firesheep-$VERSION
+
+    Mozilla SDK Path:  ${MOZ_SDK}
+    Mozilla SDK Arch:  ${MOZ_ABI}
+"
