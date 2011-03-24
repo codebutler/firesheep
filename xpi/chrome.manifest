@@ -13,6 +13,6 @@ resource firesheep modules/
 interfaces components/MozPopen.xpt
 binary-component platform/WINNT_x86-msvc/components/MozPopen.dll ABI=WINNT_x86-msvc
 binary-component platform/Darwin_x86-gcc3/components/MozPopen.dylib ABI=Darwin_x86-gcc3
-binary-component platform/Darwin_x86-64-gcc3/components/MozPopen.dylib ABI=Darwin_x86-64-gcc3
+binary-component platform/Darwin_x86_64-gcc3/components/MozPopen.dylib ABI=Darwin_x86_64-gcc3
 binary-component platform/Linux_x86-gcc3/components/MozPopen.so ABI=Linux_x86-gcc3
 binary-component platform/Linux_x86_64-gcc3/components/MozPopen.so ABI=Linux_x86_64-gcc3

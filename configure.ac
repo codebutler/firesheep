@@ -90,7 +90,7 @@ if test x$TARGET = xOSX; then
 		AC_MSG_ERROR([xulrunner not found])
 	fi
         if test "x$(file -b $XULRUNNER)" = "xMach-O 64-bit executable x86_64"; then
-		MOZ_ABI="Darwin_x86-64-gcc3"
+		MOZ_ABI="Darwin_x86_64-gcc3"
 		CFLAGS="$CFLAGS -arch x86_64"
 	else
 		MOZ_ABI="Darwin_x86-gcc3"
