@@ -51,7 +51,7 @@ typedef map<string, string> HeaderMap;
 class HttpPacket {
 public:
   HttpPacket(string from, string to);
-  bool parse(const char *payload, int payload_size);
+  bool parse(const char *payload, int payload_size, int *parsed_len);
   
   bool isComplete();
   

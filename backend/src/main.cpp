@@ -25,6 +25,10 @@
 #include "abstract_platform.hpp"
 #include "json_spirit_writer_template.h"
 
+#ifdef WIN32
+	#define PLATFORM_WIN32
+#endif
+
 #ifdef PLATFORM_WIN32
 #include "windows_platform.hpp"
 #elif PLATFORM_OSX
