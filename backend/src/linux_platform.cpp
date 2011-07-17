@@ -42,12 +42,24 @@ bool LinuxPlatform::run_privileged() {
 string device_get_property_string(LibHalContext *context, string device, string key, DBusError *error)
 {
   char *buf = libhal_device_get_property_string(context, device.c_str(), key.c_str(), error);
+
+  string property;
   if (dbus_error_is_set(error)) {
-    runtime_error ex(str(format("libhal_device_get_property_string failed: %s %s") % error->name % error->message));
-    dbus_error_free(error);
-    throw ex;
+    if (key.compare(0, 5, "info.") != 0) {
+      runtime_error ex(str(format("libhal_device_get_property_string failed: %s %s") % error->name % error->message));
+      dbus_error_free(error);
+      throw ex;
+    }
+    else {
+      dbus_error_free(error);
+      property = "Unknown";
+    }
   }
-  return string(buf);
+  else {
+    property = string(buf);
+  }
+
+  return property;
 }
 
 vector<InterfaceInfo> LinuxPlatform::interfaces()
