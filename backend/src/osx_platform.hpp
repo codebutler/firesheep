@@ -28,7 +28,7 @@
 
 class OSXPlatform : public UnixPlatform {
 public:
-  OSXPlatform(vector<string>);
+  OSXPlatform(string);
   bool run_privileged();
   vector<InterfaceInfo> interfaces();
 };

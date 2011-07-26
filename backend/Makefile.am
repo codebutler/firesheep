@@ -1,66 +1,53 @@
-SOURCES = \
-	src/main.cpp                   \
-	src/http_sniffer.cpp           \
-	src/http_packet.cpp            \
-	deps/http-parser/http_parser.c
-    
-CFLAGS += \
-	-DHAVE_STDARG_H                \
-	-Wall                          \
-	-include src/config.h          \
-	-g
-    
 INCLUDES = \
 	-I deps/                      \
 	-I deps/http-parser           \
-	-I deps/json_spirit    
-    
+	-I deps/json_spirit
+
+#CXXFLAGS = \
+#	-Wall                          \
+#	-g -O0
+
+bin_PROGRAMS = backend
+lib_LTLIBRARIES = libfiresheep.la
+
+backend_SOURCES = \
+	src/main.cpp
+
+backend_LDADD = \
+	libfiresheep.la
+
+backend_LDFLAGS = -static
+
+libfiresheep_la_SOURCES = \
+	src/libfiresheep.cpp           \
+	src/http_sniffer.cpp           \
+	src/http_packet.cpp            \
+	deps/http-parser/http_parser.c
+
 if PLATFORM_OSX
-SOURCES += src/osx_platform.cpp
-CFLAGS  += -DPLATFORM_OSX
-CFLAGS  += -framework Security
-CFLAGS  += -framework SystemConfiguration
-CFLAGS  += -framework CoreFoundation
-CFLAGS  += -I/usr/local/include
-CFLAGS  += $(PCAP_CFLAGS)
-CFLAGS  += $(BOOST_CPPFLAGS)
-LIBS    += $(PCAP_LIBS)
-LIBS    += $(BOOST_FORMAT_LIBS) $(BOOST_STRING_ALGO_LIBS)
+CXXFLAGS += -DPLATFORM_OSX -arch i386 -arch x86_64
+CFLAGS += $(CXXFLAGS)
+libfiresheep_la_SOURCES += src/osx_platform.cpp
+libfiresheep_la_LDFLAGS  = -framework Security
+libfiresheep_la_LDFLAGS += -framework SystemConfiguration
+libfiresheep_la_LDFLAGS += -framework CoreFoundation
+libfiresheep_la_LIBADD   = $(PCAP_LIBS) $(BOOST_FORMAT_LIBS) $(BOOST_STRING_ALGO_LIBS)
 endif
 if PLATFORM_WIN32
-SOURCES += src/windows_platform.cpp
-CFLAGS  += -DPLATFORM_WIN32
-CFLAGS  += -I"/c/Program Files/boost/boost_1_44"
-CFLAGS  += -I"deps/winpcap/include"
-CFLAGS  += -L"deps/winpcap/lib"
-LIBS    += -lwpcap
+CXXFLAGS += -DPLATFORM_WIN32
+#LIBFIRESHEEP_SOURCES += src/windows_platform.cpp
+#LIBFIRESHEEP_CFLAGS  += -I"/c/Program Files/boost/boost_1_44"
+#LIBFIRESHEEP_CFLAGS  += -I"deps/winpcap/include"
+#LIBFIRESHEEP_CFLAGS  += -L"deps/winpcap/lib"
+#LIBFIRESHEEP_LIBS    += -lwpcap
 endif
 if PLATFORM_LINUX
-SOURCES += src/linux_platform.cpp
-CFLAGS  += -DPLATFORM_LINUX $(BUILD_TARGET)
-CFLAGS  += $(PCAP_CFLAGS)
-CFLAGS  += $(BOOST_CPPFLAGS)
-CFLAGS  += $(HAL_CFLAGS)
-LIBS    += $(PCAP_LIBS)
-LIBS    += $(BOOST_FORMAT_LIBS) $(BOOST_STRING_ALGO_LIBS)
-LIBS    += $(HAL_LIBS)
+CXXFLAGS += -DPLATFORM_LINUX
+#LIBFIRESHEEP_SOURCES += src/linux_platform.cpp
+#LIBFIRESHEEP_CFLAGS  += $(PCAP_CFLAGS)
+#LIBFIRESHEEP_CFLAGS  += $(BOOST_CPPFLAGS)
+#LIBFIRESHEEP_CFLAGS  += $(HAL_CFLAGS)
+#LIBFIRESHEEP_LIBS    += $(PCAP_LIBS)
+#LIBFIRESHEEP_LIBS    += $(BOOST_FORMAT_LIBS) $(BOOST_STRING_ALGO_LIBS)
+#LIBFIRESHEEP_LIBS    += $(HAL_LIBS)
 endif
-
-DEST   = $(top_builddir)/xpi/platform/$(MOZ_ABI)
-TARGET = $(DEST)/firesheep-backend
-
-all: $(TARGET)
-
-$(TARGET): $(SOURCES) Makefile
-	mkdir -p $(DEST)
-	rm -f $@
-	$(CXX) $(CFLAGS) $(INCLUDES) $(LIBS) -o $@ $(SOURCES)
-
-if PLATFORM_WIN32
-	cp -f `which cygwin1.dll` $(DEST)
-	cp -f `which cygstdc++-6.dll` $(DEST)
-	cp -f `which cyggcc_s-1.dll` $(DEST)
-endif
-    
-clean:
-	rm -f $(TARGET)

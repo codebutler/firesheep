@@ -22,10 +22,12 @@
 
 AC_INIT([Firesheep], [0.1], [eric@codebutler.com],
         [firesheep], [http://codebutler.github.com/firesheep])
+AC_PROG_CC([clang gcc])
 AC_PREREQ([2.61])
 AM_INIT_AUTOMAKE([foreign])
 
-AC_PROG_CXX
+AC_PROG_LIBTOOL
+AC_PROG_CXX([clang++ g++])
 
 # A common source of problems.
 if test ! -d backend/deps/http-parser; then
@@ -45,6 +47,9 @@ case "$host_os" in
 	darwin*)
 		TARGET=OSX
 		CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6"
+                MOZ_ABI="OSX"
+                AC_SUBST(MOZ_ABI)
+                
 	;;
 	linux*)
 		TARGET=LINUX
@@ -56,78 +61,6 @@ esac
 AM_CONDITIONAL(PLATFORM_WIN32, test x$TARGET = xWIN32)
 AM_CONDITIONAL(PLATFORM_OSX, test x$TARGET = xOSX)
 AM_CONDITIONAL(PLATFORM_LINUX, test x$TARGET = xLINUX)
-
-# BEGIN MOZILLA STUFF (XULRUNNER SDK)
-# Mozilla doesn't provide pkg-config files for OSX, hence all this mess.
-
-if test x$TARGET = xOSX; then
-	AC_ARG_WITH([xulrunner-sdk],
-		[AS_HELP_STRING([--with-xulrunner-sdk=<path>], [path to xulrunner sdk])],
-		[xulrunner_sdk="$withval"],
-		[xulrunner_sdk=""])
-
-	if test x$TARGET = xWIN32; then
-		xulrunner_sdk=`readlink -f $xulrunner_sdk`
-	fi
-	
-	AS_IF([test -d "$xulrunner_sdk"], [], [AC_MSG_FAILURE([Specify --with-xulrunner-sdk=<path>.])])
-
-	MOZ_SDK=$xulrunner_sdk
-	AC_SUBST(MOZ_SDK)
-
-	MOZ_PATH="${xulrunner_sdk}/bin:${xulrunner_sdk}/host/bin"
-	AC_SUBST(MOZ_PATH)
-
-	AC_PATH_PROGS([XPIDL], [xpidl host_xpidl], [no], [$MOZ_PATH:$PATH])
-	if test "x$XPIDL" = "xno"; then
-		AC_MSG_ERROR([xpidl compiler not found])
-	fi
-	AC_SUBST(XPIDL)
-
-        # Hack to figure out architecture of SDK.
-        AC_PATH_PROG([XULRUNNER], [xulrunner], [no], [$MOZ_PATH:$PATH])
-	if test "x$XPIDL" = "xno"; then
-		AC_MSG_ERROR([xulrunner not found])
-	fi
-        if test "x$(file -b $XULRUNNER)" = "xMach-O 64-bit executable x86_64"; then
-		MOZ_ABI="Darwin_x86_64-gcc3"
-		CFLAGS="$CFLAGS -arch x86_64"
-	else
-		MOZ_ABI="Darwin_x86-gcc3"
-		CFLAGS="$CFLAGS -arch i386"
-	fi
-	AC_SUBST(MOZ_ABI)
-
-	XPIDL_FLAGS="-I ${xulrunner_sdk}/idl"
-	AC_SUBST(XPIDL_FLAGS)
-
-	MOZ_CFLAGS="-fshort-wchar -I${MOZ_SDK}/include -DMOZ_NO_MOZALLOC"
-	AC_SUBST(MOZ_CFLAGS)
-
-	MOZ_LIBS="-L${MOZ_SDK}/lib -L${MOZ_SDK}/bin -Wl,-executable_path,${MOZ_SDK}/bin/xulrunner-bin -lxpcomglue_s -lxpcom -lplds4 -lplc4 -lnspr4 -lpthread -ldl -lmozalloc"
-	AC_SUBST(MOZ_LIBS)
-else
-	PKG_CHECK_MODULES(MOZ, [libxul >= 1.9.2])
-	AC_SUBST(MOZ_CFLAGS)
-	AC_SUBST(MOZ_LIBS)
-
-	MOZ_SDK=`pkg-config libxul --variable=sdkdir`
-	AC_SUBST(MOZ_SDK)
-
-	MOZ_PATH="${MOZ_SDK}/bin"
-	AC_SUBST(MOZ_PATH)
-
-	XPIDL_FLAGS="-I ${MOZ_SDK}/idl"
-	AC_SUBST(XPIDL_FLAGS)
-
-	AC_PATH_PROG([XPIDL], [xpidl], [no], [$MOZ_PATH:$PATH])
-	if test "x$XPIDL" = "xno"; then
-		AC_MSG_ERROR([xpidl compiler not found])
-	fi
-	AC_SUBST(XPIDL)
-fi
-
-# END MOZILLA STUFF
 
 # BEGIN PCAP LIBS
 AC_PATH_PROG([PCAP_CONFIG], [pcap-config], [no], [$PATH])
@@ -179,12 +112,12 @@ if test x$TARGET = xLINUX; then
 fi
 # END LINUX
 
-AC_SUBST(CFLAGS)
+CXXFLAGS="-Wall -g -O0"
+AC_SUBST(CXXFLAGS)
 
 AC_CONFIG_FILES([
 Makefile
 backend/Makefile
-mozpopen/Makefile
 ])
 
 AC_OUTPUT
@@ -192,6 +125,5 @@ AC_OUTPUT
 echo "
 Firesheep-$VERSION
 
-    Mozilla SDK Path:  ${MOZ_SDK}
     Mozilla SDK Arch:  ${MOZ_ABI}
 "

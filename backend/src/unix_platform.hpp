@@ -48,14 +48,9 @@ static const mode_t MODE = S_IFREG | S_ISUID | S_IRUSR | S_IXUSR |
 class UnixPlatform : public AbstractPlatform
 {
 public:
-  UnixPlatform(vector<string> args)
-    : m_args(args)
+  UnixPlatform(string path)
+    : m_path(path)
   {
-    char path[PATH_MAX];
-    if (!realpath(args[0].c_str(), path))
-      throw runtime_error(str(boost::format("realpath() failed: %d\n") % errno));
-  
-    m_path = string(path);
   }
   
   bool is_root() {
@@ -66,7 +61,7 @@ public:
     int err;
     struct stat file_stat;
 
-    err = stat(m_path.c_str(), &file_stat);
+    err = stat(this->path().c_str(), &file_stat);
     if (err == -1)
       throw runtime_error("stat() failed");
 
@@ -80,7 +75,7 @@ public:
     int err;
     int fd;
   
-    const char *path = m_path.c_str();
+    const char *path = this->path().c_str();
 
     // Open the file.
     fd = open(path, O_RDONLY, 0);
@@ -102,18 +97,23 @@ public:
     if (err == -1)
       throw runtime_error(str(boost::format("fix_permissions: close() failed: %d.") % errno));
   }
-  
+
   virtual bool run_privileged() = 0;
   virtual vector<InterfaceInfo> interfaces() = 0;
 
 protected:
   string path() {
+    if (m_path.empty())
+      throw runtime_error("path is empty");
+
+    char path[PATH_MAX];
+    if (!realpath(m_path.c_str(), path))
+      throw runtime_error(str(boost::format("realpath() failed: %d\n") % errno));
     return m_path;
   }
 
 private:
   string m_path;
-  vector<string> m_args;
 };
 
 #endif

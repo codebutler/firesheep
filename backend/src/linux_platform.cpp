@@ -31,7 +31,7 @@
 using namespace std;
 using namespace boost;
 
-LinuxPlatform::LinuxPlatform(vector<string> argv) : UnixPlatform(argv) { }
+LinuxPlatform::LinuxPlatform(string path) : UnixPlatform(path) { }
 
 bool LinuxPlatform::run_privileged() 
 {

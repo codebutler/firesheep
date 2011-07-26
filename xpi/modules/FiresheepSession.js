@@ -24,16 +24,19 @@ Components.utils.import('resource://firesheep/util/Observers.js');
 Components.utils.import('resource://firesheep/util/Utils.js');
 Components.utils.import('resource://firesheep/util/underscore.js');
 Components.utils.import('resource://firesheep/FiresheepResult.js');
-
+Components.utils.import('resource://firesheep/util/FileTail.js');
+    
 var EXPORTED_SYMBOLS = [ 'FiresheepSession' ];
 
-function FiresheepSession (fs, iface, filter) {
-  this._core        = fs;
-  this._iface       = iface;
-  this._filter      = filter;
-  this._resultCache = {};
-  this._handlers    = fs.handlers;
-  this._isCapturing = false;
+function FiresheepSession (fs) {
+  this._core = fs;
+  this._results = [];
+  this._id = Utils.generateUUID();
+
+  Observers.add('FiresheepConfig', function (data) {
+    if (data.action == 'scripts_changed')
+      this._handlers = this._core.handlers;
+  });
 }
 
 FiresheepSession.prototype = {
@@ -41,80 +44,147 @@ FiresheepSession.prototype = {
     try {
       if (this.isCapturing)
         return;
-      
-      // Ensure the binary is actually executable.
-      var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
-      if (osString != 'WINNT') {
-        // FIXME: This should really use chmod(2) directly.
-        Utils.runCommand('chmod', [ 'a+x', this._core.backendPath ]);
+  
+      this._handlers = this._core.handlers;
 
-        // Tell backend to repair owner/setuid. Will return succesfully if everything is already OK.
-        try {
-          Utils.runCommand(this._core.backendPath, [ '--fix-permissions' ]);
-        } catch (ex) {
-          throw "Failed to fix permissions";  
-        }
-      }
+      this._iface  = this._core.captureInterface;
+      this._filter = this._core.captureFilter;
+
+      this.clear();
+      this._removeOutputFiles();
+
+      this._core.prepareBackend();
+            
+      var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+      file.initWithPath(this._core.backendPath);
+      
+      this._process = Cc["@mozilla.org/process/util;1"].createInstance(Ci.nsIProcess);
+      this._process.init(file);
 
       var self = this;
+      
+      var obs = {
+        observe: function (aSubject, aTopic, aData) {
+          try {
+            dump('observe!!! ' + aSubject + ' ' + aTopic + ' ' + aData + '\n');
+            
+            self._tail.stop();
+            self._tail = null;
+            
+            /* Read any errors */
+            if (self._errorFile.exists()) {
+              var errors = Utils.readAllText(self._errorFile);
+              var exitCode = aSubject.exitValue;
+              if (exitCode != 0 && exitCode != 15) {
+                if (errors.length == 0)
+                  throw 'Backend exited with error ' + exitCode + '.';
+                else
+                  throw errors;
+              }
+      	    }
 
-      this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
-      this._process.Init(self._core.backendPath, [ self._iface, self._filter ], 2);
-      this._process.Start();
+            self.stop.apply(self);
 
-      if (!this._process.IsRunning()) {
-        throw "Failed to start capture.";
-      }
-
-      var workerFactory = Cc["@mozilla.org/threads/workerfactory;1"].createInstance(Ci.nsIWorkerFactory);
-      this._worker = workerFactory.newChromeWorker("FiresheepWorker.js");
-      this._worker.onmessage = function (event) {
-        try {
-          dump('got message: ' + event.data + "\n");
-          var msg = JSON.parse(event.data);
-          switch (msg.type) {
-            case "started":
-              self._isCapturing = true;
-              Observers.notify('Firesheep', { action: 'capture_started' });
-              break;
-            case "stopped":
-              self._isCapturing = false;
-              self_worker = null;
-              Observers.notify('Firesheep', { action: 'capture_stopped' });
-              break;
-            case "packet":
-              self.processPacket(msg.packet);
-              break;
-            case "error":
-              dump('we haz errorz: ' + msg.error + '\n');
-              self.handleError(msg.error);
-              break;
+          } catch (e) {
+            dump('erk: ' + e + '\n');
+            self._handleError.apply(self, e);
           }
-          dump('done w/ mesage\n');
-        } catch (ex) {
-          dump('o noes: ' + ex + '\n');
-          self.handleError(ex);
         }
       };
-      this._worker.postMessage({ type: 'start', process: this._process });
+      
+      this._process.runwAsync([ self._iface, self._filter, this._outputFile.path, this._errorFile.path ], 4, obs, false);
+      
+      // FIXME: Wait 5 seconds for output files to appear.
+      while (!this._outputFile.exists()) {
+        dump('wait...\n');
+      }
+
+      var tailListener = {
+        onData: function (data) {
+          dump('Got line: ' + data + '\n');
+          self._processPacket(JSON.parse(data));
+        },
+        onError: function (error) {
+          dump('Got error: ' + error + '\n');
+          self._handleError(error);
+        }
+      };
+
+      this._tail = new FileTail(this._outputFile.path, tailListener);
+      this._tail.start();
+      
+      this._notify('capture_started');
+      
     } catch (e) {
-      dump('got error in session: ' + e + '\n');
-      this.handleError(e);
+      dump('got error in session: ' + e + ' ' + e.stack + '\n');
+      this._handleError(e);
     }
   },
   
   stop: function () {
     if (!this.isCapturing)
       return;
-    this._process.Stop();
+    this._process.kill();
     this._process = null;
-  },
-  
-  get isCapturing () {
-    return this._isCapturing;
+
+    this._notify('capture_stopped');
+                 
+    this._removeOutputFiles();
   },
 
-  processPacket: function (packet) {
+  toggle: function () {
+    if (!this.isCapturing)
+      this.start();
+    else
+      this.stop();
+  },
+  
+  clear: function () {
+    this.stop();
+    this._results = [];
+    this._resultCache = {};
+
+    this._notify('session_loaded');
+  },
+
+  get isCapturing () {
+    return (this._process != null);
+  },
+
+  get results () {
+    return this._results;
+  },
+
+  _handleError: function (e) {
+    this.stop();
+    dump('Error: ' + e + '\n');
+    this._notify('error', { error: e });
+  },
+
+  _hasSeenResult: function (result) {
+    return !!(this._resultCache[Utils.makeCacheKey(result)]);
+  },
+  
+  get _outputFile() {
+    var file = Utils.tempDir;
+    file.append('firesheep-backend-' + this._id + '.out');
+    return file;
+  },
+  
+  get _errorFile() {
+    var file = Utils.tempDir;
+    file.append('firesheep-backend-' + this._id + '.err');
+    return file;
+  },
+  
+  _removeOutputFiles: function () {
+    if (this._outputFile.exists())
+      this._outputFile.remove(false);
+    if (this._errorFile.exists())
+      this._errorFile.remove(false);
+  },
+
+  _processPacket: function (packet) {
     var host = packet.host;
     
     // Strip port number, if any.
@@ -127,7 +197,7 @@ FiresheepSession.prototype = {
     packet.queryString = packet.query;
     packet.query = Utils.parseQuery(packet.queryString);
             
-    if (packet.cookies[this._core.canaryText]) {
+    if (packet.cookies[this._core.canaryText]) { // FIXME: Needs more testing.
       dump('\n\n\n\nIGNORE!!!\n\n\n\n');
       return;
     }
@@ -193,7 +263,7 @@ FiresheepSession.prototype = {
         handler.processPacket.apply(result, [ packet ]);
       } catch (e) {           
         var errorText = 'Error in ' + handler.name + ' processPacket(): ' + e;
-        Observers.notify('Firesheep', { action: 'error', error: errorText });
+        this._notify('error', { error: errorText });
         return;
       }
     }
@@ -204,7 +274,7 @@ FiresheepSession.prototype = {
     }
     
     // Ignore packet if session has been seen before.
-    if (this.findResult(result)) {
+    if (this._hasSeenResult(result)) {
       return;
     }
         
@@ -219,23 +289,21 @@ FiresheepSession.prototype = {
     
     // Check again if packet has been seen, identifyUser() could
     // have changed sessionId.
-    if (this.findResult(result)) {
+    if (this._hasSeenResult(result)) {
       return;
     }
     
     // Cache information about this result for lookup later.
     this._resultCache[Utils.makeCacheKey(result)] = true;
 
-    this._core._handleResult.apply(this._core, [ result ]);
-  },
-  
-  handleError: function (e) {
-    dump('Error: ' + e + '\n');
-    Observers.notify('Firesheep', { action: 'error', error: e });
-    this.stop();
+    this._results.push(result); // FIXME: Don't need this + resultCache...
+    this._notify('result_added', { result: result });
   },
 
-  findResult: function (result) {
-    return !!(this._resultCache[Utils.makeCacheKey(result)]);
+  _notify: function (action, opts) {
+    if (opts == null) opts = {};
+    opts.action  = action;
+    opts.session = this;
+    Observers.notify('FiresheepSession', opts);
   }
 };

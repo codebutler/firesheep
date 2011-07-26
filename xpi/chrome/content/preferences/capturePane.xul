@@ -25,15 +25,17 @@
 
 <overlay id="capturePaneOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script src="capturePane.js" />
-  <prefpane id="capturePane" label="Capture" flex="1" onpaneload="loadInterfaces()">
+  <prefpane id="capturePane" label="Capture" onpaneload="loadInterfaces()">
     <preferences>
       <preference id="pref-interface" name="firesheep.capture_interface" type="string" />
     </preferences>
-    <hbox align="center">
-      <label control="capture_interface" value="Interface:" />
-      <menulist id="captureInterfaceMenuList" preference="pref-interface" oncommand="setInterface()">
-        <menupopup />
-      </menulist>
-    </hbox>
+    <vbox id="captureBox">
+      <hbox align="center">
+        <label control="capture_interface" value="Interface:" />
+        <menulist id="captureInterfaceMenuList" preference="pref-interface" oncommand="setInterface()">
+          <menupopup />
+        </menulist>
+      </hbox>
+    </vbox>
   </prefpane>
 </overlay>

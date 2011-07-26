@@ -28,7 +28,7 @@
 #include <CoreServices/CoreServices.h>
 #include <CoreFoundation/CoreFoundation.h>
 
-OSXPlatform::OSXPlatform(vector<string> argv) : UnixPlatform(argv) { }
+OSXPlatform::OSXPlatform(string path) : UnixPlatform(path) { }
 
 bool OSXPlatform::run_privileged()
 {
@@ -44,7 +44,7 @@ bool OSXPlatform::run_privileged()
   if (err != errAuthorizationSuccess)
     throw runtime_error(str(boost::format("osx_run_privileged: AuthorizationCreate() failed: %ld.") % (long int)err));
   
-  char *args[] = { "--fix-permissions", NULL };
+  char *args[] = { (char *) "--fix-permissions", NULL };
   
   err = AuthorizationExecuteWithPrivileges(auth, path, kAuthorizationFlagDefaults, args, NULL);
   AuthorizationFree(auth, kAuthorizationFlagDefaults);
