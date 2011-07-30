@@ -66,10 +66,12 @@ FiresheepSession.prototype = {
       var obs = {
         observe: function (aSubject, aTopic, aData) {
           try {
-            dump('observe!!! ' + aSubject + ' ' + aTopic + ' ' + aData + '\n');
+            dump('backend quit. ' + aSubject + ' ' + aTopic + ' ' + aData + '\n');
             
-            self._tail.stop();
-            self._tail = null;
+            if (self._tail) {
+              self._tail.stop();
+              self._tail = null;
+            }
             
             /* Read any errors */
             if (self._errorFile.exists()) {
@@ -86,19 +88,40 @@ FiresheepSession.prototype = {
             self.stop.apply(self);
 
           } catch (e) {
-            dump('erk: ' + e + '\n');
-            self._handleError.apply(self, e);
+            self._handleError.apply(self, [ e ]);
           }
         }
       };
       
-      this._process.runwAsync([ self._iface, self._filter, this._outputFile.path, this._errorFile.path ], 4, obs, false);
-      
-      // FIXME: Wait 5 seconds for output files to appear.
-      while (!this._outputFile.exists()) {
-        dump('wait...\n');
-      }
+      this._process.runwAsync([ this._iface, this._filter, this._outputFile.path, this._errorFile.path ], 4, obs, false);
 
+      var timerCallback = {
+        notify: function(timer) {
+          if (!self._outputFile.exists())
+            self._handleError.apply(self, [ 'Backend did not start correctly.' ]);
+          else
+            self._watchOutput.apply(self);
+          self._timer = null;
+        }
+      };
+
+      this._timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+      this._timer.initWithCallback(timerCallback, 1000, Ci.nsITimer.TYPE_ONE_SHOT);
+
+      dump('Waiting for output to appear.\n');
+
+      this._notify('capture_started');
+    
+    } catch (e) {
+      this._handleError(e);
+    }
+  },
+
+  _watchOutput: function() {
+    try {
+      dump('Output file is ready.\n');
+
+      var self = this;
       var tailListener = {
         onData: function (data) {
           dump('Got line: ' + data + '\n');
@@ -113,10 +136,7 @@ FiresheepSession.prototype = {
       this._tail = new FileTail(this._outputFile.path, tailListener);
       this._tail.start();
       
-      this._notify('capture_started');
-      
     } catch (e) {
-      dump('got error in session: ' + e + ' ' + e.stack + '\n');
       this._handleError(e);
     }
   },
@@ -124,7 +144,8 @@ FiresheepSession.prototype = {
   stop: function () {
     if (!this.isCapturing)
       return;
-    this._process.kill();
+    if (this._process.isRunning)
+      this._process.kill();
     this._process = null;
 
     this._notify('capture_stopped');
@@ -156,8 +177,8 @@ FiresheepSession.prototype = {
   },
 
   _handleError: function (e) {
+    dump('Error: ' + e + ' stack: ' + e.stack + '\n');
     this.stop();
-    dump('Error: ' + e + '\n');
     this._notify('error', { error: e });
   },
 
