@@ -46,22 +46,21 @@ var Firesheep = {
 
     if (Preferences.isSet('firesheep.capture_interface')) {
       var iface = Preferences.get('firesheep.capture_interface');
-      if (iface != null && iface != '' && iface in interfaces) // FIXME: Test this last thing.
+      if (iface != null && iface != '' && iface in interfaces)
         return iface;
     }
-    
-    //
-    // FIXME: Smarter defaults. Interfaces JSON could include:
-    // { name: "en1", type: "ethernet", bestDefault: true }
-    //                                  ^^^^^^^^^^^^^^^^^
-    
-    if (Utils.OS == 'Darwin') {
-      return 'en1';
-    } else {
-      for (var id in interfaces) {
-        return id;
-      }
-    }
+
+    // Fall back to first wireless interface.
+    var interfaceNames = _.keys(interfaces).sort(function(a, b) {
+      var i1type = interfaces[a].type;
+      var i2type = interfaces[b].type;
+      if (i1type == 'ieee80211' && i2type != 'ieee80211')
+        return -1;
+      else if (i1type != 'ieee80211' && i2type == 'ieee80211')
+        return 1;
+      return 0;
+    });
+    return interfaceNames[0];
   },
 
   get captureFilter() {
@@ -163,8 +162,11 @@ var Firesheep = {
     if (Utils.OS == 'Darwin' || Utils.OS == 'Linux') {
       var tmpFile = Utils.tempDir;
       tmpFile.append(fileName);
-      if (!tmpFile.exists())  // FIXME: Compare file sizes/dates!!
+      if ((!tmpFile.exists()) || (file.fileSize != tmpFile.fileSize) || (file.lastModifiedTime > tmpFile.lastModifiedTime)) {
+        if (tmpFile.exists())
+          tmpFile.remove(false);
         file.copyTo(tmpFile.parent, tmpFile.leafName);
+      }
       return tmpFile.path;
     }
 
