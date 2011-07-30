@@ -316,8 +316,8 @@ FiresheepSession.prototype = {
     
     // Cache information about this result for lookup later.
     this._resultCache[Utils.makeCacheKey(result)] = true;
+    this._results.push(result);
 
-    this._results.push(result); // FIXME: Don't need this + resultCache...
     this._notify('result_added', { result: result });
   },
 

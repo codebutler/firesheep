@@ -115,7 +115,6 @@ function addResult (result) {
   
   var item = document.createElement('richlistitem');
   item.setAttribute('style', 'padding-left: 6px');
-  item.setAttribute('resultId', captureSession.results.indexOf(result));
   
   var hbox = document.createElement('hbox');
   hbox.setAttribute('align', 'center');
@@ -179,10 +178,8 @@ function addResult (result) {
 function onResultDoubleClick () {
   try {
     var resultsList = document.getElementById('resultsList');
-    var selectedItem = resultsList.selectedItem;
-    if (selectedItem) {
-      var id = selectedItem.getAttribute('resultId');
-      var result = captureSession.results[id];
+    if (resultsList.selectedItem) {
+      var result = captureSession.results[resultsList.selectedIndex];
       
       if (result.handler.spoofUserAgent) {
         // FIXME!
@@ -220,10 +217,8 @@ function onResultSelect () {
       children.removeChild(children.childNodes[0]);
 
   var resultsList = document.getElementById('resultsList');
-  var selectedItem = resultsList.selectedItem;
-  if (selectedItem) {
-    var id = selectedItem.getAttribute('resultId');
-    var result = captureSession.results[id];
+  if (resultsList.selectedItem) {
+    var result = captureSession.results[resultsList.selectedIndex];
     displayObject(children, result);
   }
 }
