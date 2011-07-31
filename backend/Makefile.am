@@ -26,7 +26,6 @@ libfiresheep_la_SOURCES = \
 
 if PLATFORM_OSX
 CXXFLAGS += -DPLATFORM_OSX -arch i386 -arch x86_64
-CFLAGS += $(CXXFLAGS)
 libfiresheep_la_SOURCES += src/osx_platform.cpp
 libfiresheep_la_LDFLAGS  = -framework Security
 libfiresheep_la_LDFLAGS += -framework SystemConfiguration
@@ -43,11 +42,10 @@ CXXFLAGS += -DPLATFORM_WIN32
 endif
 if PLATFORM_LINUX
 CXXFLAGS += -DPLATFORM_LINUX
-#LIBFIRESHEEP_SOURCES += src/linux_platform.cpp
-#LIBFIRESHEEP_CFLAGS  += $(PCAP_CFLAGS)
-#LIBFIRESHEEP_CFLAGS  += $(BOOST_CPPFLAGS)
-#LIBFIRESHEEP_CFLAGS  += $(HAL_CFLAGS)
-#LIBFIRESHEEP_LIBS    += $(PCAP_LIBS)
-#LIBFIRESHEEP_LIBS    += $(BOOST_FORMAT_LIBS) $(BOOST_STRING_ALGO_LIBS)
-#LIBFIRESHEEP_LIBS    += $(HAL_LIBS)
+libfiresheep_la_SOURCES += src/linux_platform.cpp
+libfiresheep_la_CXXFLAGS = $(PCAP_CFLAGS) $(BOOST_CPPFLAGS) $(HAL_CFLAGS)
+libfiresheep_la_CFLAGS   = $(libfiresheep_la_CXXFLAGS)
+libfiresheep_la_LIBADD   = $(PCAP_LIBS) $(BOOST_FORMAT_LIBS) $(BOOST_STRING_ALGO_LIBS) $(HAL_LIBS)
 endif
+
+CFLAGS += $(CXXFLAGS)

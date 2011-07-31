@@ -1,15 +1,12 @@
 #firesheepSidebar #toolbar {
   padding: 6px;
-  border-bottom: 1px solid threedshadow;
 }
 
 #firesheepSidebar richlistbox {
   margin: 0;
-  -moz-appearance: none; 
 }
 
 #detailsTree {
-  -moz-appearance: none;
   margin: 0;
   border: 0;
   height: 150px;
@@ -22,17 +19,6 @@
 
 #detailsTree treechildren::-moz-tree-cell-text(nullValue, selected) {
   color: white;
-}
-
-splitter {
-  -moz-appearance: none;
-  min-height: 0;
-  height: 1px;
-  background: #B4B4B4;
-}
-
-#bottombar {
-  border-top: 1px solid threedshadow;
 }
 
 #bottombar button {

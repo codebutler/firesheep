@@ -20,6 +20,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#include <cstdio>
+
 #include "http_sniffer.hpp"
 #include "http_packet.hpp"
 #include "json_spirit_writer_template.h"

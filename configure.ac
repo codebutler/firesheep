@@ -38,29 +38,43 @@ fi
 m4_define_default([PKG_CHECK_MODULES], [AC_MSG_FAILURE([pkg-config was not found])])
 
 AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+
+case "$build_cpu" in
+	i[[3456]]86*)
+		build_arch="x86"
+		;;
+	amd64*|x86_64*)
+		build_arch="x86_64"
+		;;
+esac
+
 case "$host_os" in
 	cygwin)
-		TARGET=WIN32
-		MOZ_ABI="WINNT_x86-msvc"
-		AC_SUBST(MOZ_ABI)
+		DLL_EXT="dll"
+		FIRESHEEP_PLATFORM_NAME=WIN32
+		FIRESHEEP_PLATFORM="WINNT_x86-msvc"
 	;;
 	darwin*)
-		TARGET=OSX
+		DLL_EXT="dylib"
+		FIRESHEEP_PLATFORM_NAME=OSX
+		FIRESHEEP_PLATFORM="osx"
 		CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -mmacosx-version-min=10.6"
-                MOZ_ABI="OSX"
-                AC_SUBST(MOZ_ABI)
-                
 	;;
 	linux*)
-		TARGET=LINUX
-		MOZ_ABI="Linux_$(BUILD_ARCH)-gcc3"
-		AC_SUBST(MOZ_ABI)
+		DLL_EXT="so"
+		FIRESHEEP_PLATFORM_NAME=LINUX
+		FIRESHEEP_PLATFORM="Linux_${build_arch}-gcc3"
 	;;
 esac
 
-AM_CONDITIONAL(PLATFORM_WIN32, test x$TARGET = xWIN32)
-AM_CONDITIONAL(PLATFORM_OSX, test x$TARGET = xOSX)
-AM_CONDITIONAL(PLATFORM_LINUX, test x$TARGET = xLINUX)
+AC_SUBST(DLL_EXT)
+AC_SUBST(FIRESHEEP_PLATFORM)
+AC_SUBST(FIRESHEEP_PLATFORM_NAME)
+
+AM_CONDITIONAL(PLATFORM_WIN32, test x$FIRESHEEP_PLATFORM_NAME = xWIN32)
+AM_CONDITIONAL(PLATFORM_OSX, test x$FIRESHEEP_PLATFORM_NAME = xOSX)
+AM_CONDITIONAL(PLATFORM_LINUX, test x$FIRESHEEP_PLATFORM_NAME = xLINUX)
 
 # BEGIN PCAP LIBS
 AC_PATH_PROG([PCAP_CONFIG], [pcap-config], [no], [$PATH])
@@ -85,32 +99,11 @@ BOOST_STRING_ALGO
 AC_SUBST(BOOST_STRING_ALGO_LIBS)
 # END BOOST LIBS
 
-# BEGIN LINUX
-# Use generic CPU arch for xpi/platform
-# on Linux
-case "$build_cpu" in
-	i[[3456]]86*)
-		build_arch="x86"
-		build_target="-mtune=generic -m32"
-		;;
-	amd64*|x86_64*)
-		build_arch="x86_64"
-		build_target="-mtune=generic -m64"
-		;;
-esac
-
-BUILD_ARCH=$build_arch
-AC_SUBST(BUILD_ARCH)
-
-BUILD_TARGET=$build_target
-AC_SUBST(BUILD_TARGET)
-
-if test x$TARGET = xLINUX; then
+if test x$FIRESHEEP_PLATFORM_NAME = xLINUX; then
 	PKG_CHECK_MODULES(HAL, [hal])
 	AC_SUBST(HAL_CFLAGS)
 	AC_SUBST(HAL_LIBS)
 fi
-# END LINUX
 
 CXXFLAGS="-Wall -g -O0"
 AC_SUBST(CXXFLAGS)
@@ -125,5 +118,5 @@ AC_OUTPUT
 echo "
 Firesheep-$VERSION
 
-    Mozilla SDK Arch:  ${MOZ_ABI}
+    Platform:  ${FIRESHEEP_PLATFORM}
 "

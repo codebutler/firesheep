@@ -8,4 +8,6 @@ overlay   chrome://global/content/customizeToolbar.xul           chrome://firesh
 style     chrome://firesheep/content/sidebar.xul                 chrome://firesheep/skin/sidebar-osx.css      OS=Darwin
 style     chrome://firesheep/content/preferences/prefsWindow.xul chrome://firesheep/skin/preferences-osx.css  OS=Darwin
 
+style     chrome://firesheep/content/sidebar.xul                 chrome://firesheep/skin/sidebar-win.css      OS=WINNT
+
 resource firesheep modules/

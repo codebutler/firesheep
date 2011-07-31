@@ -35,9 +35,12 @@ LinuxPlatform::LinuxPlatform(string path) : UnixPlatform(path) { }
 
 bool LinuxPlatform::run_privileged() 
 {
-  const char *path = this->path().c_str();
-  execl("/usr/bin/pkexec", "pkexec", path, "--fix-permissions", NULL);
-  return true;
+  string cmd = string("/usr/bin/pkexec ");
+  cmd += this->path();
+  cmd += " --fix-permissions";
+
+  int ret = system(cmd.c_str());
+  return (ret == 0);
 }
 
 string device_get_property_string(LibHalContext *context, string device, string key, DBusError *error)

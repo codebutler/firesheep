@@ -26,11 +26,6 @@ Components.utils.import('resource://firesheep/util/Preferences.js');
 
 function loadInterfaces () {
   try {
-    sizeToContent();
-    var vbox = document.getElementById('captureBox');
-    vbox.height = vbox.boxObject.height;
-    sizeToContent();
-	
     var currentId = Firesheep.captureInterface;
   
     var list = document.getElementById('captureInterfaceMenuList');
