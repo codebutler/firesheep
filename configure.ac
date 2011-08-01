@@ -100,9 +100,14 @@ AC_SUBST(BOOST_STRING_ALGO_LIBS)
 # END BOOST LIBS
 
 if test x$FIRESHEEP_PLATFORM_NAME = xLINUX; then
-	PKG_CHECK_MODULES(HAL, [hal])
-	AC_SUBST(HAL_CFLAGS)
-	AC_SUBST(HAL_LIBS)
+	PKG_CHECK_MODULES([HAL], [hal],
+                [AC_DEFINE([HAVE_HAL], [1], [Use HAL])
+                AC_SUBST(HAL_CFLAGS)
+                AC_SUBST(HAL_LIBS)
+        ], 
+                [
+                echo "Without HAL, you will need to choose the right interface yourself."
+        ])
 fi
 
 CXXFLAGS="-Wall -g -O0"
