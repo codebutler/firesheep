@@ -143,7 +143,7 @@ var Firesheep = {
 
     // Backend is compiled as a universal binary for OSX.
     if (xulRuntime.OS == "Darwin") {
-      dir.append("OSX");
+      dir.append("osx");
 
     } else {
       var platformName = [ xulRuntime.OS, xulRuntime.XPCOMABI ].join('_');
