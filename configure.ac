@@ -100,9 +100,19 @@ AC_SUBST(BOOST_STRING_ALGO_LIBS)
 # END BOOST LIBS
 
 if test x$FIRESHEEP_PLATFORM_NAME = xLINUX; then
-	PKG_CHECK_MODULES(HAL, [hal])
+	AC_MSG_CHECKING(if --enable-hal option is specified)
+	AC_ARG_ENABLE(hal, [  --enable-hal           enable HAL interface listing])
+
+	if test "$enable_hal" = "yes"; then
+		PKG_CHECK_MODULES(HAL, [hal])
+	else
+		HAL_CFLAGS="-DDISABLE_HAL"
+		HAL_LIBS=""
+	fi
+
 	AC_SUBST(HAL_CFLAGS)
 	AC_SUBST(HAL_LIBS)
+	AC_MSG_RESULT(${enable_hal-no})
 fi
 
 CXXFLAGS="-Wall -g -O0"
