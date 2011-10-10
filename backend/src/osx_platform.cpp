@@ -76,24 +76,31 @@ vector<InterfaceInfo> OSXPlatform::interfaces()
     
     if (SCNetworkServiceGetEnabled(service)) {
       SCNetworkInterfaceRef iface = SCNetworkServiceGetInterface(service);
+      char *cServiceName = NULL, *cType = NULL, *cBsdName = NULL;
     
       CFStringRef serviceName = SCNetworkServiceGetName(service);
-      char cServiceName[(CFStringGetLength(serviceName) * 4) + 1];
-      CFStringGetCString(serviceName, cServiceName, sizeof(cServiceName), kCFStringEncodingUTF8);
+      if (serviceName != NULL) {
+        cServiceName = (char *)alloca((CFStringGetLength(serviceName) * 4) + 1);
+        CFStringGetCString(serviceName, cServiceName, sizeof(cServiceName), kCFStringEncodingUTF8);
+      }
     
       CFStringRef type = SCNetworkInterfaceGetInterfaceType(iface);
-      if (CFStringCompare(type, CFSTR("Ethernet"), 0) == kCFCompareEqualTo ||
-        CFStringCompare(type, CFSTR("IEEE80211"), 0) == kCFCompareEqualTo) {
+      if (type != NULL) {
+        if (CFStringCompare(type, CFSTR("Ethernet"), 0) == kCFCompareEqualTo ||
+          CFStringCompare(type, CFSTR("IEEE80211"), 0) == kCFCompareEqualTo) {
         
-        char cType[(CFStringGetLength(type) * 4) + 1];
-        CFStringGetCString(type, cType, sizeof(cType), kCFStringEncodingUTF8);
+            cType = (char *)alloca((CFStringGetLength(type) * 4) + 1);
+            CFStringGetCString(type, cType, sizeof(cType), kCFStringEncodingUTF8);
 
-        CFStringRef bsdName = SCNetworkInterfaceGetBSDName(iface);
-        char cBsdName[(CFStringGetLength(bsdName) * 4) + 1];
-        CFStringGetCString(bsdName, cBsdName, sizeof(cBsdName), kCFStringEncodingUTF8);
+            CFStringRef bsdName = SCNetworkInterfaceGetBSDName(iface);
+            if (bsdName != NULL) {
+              cBsdName = (char *)alloca((CFStringGetLength(bsdName) * 4) + 1);
+              CFStringGetCString(bsdName, cBsdName, sizeof(cBsdName), kCFStringEncodingUTF8);
+            }
       
-        InterfaceInfo info((string(cBsdName)), (string(cServiceName)), (string(cType)));          
-        result.push_back(info);
+            InterfaceInfo info((string(cBsdName)), (string(cServiceName)), (string(cType)));          
+            result.push_back(info);
+        }
       }
     }
   }
