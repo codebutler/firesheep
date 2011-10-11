@@ -26,7 +26,6 @@
 #include <Security/Security.h>
 #include <SystemConfiguration/SystemConfiguration.h>
 #include <CoreServices/CoreServices.h>
-#include <CoreFoundation/CoreFoundation.h>
 
 OSXPlatform::OSXPlatform(string path) : UnixPlatform(path) { }
 
@@ -76,34 +75,17 @@ vector<InterfaceInfo> OSXPlatform::interfaces()
     
     if (SCNetworkServiceGetEnabled(service)) {
       SCNetworkInterfaceRef iface = SCNetworkServiceGetInterface(service);
-      char *cServiceName = NULL, *cType = NULL, *cBsdName = NULL;
-      int strLen = 0;
-    
-      CFStringRef serviceName = SCNetworkServiceGetName(service);
-      if (serviceName != NULL) {
-        strLen = (CFStringGetLength(serviceName) * 4) + 1;
-        cServiceName = (char *)alloca(strLen);
-        CFStringGetCString(serviceName, cServiceName, strLen, kCFStringEncodingUTF8);
-      }
-    
+
       CFStringRef type = SCNetworkInterfaceGetInterfaceType(iface);
       if (type != NULL) {
         if (CFStringCompare(type, CFSTR("Ethernet"), 0) == kCFCompareEqualTo ||
           CFStringCompare(type, CFSTR("IEEE80211"), 0) == kCFCompareEqualTo) {
         
-            strLen = (CFStringGetLength(type) * 4) + 1;
-            cType = (char *)alloca(strLen);
-            CFStringGetCString(type, cType, strLen, kCFStringEncodingUTF8);
+          CFStringRef serviceName = SCNetworkServiceGetName(service);
+          CFStringRef bsdName = SCNetworkInterfaceGetBSDName(iface);
 
-            CFStringRef bsdName = SCNetworkInterfaceGetBSDName(iface);
-            if (bsdName != NULL) {
-              strLen = (CFStringGetLength(bsdName) * 4) + 1;
-              cBsdName = (char *)alloca(strLen);
-              CFStringGetCString(bsdName, cBsdName, strLen, kCFStringEncodingUTF8);
-            }
-      
-            InterfaceInfo info((string(cBsdName)), (string(cServiceName)), (string(cType)));          
-            result.push_back(info);
+          InterfaceInfo info(stringFromCFString(bsdName), stringFromCFString(serviceName), stringFromCFString(type));
+          result.push_back(info);
         }
       }
     }
@@ -114,4 +96,20 @@ vector<InterfaceInfo> OSXPlatform::interfaces()
   CFRelease(prefs);
   
   return result; 
+}
+
+string OSXPlatform::stringFromCFString(CFStringRef cfString, CFStringEncoding encoding)
+{
+    char *cstring = NULL;
+    int maxLen = NULL;
+    string result;
+
+    if (cfString != NULL) {
+        maxLen = CFStringGetMaximumSizeForEncoding(CFStringGetLength(cfString), encoding);
+        cstring = (char *)alloca(maxLen + 1);
+        CFStringGetCString(cfString, cstring, maxLen, encoding);
+        result = cstring;
+    }
+
+    return result;
 }
