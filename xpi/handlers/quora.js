@@ -8,9 +8,9 @@ register({
 
   identifyUser: function () {
     var resp = this.httpGet(this.siteUrl + '/settings');
-    var nameElem = resp.body.querySelector(".profile .nav_item");
+    var nameElem = resp.body.querySelector("li.profile a.nav_item");
     if (nameElem) {      
-      this.userName = nameElem.textContent;
+      this.userName = nameElem.innerHTML;
     }
   }
 });
