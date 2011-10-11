@@ -77,11 +77,13 @@ vector<InterfaceInfo> OSXPlatform::interfaces()
     if (SCNetworkServiceGetEnabled(service)) {
       SCNetworkInterfaceRef iface = SCNetworkServiceGetInterface(service);
       char *cServiceName = NULL, *cType = NULL, *cBsdName = NULL;
+      int strLen = 0;
     
       CFStringRef serviceName = SCNetworkServiceGetName(service);
       if (serviceName != NULL) {
-        cServiceName = (char *)alloca((CFStringGetLength(serviceName) * 4) + 1);
-        CFStringGetCString(serviceName, cServiceName, sizeof(cServiceName), kCFStringEncodingUTF8);
+        strLen = (CFStringGetLength(serviceName) * 4) + 1;
+        cServiceName = (char *)alloca(strLen);
+        CFStringGetCString(serviceName, cServiceName, strLen, kCFStringEncodingUTF8);
       }
     
       CFStringRef type = SCNetworkInterfaceGetInterfaceType(iface);
@@ -89,13 +91,15 @@ vector<InterfaceInfo> OSXPlatform::interfaces()
         if (CFStringCompare(type, CFSTR("Ethernet"), 0) == kCFCompareEqualTo ||
           CFStringCompare(type, CFSTR("IEEE80211"), 0) == kCFCompareEqualTo) {
         
-            cType = (char *)alloca((CFStringGetLength(type) * 4) + 1);
-            CFStringGetCString(type, cType, sizeof(cType), kCFStringEncodingUTF8);
+            strLen = (CFStringGetLength(type) * 4) + 1;
+            cType = (char *)alloca(strLen);
+            CFStringGetCString(type, cType, strLen, kCFStringEncodingUTF8);
 
             CFStringRef bsdName = SCNetworkInterfaceGetBSDName(iface);
             if (bsdName != NULL) {
-              cBsdName = (char *)alloca((CFStringGetLength(bsdName) * 4) + 1);
-              CFStringGetCString(bsdName, cBsdName, sizeof(cBsdName), kCFStringEncodingUTF8);
+              strLen = (CFStringGetLength(bsdName) * 4) + 1;
+              cBsdName = (char *)alloca(strLen);
+              CFStringGetCString(bsdName, cBsdName, strLen, kCFStringEncodingUTF8);
             }
       
             InterfaceInfo info((string(cBsdName)), (string(cServiceName)), (string(cType)));          
