@@ -13,6 +13,6 @@ register({
 
   identifyUser: function() {
     var resp = this.httpGet(this.siteUrl);
-    this.userName = resp.body.querySelectorAll("#memberTools a")[1].innerHTML;
+    this.userName = resp.body.querySelectorAll("#memberTools a")[2].innerHTML;
   }
 });
