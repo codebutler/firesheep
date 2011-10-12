@@ -27,48 +27,19 @@ Components.utils.import('resource://firesheep/util/ScriptParser.js');
 var EXPORTED_SYMBOLS = [ 'FiresheepConfig' ];
 
 var FiresheepConfig = {
-  _userScripts: {},
-  _isLoaded: false,
-
-  load: function () {
-    if (!this._isLoaded) {
-      /* Load user scripts */
-      if (this.configFile.exists()) {
-        doc = XML(Utils.readAllText(this.configFile));
-        scripts = doc.Script;    
-        for (var i = 0; i < scripts.length(); i++) {
-          var script = scripts[i];
-          var scriptId   = script.@id;
-          var scriptText = script.toString();      
-          this._userScripts[scriptId] = scriptText;
-        }
-      }      
-      this._isLoaded = true;
-    }
-  },
-
-  saveScript: function (id, scriptText) {
-    var isNew = (this._userScripts[id] == null);
-  
-    this._userScripts[id] = scriptText;
-    this._writeScripts();   
-  
-    var action = (isNew ? 'script_added' : 'script_updated');
-    Observers.notify('Firesheep', { action: action, id: id });
-  },
-
-  removeScript: function (id) {
-    delete this._userScripts[id];
-    this._writeScripts();
-    Observers.notify('Firesheep', { action: 'script_removed', id: id });
-  },
-  
   get userScripts() {
-    return this._userScripts;
-  },  
-
-  validateScript: function (scriptText) {    
-    return ScriptParser.validateScript(scriptText);
+    var userScripts = {};
+    if (this.configFile.exists()) {
+      doc = XML(Utils.readAllText(this.configFile));
+      scripts = doc.Script;    
+      for (var i = 0; i < scripts.length(); i++) {
+        var script = scripts[i];
+        var scriptId   = script.@id;
+        var scriptText = script.toString();      
+        userScripts[scriptId] = scriptText;
+      }
+    }      
+    return userScripts;
   },
 
   get configFile () {
@@ -79,18 +50,40 @@ var FiresheepConfig = {
     return file;
   },
 
-  _writeScripts: function () {
+  saveScript: function (id, scriptText) {
+    var userScripts = this.userScripts;
+
+    var isNew = (userScripts[id] == null);
+  
+    userScripts[id] = scriptText;
+    this._writeScripts(userScripts);
+  
+    var action = (isNew ? 'script_added' : 'script_updated');
+    Observers.notify('FiresheepConfig', { action: action, id: id });
+  },
+
+  removeScript: function (id) {
+    var userScripts = this.userScripts;
+    delete userScripts[id];
+    this._writeScripts(userScripts);
+    Observers.notify('FiresheepConfig', { action: 'script_removed', id: id });
+  },
+  
+  validateScript: function (scriptText) {    
+    return ScriptParser.validateScript(scriptText);
+  },
+
+  _writeScripts: function (userScripts) {
     var doc = <Scripts />;
   
-    for (var id in this._userScripts) {
-      var scriptText = this._userScripts[id];
+    for (var id in userScripts) {
+      var scriptText = userScripts[id];
       var script = <Script id={id}>{scriptText}</Script>;
       doc.appendChild(script);
     }
   
     Utils.writeAllText(this.configFile, doc.toXMLString());
     
-    if (this._isLoaded)
-      Observers.notify('FiresheepConfig', { action: 'scripts_changed' });
+    Observers.notify('FiresheepConfig', { action: 'scripts_changed' });
   }
 };

@@ -25,6 +25,7 @@ Components.utils.import('resource://firesheep/util/Utils.js');
 Components.utils.import('resource://firesheep/util/Observers.js');
 
 var mainWindow = null;
+var captureSession = null;
 
 function startup() {
   mainWindow = window.QueryInterface(Ci.nsIInterfaceRequestor)
@@ -34,12 +35,22 @@ function startup() {
                      .QueryInterface(Ci.nsIInterfaceRequestor)
                      .getInterface(Ci.nsIDOMWindow);
   
+  captureSession = Firesheep.createCaptureSession();
+
   reloadSession();
   updateState();
+
+  document.getElementById('captureButton').addEventListener('click', function (event) {
+    captureSession.toggle();
+  }, true);
+  document.getElementById('clearMenuItem').addEventListener('command', function (event) {
+    captureSession.clear();
+  }, true);
 }
 
 function shutdown() {
-  Firesheep.stopCapture();
+  if (captureSession)
+    captureSession.stop();
 }
 
 window.addEventListener("load", startup, false);
@@ -51,7 +62,7 @@ function reloadSession () {
   while (list.getRowCount() > 0)
     list.removeItemAt(0);
   
-  Firesheep.results.forEach(function (packet) {
+  captureSession.results.forEach(function (packet) {
     addResult(packet);
   });
   
@@ -60,11 +71,14 @@ function reloadSession () {
 
 function updateState () {
   var captureButton = document.getElementById('captureButton');
-  captureButton.label = (Firesheep.isCapturing) ? 'Stop Capturing' : 'Start Capturing';
+  captureButton.label = (captureSession.isCapturing) ? 'Stop Capturing' : 'Start Capturing';
 }
 
 var callback = function (data) {
   try {
+    if (data.session != captureSession)
+      return;
+
     switch (data.action) {
       case 'session_loaded':
         reloadSession();
@@ -73,7 +87,7 @@ var callback = function (data) {
         updateState();
         break;
       case 'capture_stopped':
-        updateState()
+        updateState();
         break;
       case 'result_added':
         addResult(data.result);
@@ -92,7 +106,7 @@ var callback = function (data) {
 };
 
 var context = this;
-Observers.add('Firesheep', function () {
+Observers.add('FiresheepSession', function () {
   callback.apply(context, arguments);
 });
 
@@ -101,7 +115,6 @@ function addResult (result) {
   
   var item = document.createElement('richlistitem');
   item.setAttribute('style', 'padding-left: 6px');
-  item.setAttribute('resultId', Firesheep.results.indexOf(result));
   
   var hbox = document.createElement('hbox');
   hbox.setAttribute('align', 'center');
@@ -165,10 +178,8 @@ function addResult (result) {
 function onResultDoubleClick () {
   try {
     var resultsList = document.getElementById('resultsList');
-    var selectedItem = resultsList.selectedItem;
-    if (selectedItem) {
-      var id = selectedItem.getAttribute('resultId');
-      var result = Firesheep.results[id];
+    if (resultsList.selectedItem) {
+      var result = captureSession.results[resultsList.selectedIndex];
       
       if (result.handler.spoofUserAgent) {
         // FIXME!
@@ -206,10 +217,8 @@ function onResultSelect () {
       children.removeChild(children.childNodes[0]);
 
   var resultsList = document.getElementById('resultsList');
-  var selectedItem = resultsList.selectedItem;
-  if (selectedItem) {
-    var id = selectedItem.getAttribute('resultId');
-    var result = Firesheep.results[id];
+  if (resultsList.selectedItem) {
+    var result = captureSession.results[resultsList.selectedIndex];
     displayObject(children, result);
   }
 }

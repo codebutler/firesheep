@@ -1,10 +1,11 @@
-firesheepSidebar {
+#firesheepSidebar {
   -moz-appearance: none;
   background: transparent;
 }
 
 #firesheepSidebar #toolbar {
-  background: -moz-linear-gradient(top, #EDEDED, #D8D8D8);
+  -moz-appearance: none;
+  background: transparent !important;
   border-bottom: 1px solid #B8B8B8;
 }
 
@@ -26,12 +27,12 @@ firesheepSidebar {
 }
 
 #firesheepSidebar richlistbox {
-  background: transparent;
+  background: white;
+  -moz-appearance: none; 
 }
 
 #bottombar {
   background: white url(chrome://firesheep/skin/bottombar_bg.png) repeat-x;
-  border-top: 0 !important;
 }
 
 #bottombar button {
@@ -42,4 +43,16 @@ firesheepSidebar {
   min-width: 15px;
   max-width: 15px;
 	display: block !important;	
+}
+
+splitter {
+  -moz-appearance: none;
+  min-height: 0;
+  height: 1px;
+  background: #B4B4B4;
+}
+
+
+#detailsTree {
+  -moz-appearance: none;
 }

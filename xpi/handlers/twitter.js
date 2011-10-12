@@ -32,7 +32,7 @@ register({
     } else {
       // New Twitter
       this.userName   = resp.body.querySelector('#screen-name').innerHTML.replace(/^\s+|\s+$/g, "");
-      this.userAvatar = resp.body.querySelector('#profile-image img').src;
+      this.userAvatar = resp.body.querySelector('.profile-links img').src;
     }
   }
 });

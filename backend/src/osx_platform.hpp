@@ -26,11 +26,17 @@
 #include "unix_platform.hpp"
 #include "interface_info.hpp"
 
+#include <CoreFoundation/CoreFoundation.h>
+
+
 class OSXPlatform : public UnixPlatform {
 public:
-  OSXPlatform(vector<string>);
+  OSXPlatform(string);
   bool run_privileged();
   vector<InterfaceInfo> interfaces();
+
+protected:
+  string stringFromCFString(CFStringRef cfString, CFStringEncoding encoding=kCFStringEncodingUTF8);
 };
 
 #endif

@@ -25,11 +25,11 @@
 
 <overlay id="websitesPaneOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script src="websitesPane.js" />
-  <prefpane id="websitesPane" label="Websites" flex="1" onpaneload="loadScripts()">
+  <prefpane id="websitesPane" label="Websites" onpaneload="loadScripts()" flex="1">
     <preferences>
     </preferences>
-    <vbox width="150" height="350" flex="1">
-      <richlistbox id="scriptsList" flex="1" ondblclick="editScript()" onselect="onSelect()" />
+    <vbox id="websitesBox" flex="1">
+      <richlistbox id="scriptsList" ondblclick="editScript()" onselect="onSelect()" />
       <hbox>
         <button label="Add" id="addButton" oncommand="addScript()" />
         <button label="Edit" id="editButton" oncommand="editScript()" disabled="true" />

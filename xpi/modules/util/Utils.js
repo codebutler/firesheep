@@ -94,19 +94,6 @@ var Utils = {
     return s;
   },
   
-  runCommand: function (command, args) {
-    var process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
-    process.Init(command, args, args.length);
-    process.Start();
-    var output = "";
-    var line = null;
-    while (line = process.ReadOutputLine()) {
-      output += line;
-    }
-    process.Wait();
-    return output;
-  },
-  
   // https://developer.mozilla.org/en/Code_snippets/HTML_to_DOM
   // http://mxr.mozilla.org/firefox/source/browser/components/microsummaries/src/nsMicrosummaryService.js?raw=1
   parseHtml: function (aHTMLString) {  
@@ -129,6 +116,68 @@ var Utils = {
   generateUUID: function () {
     var uuidGenerator = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
     var uuid = uuidGenerator.generateUUID();
-    return uuid.toString();
+    return uuid.toString().replace(/[^0-9A-Z]+/gi, "");
+  },
+
+  parseCookies: function (str) {
+    var cookies = {};
+    if (str) {
+      str.split("; ").forEach(function (pair) {
+        var index = pair.indexOf("=");
+        if (index > 0) {
+            var name  = pair.substring(0, index);
+            var value = pair.substr(index+1);
+            if (name.length && value.length)
+              cookies[name] = value;
+        }
+      });
+    }
+    return cookies;
+  },
+
+  parseQuery: function (str) {
+    var query = {}
+    if (str) {
+      str.split('&').forEach(function (pair) {
+        var pair = pair.split('=');
+        query[unescape(pair[0])] = unescape(pair[1]);
+      });
+    }
+    return query;
+  },
+
+  makeCacheKey: function (result) {
+    return Utils.md5(result.siteName + JSON.stringify(result.sessionId));
+  },
+  
+  get tempDir () {
+    var tmpDir = null;
+    
+    var xulRuntime = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime);
+    if (xulRuntime.OS == "WINNT") {
+      tmpDir = Cc["@mozilla.org/file/directory_service;1"].
+        getService(Ci.nsIProperties).
+        get("TmpD", Ci.nsIFile);    
+
+    } else {
+      // On OSX, TmpDir above returns something inside the user's homedir,
+      // which is marked nosuid when FileVault is enabled.
+      tmpDir = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+      tmpDir.initWithPath("/tmp");
+    }
+    
+    // On OSX, /tmp has the sticky bit set, making it impossible for the user 
+    // to delete files not in a subdirectory that were created by the setuid 
+    // backend. See FiresheepSession.removeOutputFiles().
+    tmpDir.append("firesheep");
+  
+    if (!tmpDir.exists() || !tmpDir.isDirectory())
+      tmpDir.create(Ci.nsIFile.DIRECTORY_TYPE, 0777);
+    
+    return tmpDir;
+  },
+
+  get OS () {
+    return Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
   }
 };

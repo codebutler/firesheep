@@ -1,5 +1,6 @@
 // Authors:
 //   Ian Gallagher <crash@neg9.org>
+//   Eric Butler <eric@codebutler.com>
 register({
   name: 'Google',
   url: 'http://www.google.com/',
@@ -13,24 +14,13 @@ register({
 
   identifyUser: function() {
     var resp = this.httpGet(this.siteUrl);
-    this.userName = resp.body.querySelector(".gb4").textContent;
 
-    // Grab avatar from Google Profiles page, if they have one
-    var avatar_element;
-    try {
-	    var profile = this.httpGet('https://www.google.com/profiles/me');
-	    avatar_element = profile.body.querySelector('.ll_profilephoto.photo');
-    }
-    catch(err) {
-	    // They likley don't have a profile setup, no avatar for us :(
-	    avatar_element = null;
-    }
-
-    if (avatar_element) {
-	    this.userAvatar = avatar_element.src;
-	    if (this.userAvatar.substr(0, 4) != 'http') {
-	      this.userAvatar = 'http://www.google.com' + this.userAvatar;
-	    }
+    if (resp.body.querySelector("#gbi4t") != null) {
+      // Google+ Account
+      this.userName   = resp.body.querySelector("#gbi4t").textContent;
+      this.userAvatar = "https:" + resp.body.querySelector("#gbi4i").src;
+    } else {
+      this.userName = resp.body.querySelector("#gbi4m1").textContent;
     }
   }
 });

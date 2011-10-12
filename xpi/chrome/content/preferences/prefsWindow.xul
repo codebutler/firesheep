@@ -26,12 +26,23 @@
 -->
 
 <prefwindow 
-    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" 
-    persist="lastSelected screenX screenY"
-    buttons="help"
-    ondialoghelp="alert('blah');"
-    style="width: 500px">
-  <prefpane id="capturePane" label="Capture" image="chrome://firesheep/skin/prefs-capture.png" src="chrome://firesheep/content/preferences/capturePane.xul" />
-  <prefpane id="websitesPane" label="Websites" image="chrome://firesheep/skin/prefs-websites.png" src="chrome://firesheep/content/preferences/websitesPane.xul" />
-  <prefpane id="advancedPane" label="Advanced" image="chrome://firesheep/skin/prefs-advanced.png" src="chrome://firesheep/content/preferences/advancedPane.xul" />
+  xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" 
+  id="firesheepPrefs"
+  windowtype="Firesheep:Preferences"
+  persist="lastSelected screenX screenY">
+  <prefpane
+    id="capturePane" 
+    label="Capture" 
+    image="chrome://firesheep/skin/prefs-capture.png" 
+    src="chrome://firesheep/content/preferences/capturePane.xul" />
+  <prefpane 
+    id="websitesPane" 
+    label="Websites" 
+    image="chrome://firesheep/skin/prefs-websites.png" 
+    src="chrome://firesheep/content/preferences/websitesPane.xul" />
+  <prefpane
+    id="advancedPane" 
+    label="Advanced" 
+    image="chrome://firesheep/skin/prefs-advanced.png" 
+    src="chrome://firesheep/content/preferences/advancedPane.xul" />
 </prefwindow>

@@ -8,6 +8,11 @@ register({
 
   identifyUser: function() {
     var resp = this.httpGet(this.siteUrl);
-    this.userName = resp.body.querySelector(".navGreeting").textContent.split(', ')[1].slice(0, -1);
+
+    var newElem = this.userName = resp.body.querySelector("#nav-your-account .nav-button-title em");
+    if(newElem != null)
+      this.userName = newElem.textContent;
+    else
+      this.userName = resp.body.querySelector(".navGreeting").textContent.split(', ')[1].slice(0, -1);
   }
 });

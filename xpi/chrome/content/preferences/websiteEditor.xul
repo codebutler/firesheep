@@ -28,6 +28,6 @@
 <dialog title="Edit Script" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" buttons="accept,cancel,extra1" buttonlabelextra1="Revert" onload="load()" style="width: 600px; height: 400px;" ondialogaccept="return save()" ondialogextra1="revert()">
   <script src="websiteEditor.js" />
   <vbox flex="1" id="scriptBox">
-    <textbox flex="1" multiline="true" id="scriptText" oninput="Websites.setDirty(true)" />
+    <textbox flex="1" multiline="true" id="scriptText" />
   </vbox>
 </dialog>

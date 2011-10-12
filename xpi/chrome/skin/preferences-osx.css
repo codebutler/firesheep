@@ -1,3 +1,10 @@
 prefwindow {
   height: auto !important;
 }
+
+/*
+prefpane > .content-box,
+prefwindow > .paneDeckContainer {
+    overflow: visible;
+}
+*/

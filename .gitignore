@@ -11,11 +11,16 @@ Makefile
 Makefile.in
 missing
 
+backend/backend
+backend/.libs
+backend/.deps
+backend/*.o
+backend/*.lo
+backend/*.la
+
 xpi/components
 xpi/backend
 xpi/platform
-mozpopen/MozPopen.h
-mozpopen/Debug
 
 build/
 
