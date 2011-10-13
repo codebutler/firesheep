@@ -26,6 +26,7 @@
 #include "unix_platform.hpp"
 #include "interface_info.hpp"
 
+#include <SystemConfiguration/SystemConfiguration.h>
 #include <CoreFoundation/CoreFoundation.h>
 
 
@@ -34,8 +35,11 @@ public:
   OSXPlatform(string);
   bool run_privileged();
   vector<InterfaceInfo> interfaces();
+  InterfaceInfo primary_interface();
 
 protected:
+  bool is_service_relevant(SCNetworkServiceRef service);
+  InterfaceInfo service_info(SCNetworkServiceRef service);
   string stringFromCFString(CFStringRef cfString, CFStringEncoding encoding=kCFStringEncodingUTF8);
 };
 

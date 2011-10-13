@@ -43,12 +43,26 @@ var Firesheep = {
   
   get captureInterface () {
     var interfaces = this.networkInterfaces;
+    var iface;
 
-    if (Preferences.isSet('firesheep.capture_interface')) {
-      var iface = Preferences.get('firesheep.capture_interface');
-      if (iface != null && iface != '' && iface in interfaces)
-        return iface;
+    // If the preference isn't set, we'll try to auto-detect. If the backend
+    // doesn't support this, no worries; we'll fall back on an arbitrary
+    // interface from the list.
+    if (Preferences.isSet('firesheep.capture_interface'))
+      iface = Preferences.get('firesheep.capture_interface');
+    else
+      iface = 'auto';
+
+    // Resolve a setting of 'auto' by looking up the primary interface. The
+    // result is still subject to the sanity checks below.
+    if (iface == 'auto') {
+      primary = this.primaryInterface;
+      if (primary != null)
+        iface = primary.id;
     }
+
+    if (iface != null && iface != '' && iface in interfaces)
+      return iface;
 
     // Fall back to first wireless interface.
     var interfaceNames = _.keys(interfaces).sort(function(a, b) {
@@ -185,6 +199,10 @@ var Firesheep = {
   
   get networkInterfaces () {
     return JSON.parse(FiresheepBackend.list_interfaces(this.libraryPath));
+  },
+
+  get primaryInterface () {
+    return JSON.parse(FiresheepBackend.primary_interface(this.libraryPath));
   },
 
   get canaryText () {

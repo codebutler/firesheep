@@ -36,6 +36,16 @@ public:
   {
     boost::to_lower(m_type);
   }
+
+  InterfaceInfo()
+    : m_id(""), m_name(""), m_type("")
+  {
+  }
+
+  InterfaceInfo(const InterfaceInfo &other)
+    : m_id(other.m_id), m_name(other.m_name), m_type(other.m_type)
+  {
+  }
   
   string id() {
     return m_id;

@@ -23,29 +23,46 @@
 #include "firesheep_platform.hpp"
 #include "json_spirit_writer_template.h"
 
+
+// Local utilities
+static json_spirit::Object interfaces_obj(vector<InterfaceInfo> &interfaces);
+static json_spirit::Object iface_obj(InterfaceInfo &iface);
+static char *encoded_value(json_spirit::Value value);
+
+
 // C API for jsctypes.
 extern "C" {
   char* list_interfaces(const char** error) {
     try {
       PLATFORM platform("");
+      char *encoded = NULL;
 
-      json_spirit::Object data_obj;
       vector<InterfaceInfo> interfaces = platform.interfaces();
-      vector<InterfaceInfo>::iterator iter;
-      for (iter = interfaces.begin(); iter != interfaces.end(); ++iter) {
-        InterfaceInfo iface = *iter;
-        json_spirit::Object iface_obj;
-        iface_obj.push_back(json_spirit::Pair("name", iface.name()));
-        iface_obj.push_back(json_spirit::Pair("type", iface.type()));
-        data_obj.push_back(json_spirit::Pair(iface.id(), iface_obj));
-      }
-  
-      string str = json_spirit::write_string(json_spirit::Value(data_obj), false);
+      json_spirit::Object data_obj = interfaces_obj(interfaces);
+      encoded = encoded_value(json_spirit::Value(data_obj));
 
-      char* cstr = new char [str.size()+1];
-      strcpy(cstr, str.c_str());
-      return cstr;
+      return encoded;
+    } catch (std::exception const &e) {
+      *error = strdup(e.what());
+      return NULL;
+    }
+  }
 
+  char *primary_interface(const char **error) {
+    try {
+      PLATFORM platform("");
+      json_spirit::Value value;
+      char *encoded = NULL;
+
+      InterfaceInfo iface = platform.primary_interface();
+      if (!iface.id().empty())
+        value = json_spirit::Value(iface_obj(iface));
+      else
+        value = json_spirit::Value();
+
+      encoded = encoded_value(value);
+
+      return encoded;
     } catch (std::exception const &e) {
       *error = strdup(e.what());
       return NULL;
@@ -64,4 +81,47 @@ extern "C" {
       return false;
     }
   }
+}
+
+
+static json_spirit::Object interfaces_obj(vector<InterfaceInfo> &interfaces)
+{
+  vector<InterfaceInfo>::iterator iter;
+  json_spirit::Object data_obj;
+
+  for (iter = interfaces.begin(); iter != interfaces.end(); ++iter) {
+    InterfaceInfo iface = *iter;
+    json_spirit::Object iface_obj;
+    iface_obj.push_back(json_spirit::Pair("name", iface.name()));
+    iface_obj.push_back(json_spirit::Pair("type", iface.type()));
+    data_obj.push_back(json_spirit::Pair(iface.id(), iface_obj));
+  }
+
+  return data_obj;
+}
+
+
+static json_spirit::Object iface_obj(InterfaceInfo &iface)
+{
+  json_spirit::Object iface_obj;
+
+  iface_obj.push_back(json_spirit::Pair("id", iface.id()));
+  iface_obj.push_back(json_spirit::Pair("name", iface.name()));
+  iface_obj.push_back(json_spirit::Pair("type", iface.type()));
+
+  return iface_obj;
+}
+
+
+static char *encoded_value(json_spirit::Value value)
+{
+  string str;
+  char *cstr = NULL;
+
+  str = json_spirit::write_string(value, false);
+
+  cstr = new char [str.size() + 1];
+  strcpy(cstr, str.c_str());
+
+  return cstr;
 }
