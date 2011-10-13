@@ -14,6 +14,19 @@ const FiresheepBackend = {
     return result.readString();
   },
 
+  primary_interface: function (libraryPath) {
+    const libfiresheep = ctypes.open(libraryPath);
+    const primary_interface = libfiresheep.declare('primary_interface', ctypes.default_abi,
+      ctypes.char.ptr,      // json result
+      ctypes.char.ptr.ptr); // error message (out)
+    
+    var error = ctypes.char.ptr();
+    var result = primary_interface(error.address());
+    if (result.isNull())
+      throw error.readString();
+    return result.readString();
+  },
+
   run_privileged: function (libraryPath, backendPath) {
     const libfiresheep = ctypes.open(libraryPath);
     const fix_permissions = libfiresheep.declare('run_privileged', ctypes.default_abi,

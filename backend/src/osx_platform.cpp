@@ -24,8 +24,12 @@
 #include "osx_platform.hpp"
 
 #include <Security/Security.h>
-#include <SystemConfiguration/SystemConfiguration.h>
 #include <CoreServices/CoreServices.h>
+
+
+// Our client ID for various OS X APIs.
+static CFStringRef kFiresheepClientID = CFSTR("com.codebutler.firesheep.backend");
+
 
 OSXPlatform::OSXPlatform(string path) : UnixPlatform(path) { }
 
@@ -63,32 +67,16 @@ vector<InterfaceInfo> OSXPlatform::interfaces()
 {
   vector<InterfaceInfo> result;
   
-  CFStringRef name = CFSTR("com.codebutler.firesheep.backend");
-  SCPreferencesRef prefs = SCPreferencesCreate(NULL, name, NULL);
-  
+  SCPreferencesRef prefs = SCPreferencesCreate(NULL, kFiresheepClientID, NULL);
   SCNetworkSetRef set = SCNetworkSetCopyCurrent(prefs);
   CFArrayRef services = SCNetworkSetCopyServices(set);
   
   int arraySize = CFArrayGetCount(services);
   for (int i = 0; i < arraySize; i++) {
     SCNetworkServiceRef service = (SCNetworkServiceRef) CFArrayGetValueAtIndex(services, i);
-    
-    if (SCNetworkServiceGetEnabled(service)) {
-      SCNetworkInterfaceRef iface = SCNetworkServiceGetInterface(service);
 
-      CFStringRef type = SCNetworkInterfaceGetInterfaceType(iface);
-      if (type != NULL) {
-        if (CFStringCompare(type, CFSTR("Ethernet"), 0) == kCFCompareEqualTo ||
-          CFStringCompare(type, CFSTR("IEEE80211"), 0) == kCFCompareEqualTo) {
-        
-          CFStringRef serviceName = SCNetworkServiceGetName(service);
-          CFStringRef bsdName = SCNetworkInterfaceGetBSDName(iface);
-
-          InterfaceInfo info(stringFromCFString(bsdName), stringFromCFString(serviceName), stringFromCFString(type));
-          result.push_back(info);
-        }
-      }
-    }
+    if (this->is_service_relevant(service))
+      result.push_back(this->service_info(service));
   }
   
   CFRelease(services);
@@ -98,18 +86,95 @@ vector<InterfaceInfo> OSXPlatform::interfaces()
   return result; 
 }
 
+InterfaceInfo OSXPlatform::primary_interface()
+{
+  SCPreferencesRef prefs = NULL;
+  SCDynamicStoreRef store = NULL;
+  CFStringRef key = NULL;
+  CFDictionaryRef ipv4State = NULL;
+  CFStringRef serviceID = NULL;
+  SCNetworkServiceRef service = NULL;
+  InterfaceInfo info;
+
+  store = SCDynamicStoreCreate(kCFAllocatorDefault, kFiresheepClientID, NULL, NULL);
+  prefs = SCPreferencesCreate(kCFAllocatorDefault, kFiresheepClientID, NULL);
+
+  if (store != NULL && prefs != NULL)
+    key = SCDynamicStoreKeyCreateNetworkGlobalEntity(kCFAllocatorDefault, kSCDynamicStoreDomainState, kSCEntNetIPv4);
+
+  if (key != NULL)
+    ipv4State = (CFDictionaryRef) SCDynamicStoreCopyValue(store, key);
+
+  if (ipv4State != NULL)
+    serviceID = (CFStringRef )CFDictionaryGetValue(ipv4State, kSCDynamicStorePropNetPrimaryService);
+
+  if (serviceID != NULL)
+    service = (SCNetworkServiceRef) SCNetworkServiceCopy(prefs, serviceID);
+
+  if (this->is_service_relevant(service))
+    info = this->service_info(service);
+
+  if (service != NULL)
+    CFRelease(service);
+  if (ipv4State != NULL)
+    CFRelease(ipv4State);
+  if (prefs != NULL)
+    CFRelease(prefs);
+  if (store != NULL)
+    CFRelease(store);
+
+  return info;
+}
+
+bool OSXPlatform::is_service_relevant(SCNetworkServiceRef service)
+{
+  SCNetworkInterfaceRef iface = NULL;
+  CFStringRef type = NULL;
+  bool is_relevant = false;
+
+  if (service != NULL && SCNetworkServiceGetEnabled(service))
+    iface = SCNetworkServiceGetInterface(service);
+
+  if (iface != NULL)
+    type = SCNetworkInterfaceGetInterfaceType(iface);
+
+  if (type != NULL)
+  {
+    if (CFStringCompare(type, CFSTR("Ethernet"), 0) == kCFCompareEqualTo)
+      is_relevant = true;
+    else if (CFStringCompare(type, CFSTR("IEEE80211"), 0) == kCFCompareEqualTo)
+      is_relevant = true;
+  }
+
+  return is_relevant;
+}
+
+InterfaceInfo OSXPlatform::service_info(SCNetworkServiceRef service)
+{
+  SCNetworkInterfaceRef iface = NULL;
+  CFStringRef bsdName = NULL, serviceName = NULL, type = NULL;
+
+  iface = SCNetworkServiceGetInterface(service);
+
+  bsdName = SCNetworkInterfaceGetBSDName(iface);
+  serviceName = SCNetworkServiceGetName(service);
+  type = SCNetworkInterfaceGetInterfaceType(iface);
+
+  return InterfaceInfo(stringFromCFString(bsdName), stringFromCFString(serviceName), stringFromCFString(type));
+}
+
 string OSXPlatform::stringFromCFString(CFStringRef cfString, CFStringEncoding encoding)
 {
-    char *cstring = NULL;
-    int maxLen = NULL;
-    string result;
+  char *cstring = NULL;
+  int maxLen = NULL;
+  string result;
 
-    if (cfString != NULL) {
-        maxLen = CFStringGetMaximumSizeForEncoding(CFStringGetLength(cfString), encoding);
-        cstring = (char *)alloca(maxLen + 1);
-        CFStringGetCString(cfString, cstring, maxLen, encoding);
-        result = cstring;
-    }
+  if (cfString != NULL) {
+    maxLen = CFStringGetMaximumSizeForEncoding(CFStringGetLength(cfString), encoding);
+    cstring = (char *)alloca(maxLen + 1);
+    CFStringGetCString(cfString, cstring, maxLen, encoding);
+    result = cstring;
+  }
 
-    return result;
+  return result;
 }

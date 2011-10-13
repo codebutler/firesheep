@@ -26,15 +26,11 @@ Components.utils.import('resource://firesheep/util/Preferences.js');
 
 function loadInterfaces () {
   try {
-    var currentId = Firesheep.captureInterface;
+    var currentId = Preferences.get('firesheep.capture_interface');
   
     var list = document.getElementById('captureInterfaceMenuList');
-    
-    var ifaces = Firesheep.networkInterfaces;
-    for (var id in ifaces) {
-      var name = ifaces[id].name;
-      var label = (id.length > 10) ? name : (name + ' (' + id + ')');
-      
+
+    function addInterface(id, label) {
       var item = document.createElement('menuitem');
       item.setAttribute('label', label);
       item.setAttribute('value', id);
@@ -42,6 +38,21 @@ function loadInterfaces () {
       
       if (id == currentId)
         list.selectedItem = item;
+    }
+
+    // If the backend can find a primary interface, add the Automatic option.
+    var primary_iface = Firesheep.primaryInterface;
+    if (primary_iface.id.length > 0) {
+      addInterface('auto', 'Automatic');
+    }
+    
+    var ifaces = Firesheep.networkInterfaces;
+    for (var id in ifaces) {
+      var iface = ifaces[id];
+      var name = iface.name;
+      var label = (id.length > 10) ? name : (name + ' (' + id + ')');
+      
+      addInterface(id, label);
     }
   } catch (e) {
     var errorText = (!!e.stack) ? e + " " + e.stack : e;
@@ -52,6 +63,6 @@ function loadInterfaces () {
 function setInterface () {
   var list = document.getElementById('captureInterfaceMenuList');
   var id = list.selectedItem.value;
-  
+
   Preferences.set('firesheep.capture_interface', id);
 }

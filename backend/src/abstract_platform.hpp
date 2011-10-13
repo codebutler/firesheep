@@ -42,6 +42,11 @@ public:
   virtual void fix_permissions() = 0;
   virtual bool run_privileged() = 0;
   virtual vector<InterfaceInfo> interfaces() = 0;
+
+  virtual InterfaceInfo primary_interface()
+  {
+    return InterfaceInfo();
+  }
 };
 
 #endif
