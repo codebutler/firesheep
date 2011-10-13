@@ -108,6 +108,7 @@ FiresheepSession.prototype = {
       this._timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
       this._timer.initWithCallback(timerCallback, 1000, Ci.nsITimer.TYPE_ONE_SHOT);
 
+      dump('Capturing on ' + this._iface + ' (' + this._filter + ')' + '\n');
       dump('Waiting for output to appear.\n');
 
       this._notify('capture_started');
