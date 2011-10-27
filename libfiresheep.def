@@ -1,0 +1,5 @@
+LIBRARY libfiresheep
+
+EXPORTS
+	list_interfaces @1
+	run_privileged @2

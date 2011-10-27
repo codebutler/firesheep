@@ -21,15 +21,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
-#include <stdbool.h>
 #include "windows_platform.hpp"
 #include "interface_info.hpp"
 #include "pcap.h"
 using namespace std;
 
-WindowsPlatform::WindowsPlatform(vector<string>)
+WindowsPlatform::WindowsPlatform(string path)
 {
-  // FIXME
+	// FIXME
 }
 
 bool WindowsPlatform::is_root()
@@ -67,9 +66,9 @@ vector<InterfaceInfo> WindowsPlatform::interfaces()
   
   for (d = alldevs; d; d = d->next) {
     string id(d->name);
-    boost::replace_all(id, "\\", "\\\\");
-    boost::replace_all(id, "{", "\\{");
-    boost::replace_all(id, "}", "\\}");
+    //boost::replace_all(id, "\\", "\\\\");
+    //boost::replace_all(id, "{", "\\{");
+    //boost::replace_all(id, "}", "\\}");
     InterfaceInfo info(id, (string(d->description)), "ethernet");
     results.push_back(info);
   }

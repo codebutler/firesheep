@@ -25,16 +25,16 @@
 
 #include <string>
 #include <vector>
-#include <stdbool.h>
+// #include <stdbool.h>
 #include "abstract_platform.hpp"
 #include "interface_info.hpp"
 
 using namespace std;
 
-class WindowsPlatform : public AbstractPlatform
+class __declspec(dllexport) WindowsPlatform : public AbstractPlatform
 {
 public:
-  WindowsPlatform(vector<string>);
+  WindowsPlatform(string);
   bool is_root();
   bool check_permissions();
   void fix_permissions();
