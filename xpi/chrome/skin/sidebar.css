@@ -5,7 +5,7 @@
 
 #firesheepSidebar richlistbox {
   margin: 0;
-  -moz-appearance: none; 
+  -moz-appearance: none;
 }
 
 #detailsTree {
@@ -55,7 +55,7 @@ splitter {
 }
 
 #showMenuButton {
-  background: url(chrome://firesheep/skin/menu_button.png); 
+  background: url(chrome://firesheep/skin/menu_button.png);
   min-width: 32px;
   max-width: 32px;
 }

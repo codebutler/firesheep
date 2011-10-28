@@ -38,10 +38,10 @@
 void received_packet(HttpPacket *packet);
 void list_interfaces(AbstractPlatform *platform);
 
-int main(int argc, const char *argv[]) 
+int main(int argc, const char *argv[])
 {
   vector<string>sargv(argv, argv + argc);
-  
+
 #ifdef PLATFORM_WIN32
   WindowsPlatform platform(sargv);
 #elif PLATFORM_OSX
@@ -49,7 +49,7 @@ int main(int argc, const char *argv[])
 #elif PLATFORM_LINUX
   LinuxPlatform platform(sargv);
 #endif
-  
+
   if (argc > 1) {
     if (argv[1] == string("--fix-permissions")) {
       if (platform.is_root()) {
@@ -68,8 +68,8 @@ int main(int argc, const char *argv[])
       list_interfaces(&platform);
       return EXIT_SUCCESS;
     }
-  } 
-  
+  }
+
   if (!platform.is_root()) {
     cerr << "Run --fix-permissions first." << endl;
     return EXIT_FAILURE;
@@ -83,14 +83,14 @@ int main(int argc, const char *argv[])
   string iface(argv[1]);
   string filter(argv[2]);
 
-  try { 
+  try {
     HttpSniffer sniffer(iface, filter, received_packet);
     sniffer.start();
   } catch (exception &e) {
     cerr << e.what() << endl;
     return EXIT_FAILURE;
-  } 
-  
+  }
+
   return EXIT_SUCCESS;
 }
 
@@ -105,27 +105,27 @@ void received_packet(HttpPacket *packet)
   data_obj.push_back(json_spirit::Pair("host",      packet->host()));
   data_obj.push_back(json_spirit::Pair("cookies",   packet->cookies()));
   data_obj.push_back(json_spirit::Pair("userAgent", packet->user_agent()));
-  
+
   string data = json_spirit::write_string(json_spirit::Value(data_obj), false);
-  cout << data << endl;   
+  cout << data << endl;
 }
 
 void list_interfaces(AbstractPlatform *platform)
 {
   json_spirit::Object data_obj;
-  
+
   vector<InterfaceInfo> interfaces = platform->interfaces();
   vector<InterfaceInfo>::iterator iter;
   for (iter = interfaces.begin(); iter != interfaces.end(); ++iter) {
     InterfaceInfo iface = *iter;
-    
+
     json_spirit::Object iface_obj;
     iface_obj.push_back(json_spirit::Pair("name", iface.name()));
     iface_obj.push_back(json_spirit::Pair("type", iface.type()));
-    
+
     data_obj.push_back(json_spirit::Pair(iface.id(), iface_obj));
   }
-  
+
   string data = json_spirit::write_string(json_spirit::Value(data_obj), false);
   cout << data << endl;
 }

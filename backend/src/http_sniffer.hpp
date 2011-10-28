@@ -43,12 +43,12 @@ protected:
   string    m_filter;
   http_packet_cb  m_callback;
   bool    m_wifimon;
-  
+
   static void got_packet_wrapper(u_char *user, const struct pcap_pkthdr *header, const u_char *packet) {
     HttpSniffer *sniffer = (HttpSniffer *) user;
     sniffer->got_packet(header, packet);
   }
-  
+
 private:
   PacketCacheMap m_pending_packets;
   void got_packet(const struct pcap_pkthdr *header, const u_char *packet);

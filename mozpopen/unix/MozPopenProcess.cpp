@@ -1,5 +1,5 @@
 /*
- * MozPopenProcess.cpp 
+ * MozPopenProcess.cpp
  *
  * Authors:
  *   Eric Butler <eric@codebutler.com>
@@ -20,7 +20,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
- 
+
 #include "nsStringAPI.h"
 #include "MozPopen.h"
 #include "MozPopenProcess.h"
@@ -44,7 +44,7 @@ NS_IMETHODIMP
 MozPopenProcess::Start()
 {
 	const redi::pstreams::pmode mode = redi::pstreams::pstdout|redi::pstreams::pstderr;
-	mChild.open(mExec, mArgs, mode);	
+	mChild.open(mExec, mArgs, mode);
 	return NS_OK;
 }
 
@@ -67,7 +67,7 @@ NS_IMETHODIMP
 MozPopenProcess::ReadOutputLine(nsACString &aLine)
 {
 	mChild.clear();
-	
+
 	std::string line;
 	if (std::getline(mChild.out(), line))
 		aLine.Assign(line.c_str(), line.size());
@@ -87,7 +87,7 @@ MozPopenProcess::ReadErrorLine(nsACString &aLine)
 }
 
 NS_IMETHODIMP
-MozPopenProcess::Wait(PRUint16 *anInt) 
+MozPopenProcess::Wait(PRUint16 *anInt)
 {
 	mChild.close();
 	*anInt = mChild.rdbuf()->status();

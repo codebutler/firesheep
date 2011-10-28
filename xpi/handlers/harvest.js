@@ -7,7 +7,7 @@ register({
   matchPacket: function (packet) {
     return (packet.host.match(/\.harvestapp.com$/));
   },
-  
+
   processPacket: function () {
     this.siteUrl = 'http://' + this.firstPacket.host;
 

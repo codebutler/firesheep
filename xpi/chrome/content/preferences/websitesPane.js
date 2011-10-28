@@ -34,7 +34,7 @@ function loadScripts () {
     _.each(Firesheep.config.userScripts, function (scriptText, scriptId) {
       addListItem(scriptId, true);
     });
-    
+
     Observers.add('Firesheep', observer);
   } catch (e) {
     alert(e);
@@ -77,7 +77,7 @@ function importScript () {
     var fp = Cc["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
     fp.init(window, "Select a File", nsIFilePicker.modeOpen);
     fp.appendFilter("Firesheep Scripts","*.js");
-    if (fp.show() == nsIFilePicker.returnOK) {    
+    if (fp.show() == nsIFilePicker.returnOK) {
       var scriptId   = Utils.generateUUID();
       var scriptText = Utils.readAllText(fp.file);
       Firesheep.config.saveScript(scriptId, scriptText);
@@ -140,22 +140,22 @@ function addListItem(id, isUser)
   var item = document.createElement('richlistitem');
   item.value  = id;
   item.isUser = isUser;
-  
+
   var name = ScriptParser.getName(isUser ? Firesheep.config.userScripts[id] : Firesheep.builtinScripts[id]) || id;
   var hbox = document.createElement("hbox");
-  
+
   var nameLabel = document.createElement('label');
   nameLabel.setAttribute('value', name);
   hbox.appendChild(nameLabel);
   item.nameLabel = nameLabel;
-  
+
   var customLabel = document.createElement('label');
   customLabel.setAttribute('value', (isUser ? '(Custom)' : ''));
   customLabel.setAttribute('disabled', true);
   hbox.appendChild(customLabel);
-  
+
   item.appendChild(hbox);
-  
+
   var list = document.getElementById('scriptsList');
   list.appendChild(item);
   return item;
@@ -163,7 +163,7 @@ function addListItem(id, isUser)
 
 function onSelect()
 {
-  var item = document.getElementById("scriptsList").selectedItem;  
+  var item = document.getElementById("scriptsList").selectedItem;
 
   var editButton   = document.getElementById('editButton');
   var removeButton = document.getElementById('removeButton');

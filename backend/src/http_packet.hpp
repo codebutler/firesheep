@@ -52,9 +52,9 @@ class HttpPacket {
 public:
   HttpPacket(string from, string to);
   bool parse(const char *payload, int payload_size);
-  
+
   bool isComplete();
-  
+
   string from();
   string to();
   string host();
@@ -63,9 +63,9 @@ public:
   string user_agent();
   string query();
   string cookies();
-  
+
   HeaderMap headers();
-  
+
 private:
   http_parser          m_parser;
   http_parser_settings m_settings;
@@ -86,7 +86,7 @@ private:
   HTTP_PARSER_DATA_CALLBACK(query_string);
   HTTP_PARSER_CALLBACK(headers_complete);
   HTTP_PARSER_CALLBACK(message_complete);
-  
+
   void add_header(string name, string value);
   string get_header(string name);
 };

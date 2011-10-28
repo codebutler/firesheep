@@ -12,7 +12,7 @@ zip:
 if PLATFORM_OSX
 	$(CHMOD) || sudo $(CHMOD)
 endif
-	cd xpi && zip -r ../build/firesheep.xpi * 
+	cd xpi && zip -r ../build/firesheep.xpi *
 
 clean-local:
 	rm -f $(top_builddir)/build/firesheep.xpi

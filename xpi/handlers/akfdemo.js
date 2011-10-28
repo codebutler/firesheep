@@ -2,7 +2,7 @@
 //   Ian Gallagher <crash@neg9.org>
 //
 // This handler debunks a really bad example "fix" against Firesheep and sidejacking,
-// As a guest post on http://akfpartners.com/techblog/2010/11/20/slaying-firesheep/ 
+// As a guest post on http://akfpartners.com/techblog/2010/11/20/slaying-firesheep/
 // by Randy Wigginton.
 //
 // Details: http://akfpartners.com/techblog/2010/11/20/slaying-firesheep/

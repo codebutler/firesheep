@@ -36,19 +36,19 @@ public:
   {
     boost::to_lower(m_type);
   }
-  
+
   string id() {
     return m_id;
   }
-  
+
   string name() {
     return m_name;
   }
-  
+
   string type() {
     return m_type;
   }
-  
+
 private:
   string m_id;
   string m_name;

@@ -28,18 +28,18 @@ var ScriptParser = {
     [ isValid, errorText, obj ] = this._loadScript(scriptText);
     return obj;
   },
-  
+
   validateScript: function (scriptText) {
     var isValid, errorText, obj;
     [ isValid, errorText, obj ] = this._loadScript(scriptText);
     return [ isValid, errorText ];
   },
-  
+
   getName: function (scriptText) {
     var obj = this.parseScript(scriptText);
     return (obj) ? obj.name : null;
   },
-  
+
   _loadScript: function (scriptText) {
     var registerCalled = false;
     var errorText      = null;
@@ -56,17 +56,17 @@ var ScriptParser = {
             missingFields.push('domains');
           if (!obj['sessionCookieNames'] && !obj.matchPacket)
             missingFields.push('sessionCookieNames');
-          if (missingFields.length > 0) 
+          if (missingFields.length > 0)
             errorText = 'Missing fields: ' + missingFields.join(',');
         } else {
           errorText = "register() requires one object parameter.";
         }
-        
+
         theObj = obj;
       };
       eval(scriptText);
     };
-  
+
     try {
       scriptWrapper.apply({});
       if (!registerCalled) {
@@ -75,10 +75,10 @@ var ScriptParser = {
     } catch (e) {
       errorText = "Script Error: " + e;
     }
-    
+
     if (errorText)
       theObj = null;
-  
+
     return [ !errorText, errorText, theObj ];
   }
 }

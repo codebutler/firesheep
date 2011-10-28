@@ -41,15 +41,15 @@ class MozPopenProcess : public IMozPopenProcess
 public:
 	NS_DECL_ISUPPORTS
 	NS_DECL_IMOZPOPENPROCESS
-	
+
 	MozPopenProcess();
-	
+
 private:
 	~MozPopenProcess();
-	
+
 protected:
 	std::string mExec;
 	std::vector<std::string> mArgs;
-	
+
 	redi::ipstream mChild;
 };

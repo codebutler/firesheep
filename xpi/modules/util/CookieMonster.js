@@ -29,7 +29,7 @@ var EXPORTED_SYMBOLS = [ 'CookieMonster' ];
 
 var CookieMonster = {
   channels: [],
-  
+
   observe: function(subject, topic, data) {
     try {
       // Initially I wanted to use an object as a hashtable here,
@@ -38,10 +38,10 @@ var CookieMonster = {
         var info = this.channels[i];
         if (info.channel == subject) {
           this.channels.splice(i, 1);
-                    
+
           var httpChannel = subject.QueryInterface(Ci.nsIHttpChannel);
           httpChannel.setRequestHeader('Cookie', info.cookies, false);
-           
+
           break;
         }
       }
@@ -49,11 +49,11 @@ var CookieMonster = {
       dump('Error in CookieMonster: ' + e + '\n');
     }
   },
-  
+
   addChannel: function (channel, cookies) {
     this.channels.push({ channel: channel, cookies: cookies });
   },
-  
+
   QueryInterface: function(iid) {
     if (iid.equals(Ci.nsISupports) || iid.euqals(Ci.nsIObserver))
       return this;

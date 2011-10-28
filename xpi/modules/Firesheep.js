@@ -29,21 +29,21 @@ Components.utils.import('resource://firesheep/util/underscore.js');
 
 var EXPORTED_SYMBOLS = [ 'Firesheep' ];
 
-var Firesheep = {  
+var Firesheep = {
   config: FiresheepConfig,
-  
+
   _captureSession: null,
-  
+
   _loaded: false,
-  
+
   _results: null,
-  
+
   _myDir: null,
-  
+
   load: function () {
     if (!this._loaded) {
       this._loaded = true;
-      
+
       if ("@mozilla.org/extensions/manager;1" in Cc) {
         var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
         var file = em.getInstallLocation('firesheep@codebutler.com').location;
@@ -57,17 +57,17 @@ var Firesheep = {
           this._finishLoading();
         });
       }
-    }  
+    }
   },
-  
-  _finishLoading: function () {      
+
+  _finishLoading: function () {
     this.config.load();
-    
+
     this.clearSession();
-   
+
     var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
     if (!prefs.prefHasUserValue('firesheep.capture_interface')) {
-      var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
+      var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;
       if (osString == 'Darwin') {
         prefs.setCharPref('firesheep.capture_interface', 'en1');
       } else {
@@ -76,25 +76,25 @@ var Firesheep = {
           break;
         }
       }
-    }      
-    
+    }
+
     // Watch for config changes.
     Observers.add('FiresheepConfig', function (data) {
       if (data.action == 'scripts_changed')
         Firesheep.reloadScripts();
     });
   },
-  
+
   /*
   saveSession: function () {
-    
+
   },
-  
+
   loadSession: function () {
-    
+
   },
   */
-  
+
   clearSession: function () {
     this.stopCapture();
     this._results = [];
@@ -103,7 +103,7 @@ var Firesheep = {
     if (this._loaded)
       Observers.notify('Firesheep', { action: 'session_loaded' });
   },
-  
+
   startCapture: function () {
     try {
       if (this.isCapturing)
@@ -113,18 +113,18 @@ var Firesheep = {
       var iface = prefs.getCharPref('firesheep.capture_interface');
       if (iface == null || iface == '')
         throw 'Invalid interface';
-    
+
       var filter = prefs.getCharPref('firesheep.capture_filter');
       if (filter == null || filter == '')
         throw 'Invalid filter';
-    
+
       this._captureSession = new FiresheepSession(this, iface, filter);
       this._captureSession.start();
     } catch (e) {
       Observers.notify('Firesheep', { action: 'error', error: e });
     }
   },
-  
+
   stopCapture: function () {
     try {
       if (this._captureSession)
@@ -133,28 +133,28 @@ var Firesheep = {
       Observers.notify('Firesheep', { action: 'error', error: e });
     }
   },
-  
+
   toggleCapture: function () {
     if (!this.isCapturing)
       this.startCapture();
     else
       this.stopCapture();
   },
-  
+
   get isCapturing () {
-    return ((this._captureSession != null) && this._captureSession.isCapturing); 
+    return ((this._captureSession != null) && this._captureSession.isCapturing);
   },
-  
+
   get results () {
     return this._results;
   },
-  
+
   get handlers () {
     var handlers = {
       domains: {},
       dynamic: []
     };
-    
+
     function loadScript(scriptText, scriptId) {
       var obj = ScriptParser.parseScript(scriptText);
       if (obj != null) {
@@ -164,7 +164,7 @@ var Firesheep = {
             handlers.domains[domain] = obj;
           });
         }
-        
+
         // Dynamic handlers
         if (typeof(obj.matchPacket) == 'function') {
           handlers.dynamic.push(obj);
@@ -173,19 +173,19 @@ var Firesheep = {
         dump('Failed to load script: ' + scriptName + '\n');
       }
     }
-    
+
     _.each(this.builtinScripts, loadScript);
     _.each(this.config.userScripts, loadScript);
-    
+
     return handlers;
   },
-  
+
   get _scriptsDir () {
     var file = this._myDir.clone();
     file.append('handlers');
     return file;
   },
-  
+
   get builtinScripts () {
     var builtinScripts = {};
     var files = this._scriptsDir.directoryEntries;
@@ -199,8 +199,8 @@ var Firesheep = {
     }
     return builtinScripts;
   },
-  
-  get backendPath () {    
+
+  get backendPath () {
     var xulRuntime = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime);
     var platformName = [ xulRuntime.OS, xulRuntime.XPCOMABI ].join('_');
 
@@ -214,7 +214,7 @@ var Firesheep = {
     }
 
     // Hack for filevault
-    var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
+    var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;
     if (osString == 'Darwin') {
       var username = Utils.runCommand('whoami', []).trim();
       var vaultFile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
@@ -222,7 +222,7 @@ var Firesheep = {
       if (vaultFile.exists()) {
         var tmpFile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
         tmpFile.initWithPath("/tmp/firesheep-backend");
-        if (!tmpFile.exists()) 
+        if (!tmpFile.exists())
           file.copyTo(tmpFile.parent, tmpFile.leafName);
         return tmpFile.path;
       }
@@ -230,11 +230,11 @@ var Firesheep = {
 
     return file.path;
   },
-  
+
   get networkInterfaces () {
     return JSON.parse(Utils.runCommand(Firesheep.backendPath, [ '--list-interfaces' ]));
   },
-    
+
   _handleResult: function (result) {
     this._results.push(result);
     Observers.notify('Firesheep', { action: 'result_added', result: result });

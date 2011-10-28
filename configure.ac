@@ -60,7 +60,7 @@ if test x$TARGET = xOSX; then
 	if test x$TARGET = xWIN32; then
 	        xulrunner_sdk=`readlink -f $xulrunner_sdk`
 	fi
-	
+
 	AS_IF([test -d "$xulrunner_sdk"], [], [AC_MSG_FAILURE([Specify --with-xulrunner-sdk=<path>.])])
 
 	MOZ_SDK=$xulrunner_sdk

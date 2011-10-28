@@ -26,7 +26,7 @@ function load() {
   this.id     = window.arguments[0];
   this.isUser = window.arguments[1];
   revert();
-  
+
   if (!this.isUser) {
     document.getElementById('scriptText').editable = false;
     document.getElementById('scriptText').readonly = true;
@@ -40,12 +40,12 @@ function save () {
 
   var isValid, errors;
   [ isValid, error ] = Firesheep.config.validateScript(text);
-  
+
   if (isValid)
     Firesheep.config.saveScript(this.id, text);
   else
     alert(error);
-    
+
   return isValid;
 }
 

@@ -10,7 +10,7 @@ register({
   identifyUser: function() {
     var prefs = this.httpGet(this.siteUrl + 'preferences');
     this.userName = prefs.body.querySelector('input#user_email.text_field').value;
-	
+
 	//todo add code to grab usericon
 	}
 });

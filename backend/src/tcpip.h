@@ -55,14 +55,14 @@ struct radiotap_header {
 
 /* SNAP LLC header */
 PACK_START
-struct snap_llc_header           
+struct snap_llc_header
 {
-	u_int8_t	dsap; 
+	u_int8_t	dsap;
 	u_int8_t	ssap;
 	u_int8_t	ctl;
-	u_int16_t	org; 
+	u_int16_t	org;
 	u_int8_t	org2;
-	u_int16_t	ether_type;	/* ethernet type */              
+	u_int16_t	ether_type;	/* ethernet type */
 }PACK_END;
 
 
@@ -86,7 +86,7 @@ struct wifi_header {
 #define FC_FROM_DS(fc) ((fc) & 0x0200)
 
 /* Type data */
-#define	T_DATA 0x2 
+#define	T_DATA 0x2
 
 /* Subtype QoS data */
 #define DATA_FRAME_IS_QOS(x) ((x) & 0x08)
