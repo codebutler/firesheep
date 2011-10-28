@@ -33,13 +33,13 @@ var FiresheepWorker = function(captureSession) {
 
 FiresheepWorker.prototype = {
   run: function () {
-    try { 
+    try {
       this._runOnMainThread(function () {
         Observers.notify('Firesheep', { action: 'capture_started' });
       });
 
       var process = this._captureSession._process;
-      
+
       /* Read stdout until process exits */
       var line;
       while (line = process.ReadOutputLine()) {
@@ -52,7 +52,7 @@ FiresheepWorker.prototype = {
       while (line = process.ReadErrorLine()) {
         errors.push(line);
       }
-      
+
       var exitCode = process.Wait();
       if (exitCode != 0 && exitCode != 15) {
         if (errors.length == 0)
@@ -60,36 +60,36 @@ FiresheepWorker.prototype = {
         else
           throw errors.join(', ');
       }
-      
+
       this._runOnMainThread(function() {
         this._captureSession.stop();
-      });     
+      });
     } catch (e) {
       this._runOnMainThread(function () {
         this._captureSession.handleError(e);
       });
     }
   },
-  
-  _processPacket: function (packet) {   
+
+  _processPacket: function (packet) {
     var host = packet.host;
-    
+
     // Strip port number, if any.
     if (host.indexOf(':') > 0)
       host = host.slice(0, host.indexOf(':'));
-    
+
     packet.cookieString = packet.cookies;
     packet.cookies = parseCookies(packet.cookieString);
 
     packet.queryString = packet.query;
     packet.query = parseQuery(packet.queryString);
-      
+
     var handlers = this._captureSession._handlers;
-        
+
     var handler = handlers.domains[host];
     if (!handler) {
       // Try stripping off subdomains
-      var tmpHost = (host.indexOf('.') > 0) ? host.split('.').slice(-2).join('.') : host;  
+      var tmpHost = (host.indexOf('.') > 0) ? host.split('.').slice(-2).join('.') : host;
       handler = handlers.domains[tmpHost];
       if (!handler) {
         handler = _.find(handlers.dynamic, function (h) {
@@ -101,25 +101,25 @@ FiresheepWorker.prototype = {
         host = tmpHost;
       }
     }
-    
+
     if (handler.domains)
       host = handler.domains[0];
-    
+
     var result = new Result({
       siteName: (handler && handler.name) ? handler.name : host,
       siteUrl:  (handler && handler.url)  ? handler.url  : 'http://' + host + '/',
       siteIcon: (handler && handler.icon) ? handler.icon : 'http://' + host + '/favicon.ico',
-      
+
       sessionId: null,
-      
+
       firstPacket: packet,
-      
+
       handler: handler
     });
-    
+
     // Default session handling
     if (handler && handler.sessionCookieNames) {
-      var theSession = {};      
+      var theSession = {};
       var foundAll = _.all(handler.sessionCookieNames, function (cookieName) {
         var cookieValue = packet.cookies[cookieName];
         if (cookieValue) {
@@ -129,7 +129,7 @@ FiresheepWorker.prototype = {
           return false;
         }
       });
-      
+
       if (foundAll) {
         result.sessionId = theSession;
       } else {
@@ -138,12 +138,12 @@ FiresheepWorker.prototype = {
         return;
       }
     }
-    
+
     // Custom packet processing
     if (handler && typeof(handler.processPacket) == 'function') {
       try {
         handler.processPacket.apply(result, [ packet ]);
-      } catch (e) {           
+      } catch (e) {
         var errorText = 'Error in ' + handler.name + ' processPacket(): ' + e;
         this._runOnMainThread(function () {
           Observers.notify('Firesheep', { action: 'error', error: errorText });
@@ -156,12 +156,12 @@ FiresheepWorker.prototype = {
     if (!result.sessionId) {
       return;
     }
-    
+
     // Ignore packet if session has been seen before.
     if (this._findResult(result)) {
       return;
     }
-        
+
     // Figure out user identity.
     if (handler && typeof(handler.identifyUser) == 'function') {
       this._runOnMainThread(function () {
@@ -172,13 +172,13 @@ FiresheepWorker.prototype = {
         }
       });
     }
-    
+
     // Check again if packet has been seen, identifyUser() could
     // have changed sessionId.
     if (this._findResult(result)) {
       return;
     }
-    
+
     // Cache information about this packet for lookup later.
     this._cacheResult(result);
 
@@ -190,11 +190,11 @@ FiresheepWorker.prototype = {
   _findResult: function (result) {
     return this._captureSession._resultCache[makeCacheKey(result)];
   },
-  
+
   _cacheResult: function (result) {
     this._captureSession._resultCache[makeCacheKey(result)] = true;
   },
-  
+
   _runOnMainThread: function(func) {
     var me = this;
     var tm = Cc["@mozilla.org/thread-manager;1"].getService(Ci.nsIThreadManager);
@@ -202,13 +202,13 @@ FiresheepWorker.prototype = {
       run: function () {
         try {
           func.apply(me);
-        } catch (e) { 
+        } catch (e) {
           me._captureSession.handleError(e);
         }
       }
     }, Ci.nsIThread.DISPATCH_SYNC);
   },
-  
+
   QueryInterface: function(iid) {
     if (iid.equals(Ci.nsIRunnable) || iid.equals(Ci.nsISupports))
             return this;
@@ -227,7 +227,7 @@ Result.prototype = {
   httpPost: function (url, data) {
     return this._createRequest('POST', url, data);
   },
-  _createRequest: function (method, url, data) {    
+  _createRequest: function (method, url, data) {
     var cookies = [];
     if (this.firstPacket.cookies) {
       for (var cookieName in this.firstPacket.cookies) {
@@ -235,23 +235,23 @@ Result.prototype = {
         cookies.push(cookieString);
       }
     }
-    
+
     var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance();
     req.open(method, url, false);
     var channel = req.channel.QueryInterface(Ci.nsIHttpChannel);
-    
+
     if (this.handler.spoofUserAgent) {
       channel.setRequestHeader('User-Agent', this.firstPacket.userAgent, false);
     }
-    
+
     if (cookies.length > 0) {
       // Simply setting the 'Cookie' header here does not work: cookies from the browser
       // get appended later on. CookieMonster takes care of this problem.
       CookieMonster.addChannel(channel, cookies.join('; '));
     }
-    
+
     req.send(data);
-    
+
     // Cookies don't get sent along with the redirect =/
     if (req.channel.originalURI.host != req.channel.URI.host) {
       var e = {
@@ -260,7 +260,7 @@ Result.prototype = {
       };
       throw e;
     }
-    
+
     if (req.status == 200) {
       var result = {
         request: req,

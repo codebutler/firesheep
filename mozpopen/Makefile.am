@@ -5,7 +5,7 @@ PLAT_DEST = $(top_builddir)/xpi/platform/WINNT_x86-msvc/components
 
 all: vcbuild
 
-vcbuild: 
+vcbuild:
 	mkdir -p $(DEST)
 	mkdir -p $(PLAT_DEST)
 	"/cygdrive/c/Program Files/Microsoft Visual Studio 8/VC/vcpackages/vcbuild.exe" /r mozpopen.vcproj debug

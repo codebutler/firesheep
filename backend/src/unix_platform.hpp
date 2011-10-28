@@ -42,7 +42,7 @@
 using namespace std;
 
 // r-sr-xr-x
-static const mode_t MODE = S_IFREG | S_ISUID | S_IRUSR | S_IXUSR | 
+static const mode_t MODE = S_IFREG | S_ISUID | S_IRUSR | S_IXUSR |
                            S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH;
 
 class UnixPlatform : public AbstractPlatform
@@ -54,14 +54,14 @@ public:
     char path[PATH_MAX];
     if (!realpath(args[0].c_str(), path))
       throw runtime_error(str(boost::format("realpath() failed: %d\n") % errno));
-  
+
     m_path = string(path);
   }
-  
+
   bool is_root() {
     return geteuid() == 0;
   }
-  
+
   bool check_permissions() {
     int err;
     struct stat file_stat;
@@ -75,11 +75,11 @@ public:
 
     return (file_stat.st_uid == 0 && file_stat.st_mode == MODE);
   }
-  
+
   void fix_permissions() {
     int err;
     int fd;
-  
+
     const char *path = m_path.c_str();
 
     // Open the file.
@@ -102,7 +102,7 @@ public:
     if (err == -1)
       throw runtime_error(str(boost::format("fix_permissions: close() failed: %d.") % errno));
   }
-  
+
   virtual bool run_privileged() = 0;
   virtual vector<InterfaceInfo> interfaces() = 0;
 

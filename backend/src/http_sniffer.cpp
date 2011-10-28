@@ -48,7 +48,7 @@ void HttpSniffer::start()
   handle = pcap_open_live(m_iface.c_str(), SNAP_LEN, 1, 1000, errbuf);
   if (handle == NULL)
     throw runtime_error(str(boost::format("Couldn't open device %s: %s") % m_iface % errbuf));
-  
+
   /* Make sure we're capturing on an Ethernet or 802.11 monitor device */
   if (pcap_datalink(handle) == DLT_IEEE802_11_RADIO)
     m_wifimon = true;
@@ -173,11 +173,11 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
         return;
     }
   }
-  
+
   /* Ignore non tcp packets */
   if (!((ip && ip->ip_p == IPPROTO_TCP) || (ip6 && ip6->ip6_nxt == IPPROTO_TCP)))
     return;
-  
+
   /* Check and set TCP header size */
   tcp = (struct sniff_tcp*)(packet + l3hdr_off + size_ip);
   size_tcp = TH_OFF(tcp)*4;
@@ -195,40 +195,40 @@ void HttpSniffer::got_packet(const struct pcap_pkthdr *header, const u_char *pac
   if (ether_type == ETHERTYPE_IP) {
     from = str(boost::format("%s:%d") % inet_ntoa(ip->ip_src) % ntohs(tcp->th_sport));
     to   = str(boost::format("%s:%d") % inet_ntoa(ip->ip_dst) % ntohs(tcp->th_dport));
-  } else {  
+  } else {
     char src_addr_buf[INET6_ADDRSTRLEN];
     inet_ntop(AF_INET6, &ip6->ip6_src, src_addr_buf, sizeof(src_addr_buf));
-    
+
     char dst_addr_buf[INET6_ADDRSTRLEN];
     inet_ntop(AF_INET6, &ip6->ip6_dst, dst_addr_buf, sizeof(src_addr_buf));
-    
+
     from = str(boost::format("[%s]:%d") % string(src_addr_buf) % ntohs(tcp->th_sport));
     to   = str(boost::format("[%s]:%d") % string(dst_addr_buf) % ntohs(tcp->th_dport));
   }
-  
+
   /* Define/compute tcp payload (segment) offset */
   payload = (const char *)(packet + l3hdr_off + size_ip + size_tcp);
-  
+
   /* Compute tcp payload (segment) size */
   size_payload = ip_len - (size_ip + size_tcp);
-  
+
   string key;
   key.append(from);
   key.append("-");
   key.append(to);
-  
+
   HttpPacket *http_packet = 0;
-  
+
   PacketCacheMap::iterator iter;
   iter = m_pending_packets.find(key);
-  
+
   if (iter == m_pending_packets.end())
     http_packet = new HttpPacket(from, to);
   else {
     http_packet = iter->second;
     m_pending_packets.erase(iter);
   }
-  
+
   if (http_packet->parse(payload, size_payload)) {
     if (http_packet->isComplete()) {
       m_callback(http_packet);

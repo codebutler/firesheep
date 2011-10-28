@@ -20,7 +20,7 @@ register({
     var resp = this.httpGet('http://posterous.com/manage/settings/contact');
     var firstName = resp.body.querySelector('#user_firstname').value;
     var lastName  = resp.body.querySelector('#user_lastname').value;
-  
+
     this.userName   = firstName + ' ' + lastName;
     this.userAvatar = resp.body.querySelector('img[alt="user photo"]').src;
   }

@@ -32,8 +32,8 @@ HttpPacket::HttpPacket(string from, string to)
   m_settings.on_query_string     = query_string_cb_wrapper;
   m_settings.on_headers_complete = headers_complete_cb_wrapper;
   m_settings.on_message_complete = message_complete_cb_wrapper;
-  
-  http_parser_init(&m_parser, HTTP_REQUEST);  
+
+  http_parser_init(&m_parser, HTTP_REQUEST);
   m_parser.data = this;
 }
 
@@ -91,7 +91,7 @@ string HttpPacket::cookies()
   return get_header("cookie");
 }
 
-HeaderMap HttpPacket::headers() 
+HeaderMap HttpPacket::headers()
 {
   return m_headers;
 }
@@ -103,7 +103,7 @@ void HttpPacket::add_header(string name, string value)
   if (iter == m_headers.end()) {
     m_headers[name] = value;
   } else {
-    // FIXME: Technically this is allowed in certain situations, but I doubt 
+    // FIXME: Technically this is allowed in certain situations, but I doubt
     // any browsers would do this.
     // http://github.com/ry/node/blob/master/lib/http.js#L219
     cerr << "Ignoring duplicate header: " << name << endl;
@@ -113,7 +113,7 @@ void HttpPacket::add_header(string name, string value)
 }
 
 string HttpPacket::get_header(string name)
-{ 
+{
   HeaderMap::iterator iter;
   iter = m_headers.find(name);
   if (iter != m_headers.end())
@@ -133,20 +133,20 @@ int HttpPacket::query_string_cb(const char *buf, size_t len)
   m_query.append(buf, len);
   return 0;
 }
-  
+
 int HttpPacket::header_field_cb(const char *buf, size_t len)
 {
   string str(buf, len);
   boost::to_lower(str);
-  
+
   if (!m_tmp_header_value.empty()) {
     add_header(m_tmp_header_name, m_tmp_header_value);
     m_tmp_header_name.clear();
     m_tmp_header_value.clear();
   }
-  
+
   m_tmp_header_name.append(str);
-  
+
   return 0;
 }
 
@@ -157,7 +157,7 @@ int HttpPacket::header_value_cb(const char *buf, size_t len)
 }
 
 int HttpPacket::headers_complete_cb()
-{ 
+{
   if (!m_tmp_header_value.empty()) {
     add_header(m_tmp_header_name, m_tmp_header_value);
     m_tmp_header_name.clear();

@@ -1,5 +1,5 @@
 /*
- * MozPopenModule.cpp 
+ * MozPopenModule.cpp
  *
  * Authors:
  *   Eric Butler <eric@codebutler.com>

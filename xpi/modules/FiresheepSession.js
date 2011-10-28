@@ -39,9 +39,9 @@ FiresheepSession.prototype = {
     try {
       if (this.isCapturing)
         return;
-      
+
       // Ensure the binary is actually executable.
-      var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
+      var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;
       if (osString != 'WINNT') {
         // FIXME: This should really use chmod(2) directly.
         Utils.runCommand('chmod', [ 'a+x', this._core.backendPath ]);
@@ -55,7 +55,7 @@ FiresheepSession.prototype = {
           throw "Failed to fix permissions";
         }
       }
-      
+
       this._process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
       this._process.Init(this._core.backendPath, [ this._iface, this._filter ], 2);
       this._process.Start();
@@ -69,7 +69,7 @@ FiresheepSession.prototype = {
       this.handleError(e);
     }
   },
-  
+
   stop: function () {
     if (!this.isCapturing)
       return;
@@ -79,19 +79,19 @@ FiresheepSession.prototype = {
 
     this._process = null;
     this._thread = null;
-  
+
     Observers.notify('Firesheep', { action: 'capture_stopped' });
   },
-  
+
   get isCapturing () {
     return !!this._process
   },
-  
+
   /* Called by worker */
   postResult: function (result) {
     this._core._handleResult.apply(this._core, [ result ]);
   },
-  
+
   handleError: function (e) {
     dump('Error: ' + e + '\n');
     Observers.notify('Firesheep', { action: 'error', error: e });

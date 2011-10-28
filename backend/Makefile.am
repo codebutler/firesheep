@@ -3,18 +3,18 @@ SOURCES = \
 	src/http_sniffer.cpp           \
 	src/http_packet.cpp            \
 	deps/http-parser/http_parser.c
-    
+
 CFLAGS += \
 	-DHAVE_STDARG_H                \
 	-Wall                          \
 	-include src/config.h          \
 	-g
-    
+
 INCLUDES = \
 	-I deps/                      \
 	-I deps/http-parser           \
-	-I deps/json_spirit    
-    
+	-I deps/json_spirit
+
 if PLATFORM_OSX
 SOURCES += src/osx_platform.cpp
 CFLAGS  += -DPLATFORM_OSX
@@ -64,6 +64,6 @@ if PLATFORM_WIN32
 	cp -f `which cygstdc++-6.dll` $(DEST)
 	cp -f `which cyggcc_s-1.dll` $(DEST)
 endif
-    
+
 clean:
 	rm -f $(TARGET)

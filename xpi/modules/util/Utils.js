@@ -43,7 +43,7 @@ var Utils = {
     os.writeString(text);
     os.close();
   },
-  
+
   readAllText: function (file) {
     var data = '';
     var fstream = Cc["@mozilla.org/network/file-input-stream;1"]
@@ -62,7 +62,7 @@ var Utils = {
 
     return data;
   },
-  
+
   md5: function (str) {
     var converter =
       Cc["@mozilla.org/intl/scriptableunicodeconverter"].
@@ -93,7 +93,7 @@ var Utils = {
 
     return s;
   },
-  
+
   runCommand: function (command, args) {
     var process = Cc["@codebutler.com/mozpopen/process;1"].createInstance(Ci.IMozPopenProcess);
     process.Init(command, args, args.length);
@@ -106,10 +106,10 @@ var Utils = {
     process.Wait();
     return output;
   },
-  
+
   // https://developer.mozilla.org/en/Code_snippets/HTML_to_DOM
   // http://mxr.mozilla.org/firefox/source/browser/components/microsummaries/src/nsMicrosummaryService.js?raw=1
-  parseHtml: function (aHTMLString) {  
+  parseHtml: function (aHTMLString) {
     var windowMediator = Cc['@mozilla.org/appshell/window-mediator;1'].
                          getService(Ci.nsIWindowMediator);
     var window = windowMediator.getMostRecentWindow("navigator:browser");
@@ -125,7 +125,7 @@ var Utils = {
 
     return body;
   },
-  
+
   generateUUID: function () {
     var uuidGenerator = Cc["@mozilla.org/uuid-generator;1"].getService(Ci.nsIUUIDGenerator);
     var uuid = uuidGenerator.generateUUID();
