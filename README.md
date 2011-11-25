@@ -1,5 +1,7 @@
 # Firesheep
 
+### **THIS BRANCH IS A WORK-IN-PROGRESS! Use the 'stable' branch (requires Firefox 3.x) instead!**
+
 A Firefox extension that demonstrates HTTP session hijacking attacks.
 
 Created by: 
