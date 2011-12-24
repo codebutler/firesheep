@@ -26,7 +26,10 @@
 #include <cstdio>
 #include <pcap/pcap.h>
 #include "linux_platform.hpp"
+
+#ifndef DISABLE_HAL
 #include <libhal.h>
+#endif
 
 using namespace std;
 using namespace boost;
@@ -43,6 +46,7 @@ bool LinuxPlatform::run_privileged()
   return (ret == 0);
 }
 
+#ifndef DISABLE_HAL
 string device_get_property_string(LibHalContext *context, string device, string key, DBusError *error)
 {
   char *buf = libhal_device_get_property_string(context, device.c_str(), key.c_str(), error);
@@ -65,11 +69,14 @@ string device_get_property_string(LibHalContext *context, string device, string 
 
   return property;
 }
+#endif
 
 vector<InterfaceInfo> LinuxPlatform::interfaces()
 {
   vector<InterfaceInfo> result;
-  
+
+#ifndef DISABLE_HAL
+
   DBusError     error;
   LibHalContext *context;
   char          **devices;
@@ -79,7 +86,7 @@ vector<InterfaceInfo> LinuxPlatform::interfaces()
   context = libhal_ctx_new();
   if (context == NULL)
     throw runtime_error("libhal_ctx_new() failed");
-    
+
   /* Initialize DBus connection */
   dbus_error_init(&error); 
   if (!libhal_ctx_set_dbus_connection(context, dbus_bus_get(DBUS_BUS_SYSTEM, &error))) {
@@ -87,7 +94,7 @@ vector<InterfaceInfo> LinuxPlatform::interfaces()
     LIBHAL_FREE_DBUS_ERROR(&error);
     throw ex;
   }
-    
+
   /* Initialize HAL context */
   if (!libhal_ctx_init(context, &error)) {
     if (dbus_error_is_set(&error)) {
@@ -106,7 +113,7 @@ vector<InterfaceInfo> LinuxPlatform::interfaces()
 
   for (int i = 0; i < num_devices; i++) {
     char *device = devices[i];
-    
+
     /* Get basic device information */
     string iface    = device_get_property_string(context, devices[i], "net.interface", &error);
     string category = device_get_property_string(context, devices[i], "info.category", &error);
@@ -120,7 +127,7 @@ vector<InterfaceInfo> LinuxPlatform::interfaces()
       type = "ethernet";
     else
       continue;
-      
+
     /* device points to a 'network inteface', get parent (physical?) device */
     string parent = device_get_property_string(context, device, "net.originating_device", &error);
 
@@ -138,14 +145,34 @@ vector<InterfaceInfo> LinuxPlatform::interfaces()
     string vendor  = device_get_property_string(context, parent, "info.vendor", &error);
     string product = device_get_property_string(context, parent, "info.product", &error);
     string description(str(format("%s %s") % vendor % product));
-    
+
     InterfaceInfo info(iface, description, type);
     result.push_back(info);
   }
-  
+
   /* Free devices */
   libhal_free_string_array(devices);
+#else
+  pcap_if_t *alldevs;
+  pcap_if_t *d;
+  char errbuf[PCAP_ERRBUF_SIZE+1];
 
-  return result; 
+  if (pcap_findalldevs(&alldevs, errbuf) == -1) {
+    throw runtime_error(str(boost::format("Error in pcap_findalldevs: %s") % errbuf));
+  }
+
+  for (d = alldevs; d; d = d->next) {
+    string id(d->name);
+    boost::replace_all(id, "\\", "\\\\");
+    boost::replace_all(id, "{", "\\{");
+    boost::replace_all(id, "}", "\\}");
+    InterfaceInfo info(id, (string(d->description ? d->description : "No description")), "ethernet");
+    result.push_back(info);
+  }
+
+  pcap_freealldevs(alldevs);
+#endif
+
+  return result;
 }
 
