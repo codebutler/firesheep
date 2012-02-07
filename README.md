@@ -64,10 +64,18 @@ This has so far only been tested on Windows XP (32-bit), however the binaries wo
 
 ### Linux
 
-1. You must select an interface in monitor mode to perform the attack.
-To do so if your card support it and you have aircrack-ng installed you do:
-`airmon-ng start <interface>`
-2. Run as root: `sudo firefox`. Then select the mon0 interface.
+1.  You must select an interface in monitor mode to perform the attack. To do so if your card support it and you have aircrack-ng installed you do:
+
+        airmon-ng start <interface>
+
+2.  Run firefox as root:
+
+        $ sudo su -
+        # firefox
+
+    Then select the mon0 interface.
+
+    WARNING: Do not run firefox with sudo (`sudo firefox`) as it will [corrupt your firefox profile][8].
 
 [1]: http://mxcl.github.com/homebrew/
 [3]: http://www.cygwin.com/
@@ -75,3 +83,4 @@ To do so if your card support it and you have aircrack-ng installed you do:
 [5]: http://en.wikipedia.org/wiki/Promiscuous_mode
 [6]: http://www.winpcap.org/install/default.htm
 [7]: https://github.com/codebutler/firesheep/issues/157
+[8]: http://ubuntuforums.org/showthread.php?t=952579
