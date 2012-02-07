@@ -4,7 +4,7 @@
 
 A Firefox extension that demonstrates HTTP session hijacking attacks on Open (unencrypted) SSIDs.
 
-Extension will install on Firefox 6 to 8.
+Extension will install on Firefox 6 to 10.
 
 Created by: 
 
