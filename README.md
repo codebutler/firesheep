@@ -26,8 +26,10 @@ See instructions for your platform below. When done, an xpi will be created insi
 ### Mac OS X
 
 1. Install boost using [Homebrew][1] (`brew install boost`).
-2. Run `./autogen.sh`
-3. Run `make`!
+2. Install automake using [Homebrew][1] (`brew install automake`).
+3. Install libtoot using [Homebrew][1] (`brew install libtool`).
+4. Run `./autogen.sh`
+5. Run `make`!
 
 ### Ubuntu Linux (10.10 Maverick)
 
