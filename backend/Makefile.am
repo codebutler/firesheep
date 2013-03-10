@@ -25,7 +25,7 @@ libfiresheep_la_SOURCES = \
 	deps/http-parser/http_parser.c
 
 if PLATFORM_OSX
-CXXFLAGS += -DPLATFORM_OSX -arch i386 -arch x86_64
+CXXFLAGS += -DPLATFORM_OSX -arch i386 -arch x86_64 -I/usr/include
 libfiresheep_la_SOURCES += src/osx_platform.cpp
 libfiresheep_la_LDFLAGS  = -framework Security
 libfiresheep_la_LDFLAGS += -framework SystemConfiguration
