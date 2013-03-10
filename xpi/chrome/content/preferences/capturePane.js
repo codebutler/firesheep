@@ -42,7 +42,7 @@ function loadInterfaces () {
 
     // If the backend can find a primary interface, add the Automatic option.
     var primary_iface = Firesheep.primaryInterface;
-    if (primary_iface.id.length > 0) {
+    if (primary_iface && primary_iface.id.length > 0) {
       addInterface('auto', 'Automatic');
     }
     

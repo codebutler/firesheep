@@ -26,7 +26,9 @@
 #include <cstdio>
 #include <pcap/pcap.h>
 #include "linux_platform.hpp"
-#include <libhal.h>
+#include <libudev.h>
+#include <string.h>
+#include <stdio.h>
 
 using namespace std;
 using namespace boost;
@@ -43,108 +45,60 @@ bool LinuxPlatform::run_privileged()
   return (ret == 0);
 }
 
-string device_get_property_string(LibHalContext *context, string device, string key, DBusError *error)
-{
-  char *buf = libhal_device_get_property_string(context, device.c_str(), key.c_str(), error);
-
-  string property;
-  if (dbus_error_is_set(error)) {
-    if (key.compare(0, 5, "info.") != 0) {
-      runtime_error ex(str(format("libhal_device_get_property_string failed: %s %s") % error->name % error->message));
-      dbus_error_free(error);
-      throw ex;
-    }
-    else {
-      dbus_error_free(error);
-      property = "Unknown";
-    }
-  }
-  else {
-    property = string(buf);
-  }
-
-  return property;
-}
-
 vector<InterfaceInfo> LinuxPlatform::interfaces()
 {
   vector<InterfaceInfo> result;
-  
-  DBusError     error;
-  LibHalContext *context;
-  char          **devices;
-  int           num_devices;
 
-  /* Create HAL context */
-  context = libhal_ctx_new();
-  if (context == NULL)
-    throw runtime_error("libhal_ctx_new() failed");
-    
-  /* Initialize DBus connection */
-  dbus_error_init(&error); 
-  if (!libhal_ctx_set_dbus_connection(context, dbus_bus_get(DBUS_BUS_SYSTEM, &error))) {
-    runtime_error ex(str(format("libhal_ctx_set_dbus_connection failed: %s: %s") % error.name % error.message));
-    LIBHAL_FREE_DBUS_ERROR(&error);
-    throw ex;
-  }
-    
-  /* Initialize HAL context */
-  if (!libhal_ctx_init(context, &error)) {
-    if (dbus_error_is_set(&error)) {
-      runtime_error ex(str(format("Could not initialize connection to hald, is it running? %s %s") % error.name % error.message));
-      dbus_error_free (&error);
-      throw ex;
-    } else {
-      throw runtime_error("Could not initialize connection to hald, is it running?");
-    }
-  }
+  struct udev *udev;
+  struct udev_enumerate *enumerate;
+  struct udev_list_entry *devices, *dev_list_entry;
+  struct udev_device *dev;
 
-  /* Find all network devices */
-  devices = libhal_find_device_by_capability(context, "net", &num_devices, &error);
-  if (!devices)
-    throw runtime_error("Failed to list network devices.");
+  udev = udev_new();
 
-  for (int i = 0; i < num_devices; i++) {
-    char *device = devices[i];
-    
-    /* Get basic device information */
-    string iface    = device_get_property_string(context, devices[i], "net.interface", &error);
-    string category = device_get_property_string(context, devices[i], "info.category", &error);
+  if (!udev)
+    throw runtime_error("udev_new() failed");
 
-    string type;
-    if (category == "net.80211")
-      type = "ieee80211";
-    else if (category == "net.80211control")
-      type = "ieee80211_monitor";
-    else if (category == "net.80203")
-      type = "ethernet";
-    else
-      continue;
-      
-    /* device points to a 'network inteface', get parent (physical?) device */
-    string parent = device_get_property_string(context, device, "net.originating_device", &error);
+  enumerate = udev_enumerate_new(udev);
+  udev_enumerate_add_match_subsystem(enumerate, "net");
+  udev_enumerate_scan_devices(enumerate);
+  devices = udev_enumerate_get_list_entry(enumerate);
 
-    if (parent != "/org/freedesktop/Hal/devices/computer") {
-      /* Might need to go up one more level to actually find physical device */
-      string parent_subsystem = device_get_property_string(context, parent, "info.subsystem", &error);
-      if (parent_subsystem == "usb")
-        parent = device_get_property_string(context, parent, "info.parent", &error);
-    } else {
-        /* Some virtual network interfaces have no device parent. */
-        parent = devices[i];
+  udev_list_entry_foreach(dev_list_entry, devices) {
+    const char *path;
+    const char *utype;
+    path = udev_list_entry_get_name(dev_list_entry);
+    dev = udev_device_new_from_syspath(udev, path);
+
+    string iface(udev_device_get_sysname(dev));
+    string type = "ethernet";
+    string vendor = "";
+    string product = iface == "lo" ? "Loopback" : "Unknown";
+
+    utype = udev_device_get_devtype(dev);
+
+    if (!utype)
+       type = "ethernet";
+    else if (!strncmp(utype, "wlan", strlen(utype)))
+       type = "ieee80211";
+
+    struct udev_list_entry *list_entry;
+    udev_list_entry_foreach(list_entry, udev_device_get_properties_list_entry(dev)) {
+      const char *key = udev_list_entry_get_name(list_entry);
+      if (!strncmp(key, "ID_MODEL_FROM_DATABASE", strlen(key)))
+          product = udev_list_entry_get_value(list_entry);
+      if (!strncmp(key, "ID_VENDOR_FROM_DATABASE", strlen(key)))
+          vendor = udev_list_entry_get_value(list_entry);
     }
 
-    /* Get device properties */
-    string vendor  = device_get_property_string(context, parent, "info.vendor", &error);
-    string product = device_get_property_string(context, parent, "info.product", &error);
     string description(str(format("%s %s") % vendor % product));
-    
     InterfaceInfo info(iface, description, type);
     result.push_back(info);
+
+    udev_device_unref(dev);
   }
-  
-  /* Free devices */
-  libhal_free_string_array(devices);
+  udev_enumerate_unref(enumerate);
+  udev_unref(udev);
 
   return result; 
 }
