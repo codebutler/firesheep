@@ -30,9 +30,9 @@ See instructions for your platform below. When done, an xpi will be created insi
 2. Run `./autogen.sh`
 3. Run `make`!
 
-### Ubuntu Linux (10.10 Maverick)
+### Ubuntu Linux
 
-1. Install build dependencies (`sudo apt-get install autoconf libtool libpcap-dev libboost-all-dev libhal-dev`).
+1. Install build dependencies (`sudo apt-get install autoconf libtool libpcap-dev libboost-all-dev libudev-dev`).
 2. Run `./autogen.sh` then `make`.
 
 ### Windows
@@ -43,7 +43,7 @@ This has so far only been tested on Windows XP (32-bit), however the binaries wo
 2. Install [Cygwin][3], selecting the following packages: `automake-1.11`, `gcc-g++`.
 3. Install [BoostPro][4]. Choose *Visual C++ 8.0* and *Multithreaded debug, static runtime*.
 4. Install [WinPcap][6].
-5. From a Cygwin command prompt: Run `./autogen.sh`) then run `make`!
+5. From a Cygwin command prompt: Run `./autogen.sh` then run `make`!
 
 [1]: http://mxcl.github.com/homebrew/
 [3]: http://www.cygwin.com/
