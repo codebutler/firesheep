@@ -26,7 +26,7 @@ See instructions for your platform below. When done, an xpi will be created insi
 
 ### Mac OS X
 
-1. Install boost using [Homebrew][1] (`brew install boost`).
+1. Install build dependencies using [Homebrew][1] (`brew install autoconf automake libtool boost`).
 2. Run `./autogen.sh`
 3. Run `make`!
 

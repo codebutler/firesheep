@@ -1,5 +1,8 @@
 .DS_Store
-aclocal.m4
+*.m4
+libtool
+ltmain.sh
+depcomp
 autom4te.cache/*
 config.guess
 config.log
