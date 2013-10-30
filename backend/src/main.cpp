@@ -38,18 +38,14 @@ int main(int argc, const char *argv[])
 
     if (argc > 1) {
       if (argv[1] == string("--fix-permissions")) {
-        if (platform.is_root()) {
-          if (platform.check_permissions()) {
-            /* Nothing to do */
-            return EXIT_SUCCESS;
-          } else {
-            platform.fix_permissions();
-            return EXIT_SUCCESS;
-          }
-        } else {
+        if (!platform.is_root()) {
           cerr << "Must be run as root." << endl;
           return EXIT_FAILURE;
         }
+        if (!platform.check_permissions()) {
+          platform.fix_permissions();
+        }
+        return EXIT_SUCCESS;
       }
     } 
     
