@@ -50,14 +50,16 @@ void HttpSniffer::start()
     throw runtime_error(str(boost::format("Couldn't open device %s: %s") % m_iface % errbuf));
   
   /* Make sure we're capturing on an Ethernet or 802.11 monitor device */
-  if (pcap_datalink(handle) == DLT_IEEE802_11_RADIO)
+  if (pcap_datalink(handle) == DLT_IEEE802_11_RADIO) {
     m_wifimon = true;
-  else if (pcap_datalink(handle) != DLT_EN10MB) {
-    throw runtime_error(str(boost::format("%s is not supported (unsupported data link)") % m_iface));
+
+  } else if (pcap_datalink(handle) != DLT_EN10MB) {
+    throw runtime_error(str(boost::format("%s is not supported (unsupported data link: %s / %s)") % m_iface % pcap_datalink_val_to_name(pcap_datalink(handle)) % pcap_datalink_val_to_description(pcap_datalink(handle))));
 
   /* Make sure our ethernet interface has an IP address set */
-  } else if (pcap_lookupnet(m_iface.c_str(), &net, &mask, errbuf) == -1)
+  } else if (pcap_lookupnet(m_iface.c_str(), &net, &mask, errbuf) == -1) {
     throw runtime_error(str(boost::format("Coudn't get ip/netmask for device %s: %s") % m_iface % errbuf));
+  }
 
   /*  Compile the filter expression */
   if (pcap_compile(handle, &fp, (char *)m_filter.c_str(), 0, net) == -1)
