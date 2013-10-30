@@ -30,12 +30,13 @@ var FiresheepConfig = {
   get userScripts() {
     var userScripts = {};
     if (this.configFile.exists()) {
-      doc = XML(Utils.readAllText(this.configFile));
-      scripts = doc.Script;    
+      var parser = new DOMParser();
+      var doc = parser.parseFromString(Utils.readAllText(this.configFile), "application/json");
+      var scripts = doc.getElementsByTagName("Script");
       for (var i = 0; i < scripts.length(); i++) {
         var script = scripts[i];
-        var scriptId   = script.@id;
-        var scriptText = script.toString();      
+        var scriptId   = script.attributes['id'];
+        var scriptText = script.textContent;
         userScripts[scriptId] = scriptText;
       }
     }      
@@ -74,15 +75,19 @@ var FiresheepConfig = {
   },
 
   _writeScripts: function (userScripts) {
-    var doc = <Scripts />;
+    var doc = document.implementation.createDocument("", "", null);
+    var scripts = doc.createElement("Scripts");
+    doc.appendChild(scripts);
   
     for (var id in userScripts) {
-      var scriptText = userScripts[id];
-      var script = <Script id={id}>{scriptText}</Script>;
+      var script = doc.createElement("Script");
+      script.attributes.setNamedItem("id", id);
+      script.textContent = userScripts[id];
       doc.appendChild(script);
     }
   
-    Utils.writeAllText(this.configFile, doc.toXMLString());
+    var serializer = new XMLSerializer();
+    Utils.writeAllText(this.configFile, serializer.serializeToString(doc));
     
     Observers.notify('FiresheepConfig', { action: 'scripts_changed' });
   }
