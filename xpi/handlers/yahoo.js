@@ -1,14 +1,15 @@
 // Authors:
 //   Joe Basirico <joe@whoisjoe.net>
+//   Eric Butler <eric@codebutler.com>
 register({
   name: 'Yahoo',
-  url: 'http://www.yahoo.com',
+  siteUrl: 'http://yahoo.com',
   domains: [ 'yahoo.com' ],
-  sessionCookieNames: [ 'T', 'Y' ],
+  sessionCookieNames: [ 'T', 'Y', 'F' ],
 
   identifyUser: function () {
-    var resp = this.httpGet(this.siteUrl);
-    this.userName   = resp.body.querySelector('.y-ln-1').alt;
-    this.userAvatar = resp.body.querySelector('.y-ln-1').src;
+    var resp = this.httpGet("http://www.yahoo.com/");
+    this.userName   = resp.body.querySelector('.connected-lbl').textContent;
+    this.userAvatar = resp.body.querySelector('img.tab-icon').src;
   }
 });
