@@ -68,7 +68,7 @@ public:
     if ((file_stat.st_mode & S_ISUID) && file_stat.st_uid != 0)
       throw runtime_error("backend is setuid but owner is not root!");
 
-    return (file_stat.st_uid == 0 && file_stat.st_mode == MODE);
+    return (file_stat.st_uid == 0 && (file_stat.st_mode & S_ISUID));
   }
   
   void fix_permissions() {
