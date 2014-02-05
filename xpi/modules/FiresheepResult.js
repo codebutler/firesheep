@@ -1,11 +1,10 @@
-//
 // FiresheepResult.js
 // Part of the Firesheep project.
 //
 // Copyright (C) 2010 Eric Butler
 //
 // Authors:
-//   Eric Butler <eric@codebutler.com>
+//   Eric Butler &lt;eric@codebutler.com&gt;
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +17,7 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
 
 Components.utils.import('resource://firesheep/util/Utils.js');
 Components.utils.import('resource://firesheep/util/CookieMonster.js');
@@ -60,7 +59,7 @@ FiresheepResult.prototype = {
       channel.setRequestHeader('User-Agent', this.firstPacket.userAgent, false);
     }
     
-    if (cookies.length > 0) {
+    if (cookies.length &gt; 0) {
       // Simply setting the 'Cookie' header here does not work: cookies from the browser
       // get appended later on. CookieMonster takes care of this problem.
       CookieMonster.addChannel(channel, cookies.join('; '));
@@ -77,7 +76,7 @@ FiresheepResult.prototype = {
       throw e;
     }
     
-    if (req.status == 200) {
+    if (req.status == 200 || req.status == 302) {
       var result = {
         request: req,
         body: Utils.parseHtml(req.responseText)
