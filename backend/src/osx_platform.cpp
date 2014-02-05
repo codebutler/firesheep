@@ -166,7 +166,7 @@ InterfaceInfo OSXPlatform::service_info(SCNetworkServiceRef service)
 string OSXPlatform::stringFromCFString(CFStringRef cfString, CFStringEncoding encoding)
 {
   char *cstring = NULL;
-  int maxLen = NULL;
+  int maxLen = 0;
   string result;
 
   if (cfString != NULL) {
