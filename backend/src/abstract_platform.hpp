@@ -27,8 +27,8 @@
 #include <boost/format.hpp>
 
 #include <fcntl.h>
-#include <stdbool.h>
-#include <unistd.h>
+// #include <stdbool.h>
+// #include <unistd.h>
 
 #include "interface_info.hpp"
 

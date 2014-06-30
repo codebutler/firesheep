@@ -55,14 +55,14 @@ public:
   
   bool isComplete();
   
-  string from();
-  string to();
-  string host();
-  string method();
-  string path();
-  string user_agent();
-  string query();
-  string cookies();
+  __declspec(dllexport) string from();
+  __declspec(dllexport) string to();
+  __declspec(dllexport) string host();
+  __declspec(dllexport) string method();
+  __declspec(dllexport) string path();
+  __declspec(dllexport) string user_agent();
+  __declspec(dllexport) string query();
+  __declspec(dllexport) string cookies();
   
   HeaderMap headers();
   

@@ -22,8 +22,8 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <sys/types.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+//#include <netinet/in.h>
+//#include <arpa/inet.h>
 
 /* default snap length (maximum bytes per packet to capture) */
 #define SNAP_LEN 1518

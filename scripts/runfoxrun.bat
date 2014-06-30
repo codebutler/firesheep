@@ -1,0 +1,9 @@
+REM SET NSPR_LOG_MODULES=nsNativeModuleLoader:5
+
+SET NSPR_LOG_MODULES=all:5
+SET NSPR_LOG_FILE=C:\firefox.log
+SET NO_EM_RESTART=1
+SET MOZ_NO_REMOTE=1
+SET MOZ_CRASHREPORTER_DISABLE=1
+
+"C:\Program Files\Mozilla Firefox\firefox.exe"

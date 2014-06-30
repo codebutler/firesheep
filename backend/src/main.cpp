@@ -27,10 +27,34 @@
 #include "json_spirit_writer_template.h"
 #include "firesheep_platform.hpp"
 
+#ifdef PLATFORM_WIN32
+#include <windows.h>
+#endif
+
 void received_packet(HttpPacket *packet);
 
-int main(int argc, const char *argv[])
+#ifdef PLATFORM_WIN32
+int WINAPI WinMain(HINSTANCE hInstance,
+                   HINSTANCE hPrevInstance,
+                   LPSTR lpCmdLine,
+                   int nCmdShow)
 {
+	int argc = 0;
+
+    WCHAR** argv_tmp = CommandLineToArgvW(GetCommandLineW(), &argc);
+
+	char **argv = (char **)malloc(sizeof(char *) * argc);
+    for (int i = 0; i<argc; i++) {
+        int len = wcslen(argv_tmp[i]);
+        argv[i] = (char *)malloc(sizeof(char)*(len+1));
+        wcstombs(argv[i], argv_tmp[i], len+1);
+    }
+
+
+#else
+int main(int argc, const char *argv[])	
+{
+#endif
   try { 
     vector<string>sargv(argv, argv + argc);
 
@@ -66,6 +90,7 @@ int main(int argc, const char *argv[])
       freopen(string(argv[3]).c_str(), "w", stdout);
       freopen(string(argv[4]).c_str(), "w", stderr);
       
+#ifndef PLATFORM_WIN32
       // rw-rw-rw-
       mode_t mode = S_IFREG | 
                     S_IRUSR | S_IWUSR |  
@@ -74,6 +99,7 @@ int main(int argc, const char *argv[])
       
       fchmod(fileno(stdout), mode);
       fchmod(fileno(stderr), mode);
+#endif
     }
 
     HttpSniffer sniffer(iface, filter, received_packet);

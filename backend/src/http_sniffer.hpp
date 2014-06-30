@@ -26,13 +26,14 @@
 
 #include <string>
 #include <sys/types.h>
+#include <pcap/pcap.h>
 #include "http_packet.hpp"
 
 using namespace std;
 
 typedef map<string, HttpPacket *> PacketCacheMap;
 
-class HttpSniffer
+class __declspec(dllexport) HttpSniffer
 {
 public:
   HttpSniffer (string iface, string filter, http_packet_cb callback);
