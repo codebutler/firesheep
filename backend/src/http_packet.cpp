@@ -22,8 +22,8 @@
 
 #include "http_packet.hpp"
 
-HttpPacket::HttpPacket(string from, string to)
-  : m_from(from), m_to(to), m_complete(false)
+HttpPacket::HttpPacket(string from, string to, WifiInfo info)
+  : m_from(from), m_to(to), m_complete(false), m_wifi_info(info)
 {
   memset(&m_settings, 0, sizeof(m_settings));
   m_settings.on_header_field     = header_field_cb_wrapper;
@@ -94,6 +94,11 @@ string HttpPacket::cookies()
 HeaderMap HttpPacket::headers() 
 {
   return m_headers;
+}
+
+WifiInfo HttpPacket::wifi_info()
+{
+  return m_wifi_info;
 }
 
 void HttpPacket::add_header(string name, string value)

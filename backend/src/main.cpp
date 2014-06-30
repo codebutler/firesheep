@@ -98,6 +98,14 @@ void received_packet(HttpPacket *packet)
   data_obj.push_back(json_spirit::Pair("host",      packet->host()));
   data_obj.push_back(json_spirit::Pair("cookies",   packet->cookies()));
   data_obj.push_back(json_spirit::Pair("userAgent", packet->user_agent()));
+
+  if (!packet->wifi_info().is_empty()) {
+    json_spirit::Object wifi_info_obj;
+    wifi_info_obj.push_back(json_spirit::Pair("bssid", packet->wifi_info().bssid()));
+    wifi_info_obj.push_back(json_spirit::Pair("source", packet->wifi_info().source()));
+    wifi_info_obj.push_back(json_spirit::Pair("dest", packet->wifi_info().dest()));
+    data_obj.push_back(json_spirit::Pair("wifi_info", wifi_info_obj));
+  }
   
   string data = json_spirit::write_string(json_spirit::Value(data_obj), false);
   cout << data << endl;   
