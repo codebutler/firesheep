@@ -111,7 +111,7 @@ protected:
     char path[PATH_MAX];
     if (!realpath(m_path.c_str(), path))
       throw runtime_error(str(boost::format("realpath() failed: %d\n") % errno));
-    return m_path;
+    return string(path);
   }
 
 private:
