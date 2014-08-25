@@ -39,7 +39,7 @@ bool OSXPlatform::run_privileged()
   OSStatus           err;
   AuthorizationFlags flags;
   
-  const char *path = this->path().c_str();
+  const string &path = this->path();
   
   flags = kAuthorizationFlagExtendRights | kAuthorizationFlagInteractionAllowed;
   
@@ -49,7 +49,7 @@ bool OSXPlatform::run_privileged()
   
   char *args[] = { (char *) "--fix-permissions", NULL };
   
-  err = AuthorizationExecuteWithPrivileges(auth, path, kAuthorizationFlagDefaults, args, NULL);
+  err = AuthorizationExecuteWithPrivileges(auth, path.c_str(), kAuthorizationFlagDefaults, args, NULL);
   AuthorizationFree(auth, kAuthorizationFlagDefaults);
   if (err == errAuthorizationCanceled)
     return false;

@@ -63,8 +63,8 @@ int main(int argc, const char *argv[])
     string filter(argv[2]);
     
     if (argc > 4) {
-      freopen(string(argv[3]).c_str(), "w", stdout);
-      freopen(string(argv[4]).c_str(), "w", stderr);
+      freopen(argv[3], "w", stdout);
+      freopen(argv[4], "w", stderr);
       
       // rw-rw-rw-
       mode_t mode = S_IFREG | 

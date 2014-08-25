@@ -61,7 +61,9 @@ public:
     int err;
     struct stat file_stat;
 
-    err = stat(this->path().c_str(), &file_stat);
+    const string &path = this->path();
+
+    err = stat(path.c_str(), &file_stat);
     if (err == -1)
       throw runtime_error("stat() failed");
 
@@ -75,10 +77,10 @@ public:
     int err;
     int fd;
   
-    const char *path = this->path().c_str();
+    const string &path = this->path();
 
     // Open the file.
-    fd = open(path, O_RDONLY, 0);
+    fd = open(path.c_str(), O_RDONLY, 0);
     if (fd < 0)
       throw runtime_error(str(boost::format("fix_permissions: open() failed: %d.") % errno));
 
@@ -109,7 +111,7 @@ protected:
     char path[PATH_MAX];
     if (!realpath(m_path.c_str(), path))
       throw runtime_error(str(boost::format("realpath() failed: %d\n") % errno));
-    return m_path;
+    return string(path);
   }
 
 private:

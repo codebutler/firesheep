@@ -27,7 +27,7 @@
 #include "pcap.h"
 using namespace std;
 
-WindowsPlatform::WindowsPlatform(vector<string>)
+WindowsPlatform::WindowsPlatform(string)
 {
   // FIXME
 }

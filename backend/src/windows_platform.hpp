@@ -34,7 +34,7 @@ using namespace std;
 class WindowsPlatform : public AbstractPlatform
 {
 public:
-  WindowsPlatform(vector<string>);
+  WindowsPlatform(string);
   bool is_root();
   bool check_permissions();
   void fix_permissions();
