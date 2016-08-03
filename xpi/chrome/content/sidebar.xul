@@ -35,7 +35,7 @@
 
   <vbox flex="1">
     <hbox id="toolbar">
-      <button label="Start Capturing" id="captureButton" oncommand="Firesheep.toggleCapture()" flex="1" />
+      <button label="Start Capturing" id="captureButton" flex="1" />
     </hbox>
 
     <notificationbox flex="1" id="errors">
@@ -62,7 +62,7 @@
   </vbox>
   
   <menupopup id="bottomMenu">
-    <menuitem label="Clear" oncommand="Firesheep.clearSession()"/>
+    <menuitem id="clearMenuItem" label="Clear"/>
     <menuseparator/>
     <menuitem label="Preferences" oncommand="FiresheepUI.showPrefs()"/>
   </menupopup>

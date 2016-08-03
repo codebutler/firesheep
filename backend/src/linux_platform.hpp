@@ -29,7 +29,7 @@
 
 class LinuxPlatform : public UnixPlatform {
 public:
-  LinuxPlatform(vector<string>);
+  LinuxPlatform(string);
   bool run_privileged();
   vector<InterfaceInfo> interfaces();
 };

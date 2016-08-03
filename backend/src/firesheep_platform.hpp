@@ -1,5 +1,5 @@
 //
-// osx_platform.h: Mac OS X functions
+// firesheep_platform.hpp
 // Part of the Firesheep project.
 //
 // Copyright (C) 2010 Eric Butler
@@ -20,27 +20,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef FIRESHEEP_OSX_PLATFORM_H
-#define FIRESHEEP_OSX_PLATFORM_H
+#include "abstract_platform.hpp"
 
-#include "unix_platform.hpp"
-#include "interface_info.hpp"
-
-#include <SystemConfiguration/SystemConfiguration.h>
-#include <CoreFoundation/CoreFoundation.h>
-
-
-class OSXPlatform : public UnixPlatform {
-public:
-  OSXPlatform(string);
-  bool run_privileged();
-  vector<InterfaceInfo> interfaces();
-  InterfaceInfo primary_interface();
-
-protected:
-  bool is_service_relevant(SCNetworkServiceRef service);
-  InterfaceInfo service_info(SCNetworkServiceRef service);
-  string stringFromCFString(CFStringRef cfString, CFStringEncoding encoding=kCFStringEncodingUTF8);
-};
-
+#ifdef PLATFORM_WIN32
+#include "windows_platform.hpp"
+#define PLATFORM WindowsPlatform
+#elif PLATFORM_OSX
+#include "osx_platform.hpp"
+#define PLATFORM OSXPlatform
+#elif PLATFORM_LINUX
+#include "linux_platform.hpp"
+#define PLATFORM LinuxPlatform
+#else
+#error "no suitable platform"
 #endif

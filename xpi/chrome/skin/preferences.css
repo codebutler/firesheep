@@ -1,5 +1,6 @@
 prefwindow {
-  height: 350px;
+  width: 550px;
+  height: 450px;
 }
 
 caption {
@@ -21,4 +22,12 @@ caption {
 
 #scriptText {
   font-family: monospace;
+}
+
+#firesheepPrefs[animated="true"] #scriptsList {
+  height: 25em;
+}
+
+#firesheepPrefs[animated="false"] #scriptsList {
+  -moz-box-flex: 1;
 }

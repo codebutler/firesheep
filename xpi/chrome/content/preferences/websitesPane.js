@@ -35,7 +35,7 @@ function loadScripts () {
       addListItem(scriptId, true);
     });
     
-    Observers.add('Firesheep', observer);
+    Observers.add('FiresheepConfig', observer);
   } catch (e) {
     alert(e);
   }

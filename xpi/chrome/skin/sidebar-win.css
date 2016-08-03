@@ -1,0 +1,11 @@
+#firesheepSidebar #toolbar {
+  border-bottom: 1px solid threedshadow;
+}
+
+#bottombar {
+  border-top: 1px solid threedshadow;
+}
+
+#firesheepSidebar richlistbox {
+  -moz-appearance: none; 
+}

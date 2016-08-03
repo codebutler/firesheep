@@ -22,89 +22,59 @@
 
 AC_INIT([Firesheep], [0.1], [eric@codebutler.com],
         [firesheep], [http://codebutler.github.com/firesheep])
+AC_PROG_CC([clang gcc])
 AC_PREREQ([2.61])
 AM_INIT_AUTOMAKE([foreign])
 
-AC_PROG_CXX
+AC_PROG_LIBTOOL
+AC_PROG_CXX([clang++ g++])
 
-# OSX doesn't come wiht pkg-config, but PKG_CHECK_MODULES has to be defined to something to avoid errors.
+# A common source of problems.
+if test ! -d backend/deps/http-parser; then
+	AC_MSG_ERROR([http-parser missing, did you read the README?])
+fi
+
+# OSX doesn't come with pkg-config, but PKG_CHECK_MODULES has to be defined to something to avoid errors.
 m4_define_default([PKG_CHECK_MODULES], [AC_MSG_FAILURE([pkg-config was not found])])
 
 AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+
+case "$build_cpu" in
+	i[[3456]]86*)
+		build_arch="x86"
+		;;
+	amd64*|x86_64*)
+		build_arch="x86_64"
+		;;
+esac
+
 case "$host_os" in
 	cygwin)
-		TARGET=WIN32
+		DLL_EXT="dll"
+		FIRESHEEP_PLATFORM_NAME=WIN32
+		FIRESHEEP_PLATFORM="WINNT_x86-msvc"
 	;;
 	darwin*)
-		CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch i386 -mmacosx-version-min=10.5"
-		TARGET=OSX
+		DLL_EXT="dylib"
+		FIRESHEEP_PLATFORM_NAME=OSX
+		FIRESHEEP_PLATFORM="osx"
+		CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -mmacosx-version-min=10.6"
 	;;
 	linux*)
-		TARGET=LINUX
+		DLL_EXT="so"
+		FIRESHEEP_PLATFORM_NAME=LINUX
+		FIRESHEEP_PLATFORM="Linux_${build_arch}-gcc3"
 	;;
 esac
 
-AM_CONDITIONAL(PLATFORM_WIN32, test x$TARGET = xWIN32)
-AM_CONDITIONAL(PLATFORM_OSX, test x$TARGET = xOSX)
-AM_CONDITIONAL(PLATFORM_LINUX, test x$TARGET = xLINUX)
+AC_SUBST(DLL_EXT)
+AC_SUBST(FIRESHEEP_PLATFORM)
+AC_SUBST(FIRESHEEP_PLATFORM_NAME)
 
-# BEGIN MOZILLA STUFF (XULRUNNER SDK)
-# Mozilla doesn't provide pkg-config files for OSX, hence all this mess.
-
-if test x$TARGET = xOSX; then
-	AC_ARG_WITH([xulrunner-sdk],
-		[AS_HELP_STRING([--with-xulrunner-sdk=<path>], [path to xulrunner sdk])],
-		[xulrunner_sdk="$withval"],
-		[xulrunner_sdk=""])
-
-	if test x$TARGET = xWIN32; then
-	        xulrunner_sdk=`readlink -f $xulrunner_sdk`
-	fi
-	
-	AS_IF([test -d "$xulrunner_sdk"], [], [AC_MSG_FAILURE([Specify --with-xulrunner-sdk=<path>.])])
-
-	MOZ_SDK=$xulrunner_sdk
-	AC_SUBST(MOZ_SDK)
-
-	MOZ_PATH="${xulrunner_sdk}/bin"
-	AC_SUBST(MOZ_PATH)
-
-	AC_PATH_PROG([XPIDL], [xpidl], [no], [$MOZ_PATH:$PATH])
-	if test "x$XPIDL" = "xno"; then
-	        AC_MSG_ERROR([xpidl compiler not found])
-	fi
-	AC_SUBST(XPIDL)
-
-	XPIDL_FLAGS="-I ${xulrunner_sdk}/idl"
-	AC_SUBST(XPIDL_FLAGS)
-
-	MOZ_CFLAGS="-fshort-wchar -I${MOZ_SDK}/include"
-	AC_SUBST(MOZ_CFLAGS)
-
-	MOZ_LIBS="-L${MOZ_SDK}/lib -L${MOZ_SDK}/bin -Wl,-executable_path,${MOZ_SDK}/bin/xulrunner-bin -lxpcomglue_s -lxpcom -lplds4 -lplc4 -lnspr4 -lpthread -ldl"
-	AC_SUBST(MOZ_LIBS)
-else
-	PKG_CHECK_MODULES(MOZ, [libxul >= 1.9.2])
-	AC_SUBST(MOZ_CFLAGS)
-	AC_SUBST(MOZ_LIBS)
-
-	MOZ_SDK=`pkg-config libxul --variable=sdkdir`
-	AC_SUBST(MOZ_SDK)
-
-	MOZ_PATH="${MOZ_SDK}/bin"
-	AC_SUBST(MOZ_PATH)
-
-	XPIDL_FLAGS="-I ${MOZ_SDK}/idl"
-	AC_SUBST(XPIDL_FLAGS)
-
-	AC_PATH_PROG([XPIDL], [xpidl], [no], [$MOZ_PATH:$PATH])
-	if test "x$XPIDL" = "xno"; then
-		AC_MSG_ERROR([xpidl compiler not found])
-	fi
-	AC_SUBST(XPIDL)
-fi
-
-# END MOZILLA STUFF
+AM_CONDITIONAL(PLATFORM_WIN32, test x$FIRESHEEP_PLATFORM_NAME = xWIN32)
+AM_CONDITIONAL(PLATFORM_OSX, test x$FIRESHEEP_PLATFORM_NAME = xOSX)
+AM_CONDITIONAL(PLATFORM_LINUX, test x$FIRESHEEP_PLATFORM_NAME = xLINUX)
 
 # BEGIN PCAP LIBS
 AC_PATH_PROG([PCAP_CONFIG], [pcap-config], [no], [$PATH])
@@ -129,39 +99,24 @@ BOOST_STRING_ALGO
 AC_SUBST(BOOST_STRING_ALGO_LIBS)
 # END BOOST LIBS
 
-# BEGIN LINUX
-# Use generic CPU arch for xpi/platform
-# on Linux
-case "$build_cpu" in
-	i[[3456]]86*)
-		build_arch="x86"
-		build_target="-mtune=generic -m32"
-		;;
-	amd64*|x86_64*)
-		build_arch="x86_64"
-		build_target="-mtune=generic -m64"
-		;;
-esac
-
-BUILD_ARCH=$build_arch
-AC_SUBST(BUILD_ARCH)
-
-BUILD_TARGET=$build_target
-AC_SUBST(BUILD_TARGET)
-
-if test x$TARGET = xLINUX; then
-	PKG_CHECK_MODULES(HAL, [hal])
-	AC_SUBST(HAL_CFLAGS)
-	AC_SUBST(HAL_LIBS)
+if test x$FIRESHEEP_PLATFORM_NAME = xLINUX; then
+	PKG_CHECK_MODULES(UDEV, [libudev])
+	AC_SUBST(UDEV_CFLAGS)
+	AC_SUBST(UDEV_LIBS)
 fi
-# END LINUX
 
-AC_SUBST(CFLAGS)
+CXXFLAGS="-Wall -g -O0"
+AC_SUBST(CXXFLAGS)
 
 AC_CONFIG_FILES([
 Makefile
 backend/Makefile
-mozpopen/Makefile
 ])
 
 AC_OUTPUT
+
+echo "
+Firesheep-$VERSION
+
+    Platform:  ${FIRESHEEP_PLATFORM}
+"

@@ -1,5 +1,8 @@
 .DS_Store
-aclocal.m4
+*.m4
+libtool
+ltmain.sh
+depcomp
 autom4te.cache/*
 config.guess
 config.log
@@ -11,11 +14,16 @@ Makefile
 Makefile.in
 missing
 
+backend/backend
+backend/.libs
+backend/.deps
+backend/*.o
+backend/*.lo
+backend/*.la
+
 xpi/components
 xpi/backend
 xpi/platform
-mozpopen/MozPopen.h
-mozpopen/Debug
 
 build/
 

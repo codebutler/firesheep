@@ -24,18 +24,19 @@
 -->
 
 <overlay id="advancedPaneOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-  <prefpane id="advancedPane" label="Advanced" flex="1">
+  <prefpane id="advancedPane" label="Advanced">
     <preferences>
       <preference id="promiscPref" name="firesheep.promiscuous_mode" type="bool" />
       <preference id="filterPref" name="firesheep.capture_filter" type="string" />
     </preferences>
-
-    <groupbox>
-      <caption label="Capture" />
-      <hbox align="center">
-        <label control="filterTextBox" value="Filter:" />
-        <textbox id="filterTextBox" preference="filterPref" />
-      </hbox>
-    </groupbox>
+    <vbox id="advancedBox">
+      <groupbox>
+        <caption label="Capture" />
+        <hbox align="center">
+          <label control="filterTextBox" value="Filter:" />
+          <textbox id="filterTextBox" preference="filterPref" />
+        </hbox>
+      </groupbox>
+    </vbox>
   </prefpane>
 </overlay>

@@ -14,7 +14,7 @@ register({
 
   identifyUser: function () {
     var resp = this.httpGet(this.siteUrl);
-    this.userName   = resp.body.querySelector('#navAccountName').innerHTML;
-    this.userAvatar = resp.body.querySelector('#navAccountPic img').src;
+    this.userName   = resp.body.querySelector('.headerTinymanName').innerHTML;
+    this.userAvatar = resp.body.querySelector('.headerTinymanPhoto').src;
   }
 });

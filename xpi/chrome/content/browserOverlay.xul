@@ -29,17 +29,13 @@
 <overlay id="firesheep-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <script src="browserOverlay.js"/>
 
-  <stringbundleset id="stringbundleset">
-    <stringbundle id="firesheep-strings" src="chrome://firesheep/locale/overlay.properties"/>
-  </stringbundleset>
-
   <toolbarpalette id="BrowserToolbarPalette">
     <toolbarbutton 
       id="firesheep-toolbar-button" 
       class="toolbarbutton-1 chromeclass-toolbar-additional"
       label="&firesheepToolbarButton.label;" 
       tooltiptext="&firesheepToolbarButton.tooltip;"
-    oncommand="FiresheepUI.toggleSidebar()"/>
+      oncommand="FiresheepUI.toggleSidebar()"/>
   </toolbarpalette>
 
   <menupopup id="viewSidebarMenu">
@@ -51,14 +47,14 @@
   </keyset>
 
   <broadcasterset id="mainBroadcasterSet">
-    <broadcaster id="viewSidebar_firesheep"
-                 label="&firesheepSidebar.label;"
-                 autoCheck="false"
-                 type="checkbox"
-                 group="sidebar"
-                 sidebarurl="chrome://firesheep/content/sidebar.xul"
-                 sidebartitle="&firesheepSidebar.label;"
-                 oncommand="FiresheepUI.toggleSidebar()" />
+    <broadcaster
+      id="viewSidebar_firesheep"
+      label="&firesheepSidebar.label;"
+      autoCheck="false"
+      type="checkbox"
+      group="sidebar"
+      sidebarurl="chrome://firesheep/content/sidebar.xul"
+      sidebartitle="&firesheepSidebar.label;"
+      oncommand="FiresheepUI.toggleSidebar()" />
   </broadcasterset>
-
 </overlay>

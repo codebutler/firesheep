@@ -8,7 +8,8 @@ register({
 
   identifyUser: function () {
     var resp = this.httpGet(this.siteUrl);
-    this.userName = resp.body.querySelector('.username').textContent;
-    this.userAvatar = resp.body.querySelector('img.member-photo').src;
+    var photoElem = resp.body.querySelector('.member-photo');
+    this.userName = photoElem.alt;
+    this.userAvatar = photoElem.src;
   }
 });

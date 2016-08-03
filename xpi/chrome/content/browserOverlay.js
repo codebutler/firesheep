@@ -20,20 +20,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+Components.utils.import('resource://firesheep/util/Observers.js');
+Components.utils.import('resource://firesheep/Firesheep.js');
+Components.utils.import('resource://firesheep/util/Preferences.js');
+
 var FiresheepUI = {
   onLoad: function() {
-    if (this.initialized)
-      return;
-      
-    this.initialized = true;
-    this.strings = document.getElementById("firesheep-strings");
-    
-    var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-    if (prefs.getBoolPref('firesheep.first_run')) {
+    if (!Preferences.isSet('firesheep.first_run')) {
       toggleSidebar('viewSidebar_firesheep', true);
       var welcomeUrl = "http://codebutler.github.com/firesheep/welcome.html";
       window.gBrowser.selectedTab = window.gBrowser.addTab(welcomeUrl);
-      prefs.setBoolPref('firesheep.first_run', false);
+      Preferences.set('firesheep.first_run', false);
     }
   },
   
@@ -42,9 +39,20 @@ var FiresheepUI = {
   },
   
   showPrefs: function () {
-    var url = 'chrome://firesheep/content/preferences/prefsWindow.xul';
-    var features = 'chrome,titlebar,toolbar,centerscreen';
-    window.openDialog(url, "Preferences", features);
+    // https://wiki.mozilla.org/XUL:Windows#Preferences_Windows
+    
+    var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+    var instantApply = prefs.getBoolPref("browser.preferences.instantApply", false);
+    var features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
+
+    var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
+    var win = wm.getMostRecentWindow("Firesheep:Preferences");
+    if (win) {
+      win.focus();
+    } else {
+      var url = 'chrome://firesheep/content/preferences/prefsWindow.xul';
+      window.openDialog(url, "Firesheep Preferences", features);
+    }
   }
 };
 
