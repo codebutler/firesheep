@@ -18,9 +18,9 @@ Contributors:
 
 Start by grabbing the code using Git. If you're planning to contribute, fork the project on GitHub.
 
-    $ git clone https://github.com/codebutler/firesheep.git
-    $ cd firesheep
-    $ git submodule update --init
+    git clone https://github.com/codebutler/firesheep.git
+    cd firesheep
+    git submodule update --init
 
 See instructions for your platform below. When done, an xpi will be created inside the `build` directory. Load the extension into Firefox by dragging it into the Addons page.
 
